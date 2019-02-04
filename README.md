@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+1. Clone this repo.
+2. run flutter run - ``` alias fd='flutter run --enable-software-rendering --skia-deterministic-rendering ```
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
