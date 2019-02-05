@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 void main() {
   runApp(MyApp());
@@ -15,69 +16,174 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.blueAccent,
       ),
-      home: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: new FAB(),
-        //appBar: AppBar(),
+      home: new HomePage(),
+      routes: <String, WidgetBuilder>{
+        "/SecondPage": (BuildContext context) => new SecondPage(),
+      },
+    );
+  }
+}
 
-        body: SafeArea(
-          child: Container(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverPadding(
-                    padding: const EdgeInsets.all(8),
-                    sliver: SliverGrid.count(
-                      // Create a grid with 2 columns. If you change the scrollDirection to horizontal, this would produce 2 rows.
-                      crossAxisCount: 1,
-                      // Generate 100 Widgets that display their index in the List
-                      crossAxisSpacing: 0,
-                      children: List.generate(10, (index) {
-                        return ConstrainedBox(
-                          constraints: BoxConstraints.expand(height: 300),
-                          child: Card(
-                            elevation: 8,
-                            child: Container(
-                              margin: EdgeInsets.all(8),
-                              color: Colors.deepOrangeAccent,
-                              child: Center(
-                                child: Text(
-                                  'Ticket $index',
-                                  style: Theme.of(context).textTheme.headline,
-                                ),
+class HomePage extends StatelessWidget {
+  const HomePage({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Hero(tag: 'dash', child: new FAB()),
+      //appBar: AppBar(),
+
+      body: SafeArea(
+        child: Container(
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverPadding(
+                  padding: const EdgeInsets.all(8),
+                  sliver: SliverGrid.count(
+                    // Create a grid with 2 columns. If you change the scrollDirection to horizontal, this would produce 2 rows.
+                    crossAxisCount: 2,
+                    // Generate 100 Widgets that display their index in the List
+                    crossAxisSpacing: 0,
+                    children: List.generate(10, (index) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints.expand(height: 300),
+                        child: Card(
+                          elevation: 8,
+                          child: Container(
+                            margin: EdgeInsets.all(8),
+                            color: Colors.deepOrangeAccent,
+                            child: Center(
+                              child: Text(
+                                'Ticket \n$index',
+                                style: Theme.of(context).textTheme.headline,
                               ),
                             ),
                           ),
-                        );
-                      }),
-                    )),
-              ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.blueAccent,
-          elevation: 2,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.flight_takeoff),
-                color: Colors.white,
-                onPressed: () {
-                  print('Departure button pressed');//logs to console
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.flight_land),
-                color: Colors.white,
-                onPressed: () {
-                   print('Arrival button pressed');//logs to console
-                },
-              ),
+                        ),
+                      );
+                    }),
+                  )),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.blueAccent,
+        elevation: 2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            new DepartureButton(),
+            new ArrivalButton(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//Second Page
+class SecondPage extends StatelessWidget {
+  const SecondPage({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      //floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      //floatingActionButton: new FAB(),
+      //appBar: AppBar(),
+
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: Center(
+            child: Text('Payment Page'),
+          
+          ),
+          /*child: CustomScrollView(
+            slivers: <Widget>[
+              SliverPadding(
+                  padding: const EdgeInsets.all(8),
+                  sliver: SliverGrid.count(
+                    // Create a grid with 2 columns. If you change the scrollDirection to horizontal, this would produce 2 rows.
+                    crossAxisCount: 2,
+                    // Generate 100 Widgets that display their index in the List
+                    crossAxisSpacing: 0,
+                    children: List.generate(10, (index) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints.expand(height: 300),
+                        child: Card(
+                          elevation: 8,
+                          child: Container(
+                            margin: EdgeInsets.all(8),
+                            color: Colors.deepPurpleAccent,
+                            child: Center(
+                              child: Text(
+                                'Ticket \n$index',
+                                style: Theme.of(context).textTheme.headline,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  )),
+            ],
+          ),*/
+        ),
+      ),
+      /*bottomNavigationBar: BottomAppBar(
+        color: Colors.blueAccent,
+        elevation: 2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            new DepartureButton(),
+            new ArrivalButton(),
+          ],
+        ),
+      ),*/
+    );
+  }
+}
+
+class ArrivalButton extends StatelessWidget {
+  const ArrivalButton({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.flight_land),
+      color: Colors.white,
+      tooltip: 'Destination',
+      onPressed: () {
+        print('Arrival button pressed'); //logs to console
+      },
+    );
+  }
+}
+
+class DepartureButton extends StatelessWidget {
+  const DepartureButton({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.flight_takeoff),
+      color: Colors.white,
+      tooltip: 'Origin',
+      onPressed: () {
+        print('Departure button pressed'); //logs to console
+      },
     );
   }
 }
@@ -89,14 +195,20 @@ class FAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      foregroundColor: Colors.black,
-      backgroundColor: Colors.greenAccent[400],
-      onPressed: () {
-        print('Floating Action Button Pressed');
-      },
-      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Icon(Icons.monetization_on),
+    return Transform.rotate(
+      angle: -math.pi / 4,
+      child: FloatingActionButton(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.greenAccent[400],
+        tooltip: 'Pay',
+        onPressed: () {
+          Navigator.of(context).pushNamed("/SecondPage");
+          print('Floating Action Button Pressed');
+        },
+        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Transform.rotate(
+            angle: -math.pi / -4, child: Icon(Icons.monetization_on)),
+      ),
     );
   }
 }
