@@ -54,13 +54,7 @@ class HomePage extends StatelessWidget {
                           elevation: 8,
                           child: Container(
                             margin: EdgeInsets.all(8),
-                            color: Colors.deepOrangeAccent,
-                            child: Center(
-                              child: Text(
-                                'Ticket \n$index',
-                                style: Theme.of(context).textTheme.headline,
-                              ),
-                            ),
+                            child: custButtonScaffold(index, context),
                           ),
                         ),
                       );
@@ -83,6 +77,22 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  RaisedButton custButtonScaffold(int index, BuildContext context) {
+    return RaisedButton(
+      color: Colors.deepOrangeAccent,
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder:(_)=> new AlertDialog(
+            title: Text('AlertDialog'),
+            content: Text('Ticket $index Pressed'),
+          ),
+        );
+      },
+      child: Text('Ticket $index'),
+    );
+  }
 }
 
 //Second Page
@@ -103,7 +113,6 @@ class SecondPage extends StatelessWidget {
           color: Colors.white,
           child: Center(
             child: Text('Payment Page'),
-          
           ),
           /*child: CustomScrollView(
             slivers: <Widget>[
@@ -164,6 +173,10 @@ class ArrivalButton extends StatelessWidget {
       color: Colors.white,
       tooltip: 'Destination',
       onPressed: () {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('Arrival button Pressed'),
+          duration: Duration(),
+        ));
         print('Arrival button pressed'); //logs to console
       },
     );
@@ -182,6 +195,10 @@ class DepartureButton extends StatelessWidget {
       color: Colors.white,
       tooltip: 'Origin',
       onPressed: () {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('Departure button Pressed'),
+          duration: Duration(),
+        ));
         print('Departure button pressed'); //logs to console
       },
     );
@@ -203,6 +220,10 @@ class FAB extends StatelessWidget {
         tooltip: 'Pay',
         onPressed: () {
           Navigator.of(context).pushNamed("/SecondPage");
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text('Pay button Pressed'),
+            duration: Duration(),
+          ));
           print('Floating Action Button Pressed');
         },
         shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
