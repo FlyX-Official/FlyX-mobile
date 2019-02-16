@@ -1,7 +1,11 @@
-# wefly
+# wefly_flutter
 
 A new Flutter project.
-
+```
+1. Clone this repo.
+2. cd WeFly-Flutter/
+3. Run ->  flutter run --enable-software-rendering --skia-deterministic-rendering 
+```
 ## Getting Started
 
 This project is a starting point for a Flutter application.
