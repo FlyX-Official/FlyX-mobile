@@ -35,7 +35,8 @@ class FABBottomAppBar extends StatefulWidget {
 }
 
 class FABBottomAppBarState extends State<FABBottomAppBar> {
-  int _selectedIndex = 0;
+   var _scaffoldKey = new GlobalKey<ScaffoldState>();
+  int _selectedIndex = 2;
 
   _updateIndex(int index) {
     widget.onTabSelected(index);
@@ -50,11 +51,11 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
       return _buildTabItem(
         item: widget.items[index],
         index: index,
-        onPressed: _updateIndex,
+        onPressed:_updateIndex,
       );
     });
     items.insert(items.length >> 1, _buildMiddleTabItem());
-
+  
     return BottomAppBar(
       shape: widget.notchedShape,
       child: Row(

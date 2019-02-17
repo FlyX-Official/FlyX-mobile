@@ -34,6 +34,7 @@ class _FloatActBttnState extends State<FloatActBttn>
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: new AppDrawer(),
+
       body: Center(
         child: Text(
           _lastSelected,
@@ -49,7 +50,6 @@ class _FloatActBttnState extends State<FloatActBttn>
 
   FABBottomAppBar buildFabBottomAppBar() {
     return FABBottomAppBar(
-      centerItemText: 'A',
       color: Colors.grey,
       selectedColor: Colors.red,
       notchedShape: CircularNotchedRectangle(),
