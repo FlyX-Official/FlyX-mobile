@@ -8,7 +8,8 @@
 .buildlog/
 .history
 .svn/
-lib/LoginPage/login_page.dart
+
+
 # IntelliJ related
 *.iml
 *.ipr

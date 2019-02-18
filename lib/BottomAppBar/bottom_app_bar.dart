@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefly/SideBar/AppDrawer.dart';
+import 'package:wefly/TicketDisplayer/ticketViewer.dart';
 import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart';
 
 class BttmAppBar extends StatefulWidget {
@@ -15,6 +16,7 @@ class _BttmAppBarState extends State<BttmAppBar> {
     return new Scaffold(
       key: _scaffoldKey,
       drawer: new AppDrawer(),
+      body: TicketView(),
       floatingActionButton: _buildFab(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomAppBar(),
