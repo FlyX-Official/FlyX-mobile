@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:wefly/TicketDisplayer/ticketCard.dart';
 //import 'package:wefly/TicketDisplayer/testTicket.dart';
-
+import 'package:wefly/TicketDisplayer/ticket.dart';
 
 class TicketView extends StatelessWidget {
   // This widget is the root of your application.
@@ -37,6 +37,7 @@ class _TicketViewPageState extends State<TicketViewPage> {
       data = extractdata["tickets"];
       
     });
+  
   }
 
   @override
