@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefly/profile/profile.dart';
 
 class AppDrawer extends StatefulWidget{
   static String tag = 'AppDrawer';
@@ -65,7 +66,7 @@ class _AppDrawerState extends State<AppDrawer>{
                             ),
                     ),
                   onTap: (){
-                    Navigator.pop(context);
+                    Navigator.of(context).pushNamed(Profile.tag);
                   },
                   leading: Icon(Icons.person_add),
                 ),
