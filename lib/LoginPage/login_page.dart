@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart';
 import 'package:wefly/SideBar/AppDrawer.dart';
+import 'package:wefly/BottomAppBar/bottom_app_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wefly/style/theme.dart' as Theme;
 //import 'package:wefly_flutter/utils/bubble_indication_painter.dart';
@@ -47,75 +48,78 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      key: _scaffoldKey,
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowGlow();
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height >= 775.0
-                ? MediaQuery.of(context).size.height
-                : 775.0,
-            decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Theme.Colors.loginGradientStart,
-                    Theme.Colors.loginGradientEnd
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  tileMode: TileMode.clamp),
-              color: Colors.grey,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 75.0),
-                  child: new Image(
-                      width: 256.0,
-                      height: 256.0,
-                      color: Color.fromARGB(0, 0, 0, 0),
-                      fit: BoxFit.fill,
-                      image: new AssetImage('assets/img/login_logo.png')),
-                ),
-                /* Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: _buildMenuBar(context),
-                ),*/
-                Expanded(
-                  flex: 2,
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (i) {
-                      if (i == 0) {
-                        setState(() {
-                          right = Colors.white;
-                          left = Colors.black;
-                        });
-                      } else if (i == 1) {
-                        setState(() {
-                          right = Colors.black;
-                          left = Colors.white;
-                        });
-                      }
-                    },
-                    children: <Widget>[
-                      new ConstrainedBox(
-                        constraints: const BoxConstraints.expand(),
-                        child: _buildSignIn(context),
-                      ),
-                      new ConstrainedBox(
-                        constraints: const BoxConstraints.expand(),
-                        child: _buildSignUp(context),
-                      ),
+    return SafeArea(
+      child: new Scaffold(
+        
+        key: _scaffoldKey,
+        body: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (overscroll) {
+            overscroll.disallowGlow();
+          },
+          child: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height >= 675.0
+                  ? MediaQuery.of(context).size.height
+                  : 675.0,
+              decoration: new BoxDecoration(
+                gradient: new LinearGradient(
+                    colors: [
+                      Theme.Colors.loginGradientStart,
+                      Theme.Colors.loginGradientEnd
                     ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    tileMode: TileMode.clamp),
+                color: Colors.grey,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 75.0),
+                    child: new Image(
+                        width: 256.0,
+                        height: MediaQuery.of(context).size.height * .2,
+                        color: Color.fromARGB(0, 0, 0, 0),
+                        fit: BoxFit.fill,
+                        image: new AssetImage('assets/img/login_logo.png')),
                   ),
-                ),
-              ],
+                  /* Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: _buildMenuBar(context),
+                  ),*/
+                  Expanded(
+                    flex: 2,
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (i) {
+                        if (i == 0) {
+                          setState(() {
+                            right = Colors.white;
+                            left = Colors.black;
+                          });
+                        } else if (i == 1) {
+                          setState(() {
+                            right = Colors.black;
+                            left = Colors.white;
+                          });
+                        }
+                      },
+                      children: <Widget>[
+                        new ConstrainedBox(
+                          constraints: const BoxConstraints.expand(),
+                          child: _buildSignIn(context),
+                        ),
+                        new ConstrainedBox(
+                          constraints: const BoxConstraints.expand(),
+                          child: _buildSignUp(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -152,100 +156,47 @@ class _LoginPageState extends State<LoginPage>
         value,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-            fontFamily: "Nunito"),
+            color: Colors.white, fontSize: 16.0, fontFamily: "Nunito"),
       ),
       backgroundColor: Colors.blue,
       duration: Duration(seconds: 3),
     ));
   }
 
-  /* Widget _buildMenuBar(BuildContext context) {
-    return Container(
-      width: 300.0,
-      height: 50.0,
-      decoration: BoxDecoration(
-        color: Color(0x552B2B2B),
-        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-      ),
-      child: CustomPaint(
-        painter: TabIndicationPainter(pageController: _pageController),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: _onSignInButtonPress,
-                child: Text(
-                  "Existing",
-                  style: TextStyle(
-                      color: left,
-                      fontSize: 16.0,
-                      fontFamily: "Nunito"),
-                ),
-              ),
-            ),
-            //Container(height: 33.0, width: 1.0, color: Colors.white),
-            Expanded(
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: _onSignUpButtonPress,
-                child: Text(
-                  "New",
-                  style: TextStyle(
-                      color: right,
-                      fontSize: 16.0,
-                      fontFamily: "Nunito"),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-*/
   Widget _buildSignIn(BuildContext context) {
     var children2 = <Widget>[
-              RaisedButton(
-                color: Colors.white,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-                child: new Icon(
-                  FontAwesomeIcons.google,
-                ),
-                onPressed: () => showInSnackBar("Google button pressed"),
-              ),
-              RaisedButton(
-                color: Colors.white,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-                child: new Icon(
-                  FontAwesomeIcons.facebookF,
-                ),
-                onPressed: () => showInSnackBar("Facebook button pressed"),
-              ),
-              RaisedButton(
-                color: Colors.white,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-                child: new Icon(
-                  FontAwesomeIcons.twitter,
-                ),
-                onPressed: () => showInSnackBar("Twitter button pressed"),
-              ),
-            ];
+      RaisedButton(
+        color: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: new Icon(
+          FontAwesomeIcons.google,
+        ),
+        onPressed: () => showInSnackBar("Google button pressed"),
+      ),
+      RaisedButton(
+        color: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: new Icon(
+          FontAwesomeIcons.facebookF,
+        ),
+        onPressed: () => showInSnackBar("Facebook button pressed"),
+      ),
+      RaisedButton(
+        color: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: new Icon(
+          FontAwesomeIcons.twitter,
+        ),
+        onPressed: () => showInSnackBar("Twitter button pressed"),
+      ),
+    ];
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16),
       decoration: new BoxDecoration(
-        color: Color.fromARGB(190, 73, 144, 226),
+        color: Color.fromARGB(255, 73, 144, 226),
         shape: BoxShape.rectangle,
         borderRadius: new BorderRadius.horizontal(
           left: Radius.circular(16.0),
@@ -294,8 +245,8 @@ class _LoginPageState extends State<LoginPage>
                               size: 22.0,
                             ),
                             hintText: "Email Address",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 17.0),
+                            hintStyle:
+                                TextStyle(fontFamily: "Nunito", fontSize: 17.0),
                           ),
                         ),
                       ),
@@ -323,8 +274,8 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Password",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 17.0),
+                            hintStyle:
+                                TextStyle(fontFamily: "Nunito", fontSize: 17.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleLogin,
                               child: Icon(
@@ -380,16 +331,16 @@ class _LoginPageState extends State<LoginPage>
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
-                      child: Text(
-                        "LOGIN",
-                        style: TextStyle(
+                      child: Text("LOGIN",
+                          style: TextStyle(
                             color: Colors.black,
                             fontSize: 25.0,
-                            fontFamily: "Nunito",)
-                      ),
+                            fontFamily: "Nunito",
+                          )),
                     ),
                     onPressed: () {
-                     Navigator.of(context).pushNamed(FloatActBttn.tag);
+                      //Navigator.of(context).pushNamed(FloatActBttn.tag);
+                      Navigator.of(context).pushNamed(BttmAppBar.tag);
                     }),
               ),
             ],
@@ -441,7 +392,7 @@ class _LoginPageState extends State<LoginPage>
                         stops: [0.0, 1.0],
                         tileMode: TileMode.clamp),
                   ),
-                  width: 200.0,
+                  width: 180.0,
                   height: 1.0,
                 ),
               ],
@@ -469,7 +420,7 @@ class _LoginPageState extends State<LoginPage>
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16),
       decoration: new BoxDecoration(
-        color: Color.fromARGB(190, 73, 144, 226),
+        color: Color.fromARGB(255, 73, 144, 226),
         shape: BoxShape.rectangle,
         borderRadius: new BorderRadius.horizontal(
           right: Radius.circular(16.0),
@@ -519,8 +470,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                               hintText: "Name",
                               hintStyle: TextStyle(
-                                  fontFamily: "Nunito",
-                                  fontSize: 16.0),
+                                  fontFamily: "Nunito", fontSize: 16.0),
                             ),
                           ),
                         ),
@@ -548,8 +498,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                               hintText: "Email Address",
                               hintStyle: TextStyle(
-                                  fontFamily: "Nunito",
-                                  fontSize: 16.0),
+                                  fontFamily: "Nunito", fontSize: 16.0),
                             ),
                           ),
                         ),
@@ -577,8 +526,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                               hintText: "Password",
                               hintStyle: TextStyle(
-                                  fontFamily: "Nunito",
-                                  fontSize: 16.0),
+                                  fontFamily: "Nunito", fontSize: 16.0),
                               suffixIcon: GestureDetector(
                                 onTap: _toggleSignup,
                                 child: Icon(
@@ -613,8 +561,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                               hintText: "Confirmation",
                               hintStyle: TextStyle(
-                                  fontFamily: "Nunito",
-                                  fontSize: 16.0),
+                                  fontFamily: "Nunito", fontSize: 16.0),
                               suffixIcon: GestureDetector(
                                 onTap: _toggleSignupConfirm,
                                 child: Icon(

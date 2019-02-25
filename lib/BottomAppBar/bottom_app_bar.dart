@@ -14,6 +14,7 @@ class _BttmAppBarState extends State<BttmAppBar> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Color.fromARGB(255, 251, 108, 112),
       key: _scaffoldKey,
       drawer: new AppDrawer(),
       body: TicketView(),
@@ -25,6 +26,7 @@ class _BttmAppBarState extends State<BttmAppBar> {
 
   BottomAppBar _buildBottomAppBar() {
     return BottomAppBar(
+      
       shape: CircularNotchedRectangle(),
       child: new Row(
         mainAxisSize: MainAxisSize.max,
@@ -56,7 +58,7 @@ class _BttmAppBarState extends State<BttmAppBar> {
             color: Colors.green,
             highlightColor: Colors.redAccent,
             onPressed: () {
-              _scaffoldKey.currentState.openDrawer();
+             // _scaffoldKey.currentState.openDrawer();
             },
           ),
           IconButton(
@@ -81,6 +83,7 @@ Widget _buildFab(BuildContext context) {
     tooltip: 'fab',
     elevation: 4.0,
     //shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    child: Icon(Icons.monetization_on),
+    child: Icon(Icons.search),
+    
   );
 }
