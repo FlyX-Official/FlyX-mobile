@@ -43,24 +43,6 @@ class _AppDrawerState extends State<AppDrawer> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-<<<<<<< HEAD
-                ),
-                ListTile(
-                  title: Text("Data 2",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                    ),
-                  onTap: (){
-                    Navigator.of(context).pushNamed(Profile.tag);
-=======
-                  onTap: () {
-                    Navigator.pop(context);
->>>>>>> 24a6bca55256cb5ffee115dc0fab77b27baa67a7
-                  },
-                  leading: Icon(Icons.open_in_new),
                 ),
               ),
               ListTile(
@@ -76,6 +58,20 @@ class _AppDrawerState extends State<AppDrawer> {
                   Navigator.pop(context);
                 },
                 leading: Icon(Icons.person_add),
+              ),
+              ListTile(
+                title: Text(
+                  "Data 2",
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed(Profile.tag);
+                },
+                leading: Icon(Icons.open_in_new),
               ),
               ListTile(
                 title: Text(
