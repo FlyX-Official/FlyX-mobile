@@ -18,8 +18,11 @@ class _ProfileState extends State<Profile> with TickerProviderStateMixin {
 
   // initialize values for dropdonw menu
   String _value = null;
-  List<String> _values = new List<String>();
+  String _preferredCity = null;
 
+
+  List<String> _values = new List<String>();
+  List<String> _preferredCities = new List<String>();
 
   
   Widget build(BuildContext context) {
@@ -39,13 +42,30 @@ class _ProfileState extends State<Profile> with TickerProviderStateMixin {
   }
   @override
   void initState(){
+    /* populate all the data for the profile page */
+
+
+    // initialize the dropdown with values
     _values.addAll(["Dollars","Euros","Pesos (MX)"]);
+    // initialize the default value
+    /* modify this to save the state if changed*/
     _value = _values.elementAt(0);
+
+    
+    _preferredCities.addAll(["LAX","SFO","JFK"]);
+    _preferredCity =  _preferredCities.elementAt(0);
+
   }
 
   void _onChanged(String value){
     setState(() {
       _value =value;
+    });
+  }
+
+  void _onChangedPreferredCity(String value){
+    setState(() {
+      _preferredCity =value;
     });
   }
 
@@ -150,11 +170,37 @@ class _ProfileState extends State<Profile> with TickerProviderStateMixin {
                   );
                 }).toList(),
                 onChanged: (String value){_onChanged(value);},
-              ),
-            ],
-          ),
-        ],
-            )
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          new Column(
+              children: [
+          new Column(
+            children: <Widget>[
+              Text("Local Airport Preferred"),
+              new DropdownButton(
+                value: _preferredCity,
+                items: _preferredCities.map((String value){
+                  return new DropdownMenuItem<String>(
+                    value: value,
+                    child: new Row(
+                      children: <Widget>[
+                        new Icon(Icons.location_city),
+                        new Text('${value}')
+                      ],
+                    ),
+                    //child: Text("data"),
+                  );
+                }).toList(),
+                onChanged: (String value){_onChangedPreferredCity(value);},
+                    ),
+                  ],
+                ),
+              ],            
+          )
+
           ]
 
         ),
@@ -163,66 +209,3 @@ class _ProfileState extends State<Profile> with TickerProviderStateMixin {
   }
 }
 
-
-
-// class profilePage extends StatelessWidget{
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Scaffold(
-//       body:new SafeArea(
-//         child: ListView(
-//           children:<Widget>[
-//             SizedBox(height: 80.0,),
-//             Column(
-//               children: <Widget>[
-//                 Container(
-//                   width: 190.0,
-//                   height: 190.0,
-//                   decoration: new BoxDecoration(
-//                       shape: BoxShape.circle,
-//                       image: new DecorationImage(
-//                       fit: BoxFit.fill,
-//                       image: new NetworkImage(
-//                             "https://picsum.photos/250?image=9")
-//                             )
-//                   )
-//                 ),
-//                 Container(
-//                   decoration: BoxDecoration(
-//                     border: Border.all(
-//                       width: 10, 
-//                       color: Colors.transparent
-//                       )
-//                   ),
-//                   child:
-//                     Text("John Doe",style: TextStyle(
-//                     fontSize: 24.0,
-//                     color: Colors.black,
-//                     fontWeight: FontWeight.bold,
-//                     fontFamily: 'Arial'
-//                   ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//             Column(
-//               children: [
-//           new Column(
-//             children: <Widget>[
-//               Text("Currency Preferred"),
-//               new DropdownButton<String>(
-//                 items: null,
-//                 onChanged: (String value){_onChange},
-//               ),
-//             ],
-//           ),
-//         ],
-//             )
-//           ]
-
-//         ),
-//       )
-//     );
-//   }
-
-// }
