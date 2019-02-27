@@ -62,7 +62,7 @@ class _BttmAppBarState extends State<BttmAppBar> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.account_box),
             color: Colors.orange,
             highlightColor: Colors.redAccent,
             onPressed: () {
