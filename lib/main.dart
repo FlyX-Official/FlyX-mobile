@@ -5,6 +5,7 @@ import 'package:wefly/LoginPage/login_page.dart';
 import 'package:wefly/SideBar/AppDrawer.dart';
 import 'package:wefly/TicketDisplayer/ticketViewer.dart';
 import 'package:wefly/profile/profile.dart';
+import 'package:wefly/settings/settings.dart';
 // End of Local files
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
     BttmAppBar.tag: (context) => BttmAppBar(),
     TicketView.tag: (context) => TicketView(),
     Profile.tag: (context) => Profile(),
+    Settings.tag: (context) => Settings(),
   };
   @override
   Widget build(BuildContext context) {
