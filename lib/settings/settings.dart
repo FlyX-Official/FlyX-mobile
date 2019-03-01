@@ -23,37 +23,32 @@ class _Settings extends State<Settings> {
       body: _Body(context),
     );
   }
+  // variables
+  bool _mode =true;
+
 
   // functions
 
   // function to run as soon as app opens
   void initState() {}
 
+
+  // Widgets
   Widget _Body(BuildContext context) {
-    return new Scaffold(
-      body: new SafeArea(
-        child: ListView(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Text("data")
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    Text("data 2")
-                  ],
+    return ListView(
+      children: <Widget>[
+        Text("Switch"),
+        Center(
+          child: Switch(
+            onChanged: (bool mode){
+              setState(() => this._mode = mode);
+            },
+            value: this._mode,
+          ),
+        )
+      ],
+    );
 
-                )
-              ],
-            ),
-            Row(
-
-            )
-          ],
-        ),
-    ));
   }
+
 }
