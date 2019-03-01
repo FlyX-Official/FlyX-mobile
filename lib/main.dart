@@ -5,6 +5,7 @@ import 'package:wefly/LoginPage/login_page.dart';
 import 'package:wefly/SideBar/AppDrawer.dart';
 import 'package:wefly/TicketDisplayer/ticketViewer.dart';
 import 'package:wefly/profile/profile.dart';
+import 'package:wefly/InputPage/inputForm.dart';
 // End of Local files
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
     BttmAppBar.tag: (context) => BttmAppBar(),
     TicketView.tag: (context) => TicketView(),
     Profile.tag: (context) => Profile(),
+    InputForm.tag: (context) => InputForm(),
   };
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),//BttmAppBar(),
+      home: LoginPage(),//BttmAppBar(),//InputForm(),
       routes: routes,
     );
   }
