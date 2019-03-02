@@ -41,10 +41,10 @@ class _BttmAppBarState extends State<BttmAppBar> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.layers),
+            icon: Icon(Icons.edit_location),
             color: Colors.blue,
             highlightColor: Colors.redAccent,
-            onPressed: () {},
+            onPressed: () { Navigator.of(context).pushNamed(InputForm.tag);},
           ),
           SizedBox(
             height: 60,
@@ -54,11 +54,11 @@ class _BttmAppBarState extends State<BttmAppBar> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.map),
+            icon: Icon(Icons.notifications),
             color: Colors.green,
             highlightColor: Colors.redAccent,
             onPressed: () {
-             Navigator.of(context).pushNamed(InputForm.tag);
+            
              // _scaffoldKey.currentState.openDrawer();
             },
           ),

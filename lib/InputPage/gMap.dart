@@ -18,13 +18,17 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        height: MediaQuery.of(context).size.height,
+    return Card(
+      elevation: 8,
+          child: Container(
+        height: MediaQuery.of(context).size.height*.50,
         width: MediaQuery.of(context).size.width,
+        margin: EdgeInsets.all(8),
         child: GoogleMap(
           onMapCreated: _onMapCreated,
           initialCameraPosition: _buildCameraPosition(),
+          //mapType: MapType.hybrid,
+          compassEnabled: true,
         ),
       ),
     );

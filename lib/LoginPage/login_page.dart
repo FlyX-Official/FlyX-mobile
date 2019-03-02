@@ -6,6 +6,7 @@ import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart'
 import 'package:wefly/SideBar/AppDrawer.dart';
 import 'package:wefly/BottomAppBar/bottom_app_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:wefly/InputPage/inputForm.dart';
 import 'package:wefly/style/theme.dart' as Theme;
 //import 'package:wefly_flutter/utils/bubble_indication_painter.dart';
 
@@ -50,7 +51,6 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     return SafeArea(
       child: new Scaffold(
-        
         key: _scaffoldKey,
         body: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
@@ -302,27 +302,6 @@ class _LoginPageState extends State<LoginPage>
                         blurRadius: 20.0,
                         offset: Offset(1.0, 10.0))
                   ],
-                  /*  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
-                      offset: Offset(1.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                    BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
-                      offset: Offset(.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                  ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),*/
                 ),
                 child: MaterialButton(
                     highlightColor: Colors.transparent,
@@ -340,7 +319,7 @@ class _LoginPageState extends State<LoginPage>
                     ),
                     onPressed: () {
                       //Navigator.of(context).pushNamed(FloatActBttn.tag);
-                      Navigator.of(context).pushNamed(BttmAppBar.tag);
+                      Navigator.of(context).pushNamed(InputForm.tag);
                     }),
               ),
             ],
