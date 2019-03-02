@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefly/TicketDisplayer/ticket.dart';
+import 'package:flyx/TicketDisplayer/ticket.dart';
 
 class TicketListViewBuilder extends StatelessWidget {
   //final Ticket ticket;

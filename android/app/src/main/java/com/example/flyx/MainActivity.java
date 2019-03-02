@@ -1,4 +1,4 @@
-package com.example.wefly;
+package com.example.flyx;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

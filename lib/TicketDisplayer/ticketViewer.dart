@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:wefly/TicketDisplayer/ticketCard.dart';
-//import 'package:wefly/TicketDisplayer/testTicket.dart';
-import 'package:wefly/TicketDisplayer/ticket.dart';
+import 'package:flyx/TicketDisplayer/ticketCard.dart';
+//import 'package:flyx/TicketDisplayer/testTicket.dart';
+import 'package:flyx/TicketDisplayer/ticket.dart';
 
 class TicketView extends StatelessWidget {
   // This widget is the root of your application.

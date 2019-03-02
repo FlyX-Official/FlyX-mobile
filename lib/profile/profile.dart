@@ -1,7 +1,7 @@
-//import 'package:wefly/FloatingActionButton/fab_with_icons.dart';
-import 'package:wefly/FloatingActionButton/fab_bottom_app_bar.dart';
-import 'package:wefly/FloatingActionButton/layout.dart';
-import 'package:wefly/SideBar/AppDrawer.dart';
+//import 'package:flyx/FloatingActionButton/fab_with_icons.dart';
+import 'package:flyx/FloatingActionButton/fab_bottom_app_bar.dart';
+import 'package:flyx/FloatingActionButton/layout.dart';
+import 'package:flyx/SideBar/AppDrawer.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatefulWidget {

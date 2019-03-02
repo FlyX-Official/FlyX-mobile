@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:wefly/InputPage/gMap.dart';
-import 'package:wefly/BottomAppBar/bottom_app_bar.dart';
+import 'package:flyx/InputPage/gMap.dart';
+import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 
 class InputForm extends StatefulWidget {

@@ -1,15 +1,19 @@
 import 'dart:ui';
 import 'dart:async';
 
-import 'package:local_auth/local_auth.dart';
-import 'package:wefly/Biometrics/bioAuth.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:local_auth/local_auth.dart';
+import 'package:flyx/Biometrics/bioAuth.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:wefly/InputPage/inputForm.dart';
-import 'package:wefly/style/theme.dart' as Theme;
-//import 'package:wefly_flutter/utils/bubble_indication_painter.dart';
+import 'package:flyx/InputPage/inputForm.dart';
+import 'package:flyx/style/theme.dart' as Theme;
+//import 'package:flyx_flutter/utils/bubble_indication_painter.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "882535873724",
+    "firebase_url": "https://flyx-1551400318222.firebaseio.com",
+    "project_id": "flyx-1551400318222",
+    "storage_bucket": "flyx-1551400318222.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882535873724:android:a16c1d05abd510dc",
+        "android_client_info": {
+          "package_name": "com.example.flyx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "882535873724-p9nrskjguqaot5f2kpmb9939skqgg29a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flyx",
+            "certificate_hash": "b7d437b1bbfc1e5737b0fcdc98de9ab0cee335db"
+          }
+        },
+        {
+          "client_id": "882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTiueAqzT0tG56sIQi5SUgcGDP6MfQppI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

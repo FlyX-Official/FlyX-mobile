@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefly/profile/profile.dart';
+import 'package:flyx/profile/profile.dart';
 
 class AppDrawer extends StatefulWidget {
   static String tag = 'AppDrawer';
