@@ -8,10 +8,13 @@ PODS:
   - GoogleMaps/Base (2.7.0)
   - GoogleMaps/Maps (2.7.0):
     - GoogleMaps/Base
+  - local_auth (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
+  - local_auth (from `.symlinks/plugins/local_auth/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -22,11 +25,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/flutter/ios"
   google_maps_flutter:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
+  local_auth:
+    :path: ".symlinks/plugins/local_auth/ios"
 
 SPEC CHECKSUMS:
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   google_maps_flutter: 924970f41ec509a201b593548db005efb2a09ee9
   GoogleMaps: f79af95cb24d869457b1f961c93d3ce8b2f3b848
+  local_auth: 17f985934bb4ab2637431e5b3fe1b2d6698d2051
 
 PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
 

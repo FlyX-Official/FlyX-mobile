@@ -1,10 +1,11 @@
 import 'dart:ui';
+import 'dart:async';
+
+import 'package:local_auth/local_auth.dart';
+import 'package:wefly/Biometrics/bioAuth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart';
-import 'package:wefly/SideBar/AppDrawer.dart';
-import 'package:wefly/BottomAppBar/bottom_app_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wefly/InputPage/inputForm.dart';
 import 'package:wefly/style/theme.dart' as Theme;
@@ -46,7 +47,8 @@ class _LoginPageState extends State<LoginPage>
 
   Color left = Colors.black;
   Color right = Colors.white;
-
+  final LocalAuthentication auth = LocalAuthentication();
+  String _authorized = 'Not Authorized';
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -304,23 +306,25 @@ class _LoginPageState extends State<LoginPage>
                   ],
                 ),
                 child: MaterialButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
-                    //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
-                      child: Text("LOGIN",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25.0,
-                            fontFamily: "Nunito",
-                          )),
-                    ),
-                    onPressed: () {
-                      //Navigator.of(context).pushNamed(FloatActBttn.tag);
+                  highlightColor: Colors.transparent,
+                  splashColor: Theme.Colors.loginGradientEnd,
+                  //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 42.0),
+                    child: Text("LOGIN",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25.0,
+                          fontFamily: "Nunito",
+                        )),
+                  ),
+                  onPressed:
+                      _authenticate, /*() {
+                     //Navigator.of(context).pushNamed(FloatActBttn.tag);
                       Navigator.of(context).pushNamed(InputForm.tag);
-                    }),
+                    }*/
+                ),
               ),
             ],
           ),
@@ -348,17 +352,6 @@ class _LoginPageState extends State<LoginPage>
                   width: 200.0,
                   height: 1.0,
                 ),
-                /*Padding(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                  child: Text(
-                    "OR",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontFamily: "Nunito"),
-                  ),
-                ),*/
-
                 Container(
                   decoration: BoxDecoration(
                     gradient: new LinearGradient(
@@ -567,28 +560,6 @@ class _LoginPageState extends State<LoginPage>
                           blurRadius: 20.0,
                           offset: Offset(1.0, 10.0))
                     ],
-                    /* borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: Theme.Colors.loginGradientStart,
-                        offset: Offset(1.0, 6.0),
-                        blurRadius: 20.0,
-                      ),
-                      BoxShadow(
-                        color: Theme.Colors.loginGradientEnd,
-                        offset: Offset(1.0, 6.0),
-                        blurRadius: 20.0,
-                      ),
-                    ],
-                    gradient: new LinearGradient(
-                        colors: [
-                          Theme.Colors.loginGradientEnd,
-                          Theme.Colors.loginGradientStart
-                        ],
-                        begin: const FractionalOffset(0.2, 0.2),
-                        end: const FractionalOffset(1.0, 1.0),
-                        stops: [0.0, 1.0],
-                        tileMode: TileMode.clamp),*/
                   ),
                   child: MaterialButton(
                       highlightColor: Colors.transparent,
@@ -640,6 +611,25 @@ class _LoginPageState extends State<LoginPage>
   void _toggleSignupConfirm() {
     setState(() {
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
+    });
+  }
+
+  Future<void> _authenticate() async {
+    bool authenticated = false;
+    try {
+      authenticated = await auth.authenticateWithBiometrics(
+          localizedReason: 'Scan your fingerprint to authenticate',
+          useErrorDialogs: true,
+          stickyAuth: false);
+    } on PlatformException catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+    if (authenticated) {
+      Navigator.of(context).pushNamed(InputForm.tag);
+    }
+    setState(() {
+      _authorized = authenticated ? 'Authorized' : 'Not Authorized';
     });
   }
 }
