@@ -18,12 +18,13 @@ class _InputFormState extends State<InputForm> {
   var _fromSlider = 1;
   var _toSlider = 1; // Initial Slider Value
   @override
-  Widget build(BuildContext context)  {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        color: Colors.blue,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Column(
               //alignment: Alignment.bottomCenter,
@@ -46,18 +47,26 @@ class _InputFormState extends State<InputForm> {
                   ],
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Container(
                       child: buildFromSlider(),
                     ),
                     Container(
-                  child: buildToSlider(),
-                ),
+                      child: buildToSlider(),
+                    ),
                   ],
                 ),
-                
-                Container(
-                  child: new Cal(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: new Cal(),
+                    ),
+                    Container(
+                      child: new Cal(),
+                    ),
+                  ],
                 ),
                 Container(
                   child: buildMaterialButton(context),
@@ -75,58 +84,84 @@ class _InputFormState extends State<InputForm> {
       width: MediaQuery.of(context).size.width * .5,
       child: Card(
         elevation: 8,
-        child: Slider(
-          value: _fromSlider.toDouble(),
-          min: 1.0,
-          max: 50.0,
-          divisions: 10,
-          label: '$_fromSlider',//var _toSlider = 1;,
-          onChanged: (double newValue) {
-            setState(() {
-              _fromSlider = newValue.round();
-            });
-          },
-        ),
-      ),
-    );
-  }
-   Container buildToSlider() {
-    return Container(
-      width: MediaQuery.of(context).size.width * .5,
-      child: Card(
-        elevation: 8,
-        child: Slider(
-          value: _toSlider.toDouble(),
-          min: 1.0,
-          max: 50.0,
-          divisions: 10,
-          label: '$_toSlider',
-          onChanged: (double newValue) {
-            setState(() {
-              _toSlider = newValue.round();
-            });
-          },
+        child: Padding(
+          padding: EdgeInsets.all(25),
+          child: Column(
+            children: <Widget>[
+              Text("Origin Airport Radius"),
+              Container(
+                // width: MediaQuery.of(context).size.width * .5,
+                child: Slider(
+                  value: _fromSlider.toDouble(),
+                  min: 1.0,
+                  max: 50.0,
+                  divisions: 10,
+                  label: '$_fromSlider', //var _toSlider = 1;,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      _fromSlider = newValue.round();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  MaterialButton buildMaterialButton(BuildContext context) {
-    return MaterialButton(
-        highlightColor: Colors.transparent,
-        color: Colors.blue,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        child: Text("Search",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 25.0,
-              fontFamily: "Nunito",
-            )),
-        onPressed: () {
-          //Navigator.of(context).pushNamed(FloatActBttn.tag);
-          Navigator.of(context).pushNamed(BttmAppBar.tag);
-        });
+  Container buildToSlider() {
+    return Container(
+      width: MediaQuery.of(context).size.width * .5,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25),
+          child: Column(
+            children: <Widget>[
+              Text("Destination Airport Radius"),
+              Container(
+                child: Slider(
+                  value: _toSlider.toDouble(),
+                  min: 1.0,
+                  max: 50.0,
+                  divisions: 10,
+                  label: '$_toSlider', //var _toSlider = 1;,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      _toSlider = newValue.round();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container buildMaterialButton(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width*.5,
+      padding: EdgeInsets.all(5),
+      child: RaisedButton(
+          highlightColor: Colors.transparent,
+          color: Colors.greenAccent,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+          child: Text("Search",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25.0,
+                fontFamily: "Nunito",
+              )),
+          onPressed: () {
+            //Navigator.of(context).pushNamed(FloatActBttn.tag);
+            Navigator.of(context).pushNamed(BttmAppBar.tag);
+          }),
+    );
   }
 
   Container originLocation(String text, dynamic fieldIcon) {
@@ -167,22 +202,25 @@ class Cal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-        color: Colors.deepOrangeAccent,
-        onPressed: () async {
-          final List<DateTime> picked =
-              await DateRagePicker.showDatePicker(
+    return Container(
+      width: MediaQuery.of(context).size.width*.50,
+      child: Card(
+        elevation: 8,
+            child: FlatButton(
+            color: Colors.white,
+            onPressed: () async {
+              final List<DateTime> picked = await DateRagePicker.showDatePicker(
                   context: context,
                   initialFirstDate: new DateTime.now(),
-                  initialLastDate: (new DateTime.now())
-                      .add(new Duration(days: 7)),
+                  initialLastDate: (new DateTime.now()).add(new Duration(days: 7)),
                   firstDate: new DateTime(2015),
                   lastDate: new DateTime(2020));
-          if (picked != null && picked.length == 2) {
-            print(picked);
-          }
-        },
-        child: new Text("Pick date range"));
+              if (picked != null && picked.length == 2) {
+                print(picked);
+              }
+            },
+            child: new Text("Pick date range")),
+      ),
+    );
   }
 }
-
