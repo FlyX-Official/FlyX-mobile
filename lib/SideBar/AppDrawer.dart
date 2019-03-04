@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flyx/profile/profile.dart';
+import 'package:flyx/settings/settings.dart';
+
 
 class AppDrawer extends StatefulWidget {
   static String tag = 'AppDrawer';
@@ -61,7 +63,7 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               ListTile(
                 title: Text(
-                  "Data 2",
+                  "Profile",
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 16.0,
@@ -111,7 +113,8 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                  //Navigator.pop(context);
+                  Navigator.of(context).pushNamed(Settings.tag);
                 },
                 leading: Icon(Icons.settings),
               )
