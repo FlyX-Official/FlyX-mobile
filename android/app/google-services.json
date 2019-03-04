@@ -42,6 +42,13 @@
             {
               "client_id": "882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "882535873724-pmg49dm8ml8jepecsdpfnog0ltmod60o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flyx"
+              }
             }
           ]
         },
