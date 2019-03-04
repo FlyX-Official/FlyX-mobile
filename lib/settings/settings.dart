@@ -23,32 +23,49 @@ class _Settings extends State<Settings> {
       body: _Body(context),
     );
   }
-  // variables
-  bool _mode =true;
 
+  // variables
+  bool _mode = true;
 
   // functions
+  // function for day/night mode
+  void _onChangedMode(bool value) => setState(() => _mode = value);
 
   // function to run as soon as app opens
   void initState() {}
-
 
   // Widgets
   Widget _Body(BuildContext context) {
     return ListView(
       children: <Widget>[
-        Text("Switch"),
-        Center(
-          child: Switch(
-            onChanged: (bool mode){
-              setState(() => this._mode = mode);
-            },
-            value: this._mode,
+        Container(
+          padding: new EdgeInsets.all(32.0),
+          child: new Center(
+            child: new Column(
+              children: <Widget>[
+                new SwitchListTile(
+                  value: _mode,
+                  onChanged: _onChangedMode,
+                  title: new Text('App Mode',
+                      style: new TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black)),
+                ),
+                new ListTile(
+                  title: const Text(
+                    "Terms and Conditions",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                        decoration: TextDecoration.underline),
+                  ),
+                  onTap: () {/* redirect to terms and conditions page */},
+                )
+              ],
+            ),
           ),
-        )
+          decoration: BoxDecoration(border: Border(bottom: BorderSide())),
+        ),
       ],
     );
-
   }
-
 }
