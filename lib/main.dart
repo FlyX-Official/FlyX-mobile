@@ -1,11 +1,13 @@
-//import 'package:wefly/FloatingActionButton/fab_with_icons.dart';
-import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart';
-import 'package:wefly/BottomAppBar/bottom_app_bar.dart';
-import 'package:wefly/LoginPage/login_page.dart';
-import 'package:wefly/SideBar/AppDrawer.dart';
-import 'package:wefly/TicketDisplayer/ticketViewer.dart';
-import 'package:wefly/profile/profile.dart';
-import 'package:wefly/settings/settings.dart';
+
+//import 'package:flyx/FloatingActionButton/fab_with_icons.dart';
+import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
+import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
+import 'package:flyx/LoginPage/login_page.dart';
+import 'package:flyx/SideBar/AppDrawer.dart';
+import 'package:flyx/TicketDisplayer/ticketViewer.dart';
+import 'package:flyx/profile/profile.dart';
+import 'package:flyx/InputPage/inputForm.dart';
+import 'package:flyx/settings/settings.dart';
 // End of Local files
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +26,9 @@ class MyApp extends StatelessWidget {
     BttmAppBar.tag: (context) => BttmAppBar(),
     TicketView.tag: (context) => TicketView(),
     Profile.tag: (context) => Profile(),
+    InputForm.tag: (context) => InputForm(),
     Settings.tag: (context) => Settings(),
+
   };
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),//BttmAppBar(),
+      home: LoginPage(),//BttmAppBar(),//InputForm(),
       routes: routes,
     );
   }

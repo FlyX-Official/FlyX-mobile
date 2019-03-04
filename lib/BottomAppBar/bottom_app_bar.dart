@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wefly/SideBar/AppDrawer.dart';
-import 'package:wefly/TicketDisplayer/ticketViewer.dart';
-import 'package:wefly/FloatingActionButton/floating_action_button_homepage.dart';
-
+import 'package:flyx/SideBar/AppDrawer.dart';
+import 'package:flyx/TicketDisplayer/ticketViewer.dart';
+import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
+import 'package:flyx/InputPage/inputForm.dart';
 class BttmAppBar extends StatefulWidget {
   static String tag = 'bottom-app-bar';
 
@@ -41,10 +41,10 @@ class _BttmAppBarState extends State<BttmAppBar> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.layers),
+            icon: Icon(Icons.edit_location),
             color: Colors.blue,
             highlightColor: Colors.redAccent,
-            onPressed: () {},
+            onPressed: () { Navigator.of(context).pushNamed(InputForm.tag);},
           ),
           SizedBox(
             height: 60,
@@ -54,10 +54,11 @@ class _BttmAppBarState extends State<BttmAppBar> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.dashboard),
+            icon: Icon(Icons.notifications),
             color: Colors.green,
             highlightColor: Colors.redAccent,
             onPressed: () {
+            
              // _scaffoldKey.currentState.openDrawer();
             },
           ),

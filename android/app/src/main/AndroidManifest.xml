@@ -1,15 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.wefly">
+    package="com.example.flyx">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
+         <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="wefly"
         android:icon="@mipmap/ic_launcher">
+        <uses-library
+                android:name="org.apache.http.legacy"
+                android:required="false" />
+        <meta-data 
+                android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyDTiueAqzT0tG56sIQi5SUgcGDP6MfQppI" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
