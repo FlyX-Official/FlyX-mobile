@@ -40,10 +40,10 @@ class _LoginPageState extends State<LoginPage> {
         color: Color.fromARGB(225, 73, 144, 226),
         child: PageView(
           controller: _pageController,
-          scrollDirection: Axis.vertical,
+          scrollDirection: Axis.horizontal,
           children: <Widget>[
-            Container(child: buildSignIn(_height, _width, _fourFifths)),
-            Container(child: buildSignUp(_height, _width, _fourFifths)),
+            Center(child: buildSignIn(_height, _width, _fourFifths)),
+            Center(child: buildSignUp(_height, _width, _fourFifths)),
           ],
         ),
       ),
@@ -51,10 +51,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 //Start SignUpPage
 
-  Container buildSignUp(_height, _width, _fourFifths) {
-    return Container(
-      height: _height * .5,
-      color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
+  SingleChildScrollView buildSignUp(_height, _width, _fourFifths) {
+    return SingleChildScrollView(
+      //height: _height * .5,
+      //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,9 +142,9 @@ class _LoginPageState extends State<LoginPage> {
 
 //End SignUpPage
 
-  Container buildSignIn(_height, _width, _fourFifths) {
-    return Container(
-      height: _height * .5,
+  SingleChildScrollView buildSignIn(_height, _width, _fourFifths) {
+    return SingleChildScrollView(
+      //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
