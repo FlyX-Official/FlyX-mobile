@@ -16,6 +16,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flyx/InputPage/inputForm.dart';
 import 'package:flyx/style/theme.dart' as Theme;
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
   final Widget child;
@@ -28,17 +30,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final LocalAuthentication auth = LocalAuthentication();
   //start SignUp Controllers
-  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _signUpEmailController = TextEditingController();
-  final TextEditingController _signUpPasswordController = TextEditingController();
-    final TextEditingController _signUpNameController = TextEditingController();
-  final TextEditingController _signUpPasswordConfirmController = TextEditingController();
+  final TextEditingController _signUpPasswordController =
+      TextEditingController();
+  final TextEditingController _signUpNameController = TextEditingController();
+  final TextEditingController _signUpPasswordConfirmController =
+      TextEditingController();
   bool _success;
   String _userEmail;
   //end SignUp Controllers
   //SignIn Controllers
   final TextEditingController _signInEmailController = TextEditingController();
-  final TextEditingController _signInPasswordController = TextEditingController();
+  final TextEditingController _signInPasswordController =
+      TextEditingController();
   //end SignIn controllers
   PageController _pageController;
   //_pageController =PageController();
@@ -70,63 +75,67 @@ class _LoginPageState extends State<LoginPage> {
       controller: _pageController,
       //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        //mainAxisSize: MainAxisSize.min,
-        /* alignment: AlignmentDirectional.center,
-        overflow: Overflow.clip,
-        fit: StackFit.loose,*/
-        children: <Widget>[
-          /*Container(
-            height: _height * .33,
-            width: _width,
-            color: Color.fromARGB(255, 73, 144, 226),//Colors.black,
-            child: Image.network(
-                'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4'),
-          ),*/
-          //Logo PlaceHolder
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            //mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: _fourFifths,
-                child: signUpName("Name", Icons.mail_outline),
-              ),
-              Container(
-                width: _fourFifths,
-                child: signUpEmail("Email", Icons.mail_outline),
-              ),
-              Container(
-                width: _fourFifths,
-                child: signUpPassword("Password", Icons.lock_outline),
-              ),
-              Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                overflow: Overflow.visible,
-                children: <Widget>[
-                  Container(
-                    width: _fourFifths,
-                    margin: EdgeInsets.only(bottom: 25),
-                    child: signUpPasswordConfirmation("Confirmation", Icons.lock_outline),
-                  ),
-                  Container(
-                    child: buildSignUpCard(),
-                  ),
-                ],
-              ),
-              Container(
-                child: buildSeparator(),
-              ),
-              Container(
-                child:
-                    buildThirdPartySignIn(), //google,facebook,twitter signin buttons
-              ),
-            ],
-          ),
-        ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          //mainAxisSize: MainAxisSize.min,
+          /* alignment: AlignmentDirectional.center,
+          overflow: Overflow.clip,
+          fit: StackFit.loose,*/
+          children: <Widget>[
+            /*Container(
+              height: _height * .33,
+              width: _width,
+              color: Color.fromARGB(255, 73, 144, 226),//Colors.black,
+              child: Image.network(
+                  'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4'),
+            ),*/
+            //Logo PlaceHolder
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              //mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: _fourFifths,
+                  child: signUpName("Name", Icons.mail_outline),
+                ),
+                Container(
+                  width: _fourFifths,
+                  child: signUpEmail("Email", Icons.mail_outline),
+                ),
+                Container(
+                  width: _fourFifths,
+                  child: signUpPassword("Password", Icons.lock_outline),
+                ),
+                Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Container(
+                      width: _fourFifths,
+                      margin: EdgeInsets.only(bottom: 25),
+                      child: signUpPasswordConfirmation(
+                          "Confirmation", Icons.lock_outline),
+                    ),
+                    Container(
+                      child: buildSignUpCard(),
+                    ),
+                  ],
+                ),
+                Container(
+                  child: buildSeparator(),
+                ),
+                Container(
+                  child:
+                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -149,8 +158,13 @@ class _LoginPageState extends State<LoginPage> {
             fontFamily: "Nunito",
           ),
         ),
-        onPressed:
-            _authenticate, /*() {
+        onPressed: () async {
+          if (_formKey.currentState.validate()) {
+            _register();
+            //_authenticate;
+          }
+        },
+        /*() {
                      //Navigator.of(context).pushNamed(FloatActBttn.tag);
                       Navigator.of(context).pushNamed(InputForm.tag);
                     }*/
@@ -351,11 +365,17 @@ class _LoginPageState extends State<LoginPage> {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Name cannot be Empty';
+              }
+            },
           ),
         ),
       ),
     );
   }
+
   Container signUpEmail(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -381,11 +401,17 @@ class _LoginPageState extends State<LoginPage> {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
     );
   }
+
   Container signUpPassword(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -395,6 +421,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(25.0),
           child: TextFormField(
             autofocus: false,
+            obscureText: true,
             //focusNode: myFocusNodeEmailLogin,
             controller: _signUpPasswordController,
             textInputAction: TextInputAction.newline,
@@ -411,12 +438,17 @@ class _LoginPageState extends State<LoginPage> {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
     );
   }
-  
+
   Container signUpPasswordConfirmation(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -426,6 +458,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(25.0),
           child: TextFormField(
             autofocus: false,
+            obscureText: true,
             //focusNode: myFocusNodeEmailLogin,
             controller: _signUpPasswordConfirmController,
             textInputAction: TextInputAction.newline,
@@ -442,12 +475,18 @@ class _LoginPageState extends State<LoginPage> {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
     );
   }
-Container signInEmail(String text, dynamic fieldIcon) {
+
+  Container signInEmail(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Card(
@@ -472,12 +511,18 @@ Container signInEmail(String text, dynamic fieldIcon) {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
     );
   }
-Container signInPassword(String text, dynamic fieldIcon) {
+
+  Container signInPassword(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Card(
@@ -486,6 +531,7 @@ Container signInPassword(String text, dynamic fieldIcon) {
           padding: EdgeInsets.all(25.0),
           child: TextFormField(
             autofocus: false,
+            obscureText: true,
             //focusNode: myFocusNodeEmailLogin,
             controller: _signInPasswordController,
             textInputAction: TextInputAction.newline,
@@ -502,6 +548,11 @@ Container signInPassword(String text, dynamic fieldIcon) {
               hintText: text,
               hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
             ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
@@ -525,5 +576,29 @@ Container signInPassword(String text, dynamic fieldIcon) {
     setState(() {
       _authorized = authenticated ? 'Authorized' : 'Not Authorized';
     });
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the Widget is disposed
+    _signUpEmailController.dispose();
+    _signUpPasswordController.dispose();
+    super.dispose();
+  }
+
+  // Example code for registration.
+  void _register() async {
+    final FirebaseUser user = await _auth.createUserWithEmailAndPassword(
+      email: _signUpEmailController.text,
+      password: _signUpPasswordController.text,
+    );
+    if (user != null) {
+      setState(() {
+        _success = true;
+        _userEmail = user.email;
+      });
+    } else {
+      _success = false;
+    }
   }
 }
