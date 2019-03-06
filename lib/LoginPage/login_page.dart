@@ -27,6 +27,19 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final LocalAuthentication auth = LocalAuthentication();
+  //start SignUp Controllers
+  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _signUpEmailController = TextEditingController();
+  final TextEditingController _signUpPasswordController = TextEditingController();
+    final TextEditingController _signUpNameController = TextEditingController();
+  final TextEditingController _signUpPasswordConfirmController = TextEditingController();
+  bool _success;
+  String _userEmail;
+  //end SignUp Controllers
+  //SignIn Controllers
+  final TextEditingController _signInEmailController = TextEditingController();
+  final TextEditingController _signInPasswordController = TextEditingController();
+  //end SignIn controllers
   PageController _pageController;
   //_pageController =PageController();
   String _authorized = 'Not Authorized';
@@ -35,8 +48,8 @@ class _LoginPageState extends State<LoginPage> {
     dynamic _height = MediaQuery.of(context).size.height;
     dynamic _width = MediaQuery.of(context).size.width;
     dynamic _fourFifths = _width * .80;
-    return SafeArea(
-      child: Container(
+    return Scaffold(
+      body: Container(
         color: Color.fromARGB(225, 73, 144, 226),
         child: PageView(
           controller: _pageController,
@@ -53,6 +66,8 @@ class _LoginPageState extends State<LoginPage> {
 
   SingleChildScrollView buildSignUp(_height, _width, _fourFifths) {
     return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      controller: _pageController,
       //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
       child: Column(
@@ -78,15 +93,15 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Container(
                 width: _fourFifths,
-                child: originLocation("Name", Icons.mail_outline),
+                child: signUpName("Name", Icons.mail_outline),
               ),
               Container(
                 width: _fourFifths,
-                child: originLocation("Email", Icons.mail_outline),
+                child: signUpEmail("Email", Icons.mail_outline),
               ),
               Container(
                 width: _fourFifths,
-                child: originLocation("Password", Icons.lock_outline),
+                child: signUpPassword("Password", Icons.lock_outline),
               ),
               Stack(
                 alignment: AlignmentDirectional.bottomCenter,
@@ -95,12 +110,15 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                     width: _fourFifths,
                     margin: EdgeInsets.only(bottom: 25),
-                    child: originLocation("Confirmation", Icons.lock_outline),
+                    child: signUpPasswordConfirmation("Confirmation", Icons.lock_outline),
                   ),
                   Container(
                     child: buildSignUpCard(),
                   ),
                 ],
+              ),
+              Container(
+                child: buildSeparator(),
               ),
               Container(
                 child:
@@ -144,6 +162,8 @@ class _LoginPageState extends State<LoginPage> {
 
   SingleChildScrollView buildSignIn(_height, _width, _fourFifths) {
     return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      controller: _pageController,
       //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
       child: Column(
@@ -155,13 +175,13 @@ class _LoginPageState extends State<LoginPage> {
         fit: StackFit.loose,*/
         children: <Widget>[
           Container(
-            height: _height * .50,
+            // height: _height * .4,
             width: _width,
             //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
             child: FadeInImage.memoryNetwork(
               image:
                   'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4',
-              height: _height * .33,
+              //height: _height * .33,
               fadeOutDuration: const Duration(milliseconds: 500),
               placeholder: kTransparentImage,
               // filterQuality: FilterQuality.high,
@@ -175,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Container(
                 width: _fourFifths,
-                child: originLocation("Email", Icons.mail_outline),
+                child: signInEmail("Email", Icons.mail_outline),
               ),
               Stack(
                 alignment: AlignmentDirectional.bottomCenter,
@@ -183,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Container(
                     width: _fourFifths,
-                    child: originLocation("Password", Icons.lock_outline),
+                    child: signInPassword("Password", Icons.lock_outline),
                     margin: EdgeInsets.only(bottom: 25),
                   ),
                   Container(
@@ -193,10 +213,54 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
               Container(
+                child: buildSeparator(),
+              ),
+              Container(
                 child:
                     buildThirdPartySignIn(), //google,facebook,twitter signin buttons
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding buildSeparator() {
+    return Padding(
+      padding: EdgeInsets.all(15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              gradient: new LinearGradient(
+                  colors: [
+                    Colors.white10,
+                    Colors.white,
+                  ],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(1.0, 1.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp),
+            ),
+            width: 200.0,
+            height: 1.0,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: new LinearGradient(
+                  colors: [
+                    Colors.white,
+                    Colors.white10,
+                  ],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(1.0, 1.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp),
+            ),
+            width: 180.0,
+            height: 1.0,
           ),
         ],
       ),
@@ -262,7 +326,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Container originLocation(String text, dynamic fieldIcon) {
+  Container signUpName(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Card(
@@ -272,7 +336,158 @@ class _LoginPageState extends State<LoginPage> {
           child: TextFormField(
             autofocus: false,
             //focusNode: myFocusNodeEmailLogin,
-            //controller: loginEmailController,
+            controller: _signUpNameController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  Container signUpEmail(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpEmailController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  Container signUpPassword(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpPasswordController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Container signUpPasswordConfirmation(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpPasswordConfirmController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+Container signInEmail(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signInEmailController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+Container signInPassword(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signInPasswordController,
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
