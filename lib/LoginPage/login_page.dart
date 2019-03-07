@@ -16,7 +16,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flyx/InputPage/inputForm.dart';
 import 'package:flyx/style/theme.dart' as Theme;
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseAuth _fireBaseAuth = FirebaseAuth.instance;
+final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
@@ -31,14 +32,18 @@ class _LoginPageState extends State<LoginPage> {
   final LocalAuthentication auth = LocalAuthentication();
   //start SignUp Controllers
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
   final TextEditingController _signUpEmailController = TextEditingController();
   final TextEditingController _signUpPasswordController =
       TextEditingController();
   final TextEditingController _signUpNameController = TextEditingController();
   final TextEditingController _signUpPasswordConfirmController =
       TextEditingController();
-  bool _success;
+
+  bool _successSignUp;
+  bool _successLogin;
   String _userEmail;
+
   //end SignUp Controllers
   //SignIn Controllers
   final TextEditingController _signInEmailController = TextEditingController();
@@ -48,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
   PageController _pageController;
   //_pageController =PageController();
   String _authorized = 'Not Authorized';
+
   @override
   Widget build(BuildContext context) {
     dynamic _height = MediaQuery.of(context).size.height;
@@ -180,62 +186,65 @@ class _LoginPageState extends State<LoginPage> {
       controller: _pageController,
       //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        /* alignment: AlignmentDirectional.center,
-        overflow: Overflow.clip,
-        fit: StackFit.loose,*/
-        children: <Widget>[
-          Container(
-            // height: _height * .4,
-            width: _width,
-            //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
-            child: FadeInImage.memoryNetwork(
-              image:
-                  'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4',
-              //height: _height * .33,
-              fadeOutDuration: const Duration(milliseconds: 500),
-              placeholder: kTransparentImage,
-              // filterQuality: FilterQuality.high,
+      child: Form(
+        key: _formKey2,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          /* alignment: AlignmentDirectional.center,
+          overflow: Overflow.clip,
+          fit: StackFit.loose,*/
+          children: <Widget>[
+            Container(
+              // height: _height * .4,
+              width: _width,
+              //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
+              child: FadeInImage.memoryNetwork(
+                image:
+                    'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4',
+                //height: _height * .33,
+                fadeOutDuration: const Duration(milliseconds: 500),
+                placeholder: kTransparentImage,
+                // filterQuality: FilterQuality.high,
+              ),
             ),
-          ),
-          //Logo PlaceHolder
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: _fourFifths,
-                child: signInEmail("Email", Icons.mail_outline),
-              ),
-              Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                overflow: Overflow.visible,
-                children: <Widget>[
-                  Container(
-                    width: _fourFifths,
-                    child: signInPassword("Password", Icons.lock_outline),
-                    margin: EdgeInsets.only(bottom: 25),
-                  ),
-                  Container(
-                    //rmargin: EdgeInsets.only(top:125),
-                    child: buildLoginCard(),
-                  ),
-                ],
-              ),
-              Container(
-                child: buildSeparator(),
-              ),
-              Container(
-                child:
-                    buildThirdPartySignIn(), //google,facebook,twitter signin buttons
-              ),
-            ],
-          ),
-        ],
+            //Logo PlaceHolder
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: _fourFifths,
+                  child: signInEmail("Email", Icons.mail_outline),
+                ),
+                Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Container(
+                      width: _fourFifths,
+                      child: signInPassword("Password", Icons.lock_outline),
+                      margin: EdgeInsets.only(bottom: 25),
+                    ),
+                    Container(
+                      //rmargin: EdgeInsets.only(top:125),
+                      child: buildLoginCard(),
+                    ),
+                  ],
+                ),
+                Container(
+                  child: buildSeparator(),
+                ),
+                Container(
+                  child:
+                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -258,7 +267,7 @@ class _LoginPageState extends State<LoginPage> {
                   stops: [0.0, 1.0],
                   tileMode: TileMode.clamp),
             ),
-            width: 200.0,
+            width: MediaQuery.of(context).size.width * .33,
             height: 1.0,
           ),
           Container(
@@ -273,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                   stops: [0.0, 1.0],
                   tileMode: TileMode.clamp),
             ),
-            width: 180.0,
+            width: MediaQuery.of(context).size.width * .33,
             height: 1.0,
           ),
         ],
@@ -299,11 +308,13 @@ class _LoginPageState extends State<LoginPage> {
             fontFamily: "Nunito",
           ),
         ),
-        onPressed:
-            _authenticate, /*() {
-                     //Navigator.of(context).pushNamed(FloatActBttn.tag);
-                      Navigator.of(context).pushNamed(InputForm.tag);
-                    }*/
+        onPressed: () async {
+          if (_formKey2.currentState.validate()) {
+            _signInEmailPassword();
+            //_handleSignIn;
+            //Navigator.of(context).pushNamed(InputForm.tag);
+          }
+        },
       ),
     );
   }
@@ -336,7 +347,14 @@ class _LoginPageState extends State<LoginPage> {
       child: new Icon(
         fieldIcon,
       ),
-      onPressed: () => print("$text button pressed"),
+      onPressed: () {
+        if (text == "Google") {
+          _googleHandleSignIn();
+          print("gbutton signin" + "$_googleHandleSignIn()");
+        } else {
+          print("$text button pressed");
+        }
+      },
     );
   }
 
@@ -403,7 +421,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             validator: (String value) {
               if (value.isEmpty) {
-                return 'Please enter some text';
+                return 'Email field cannot be empty';
               }
             },
           ),
@@ -440,7 +458,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             validator: (String value) {
               if (value.isEmpty) {
-                return 'Please enter some text';
+                return 'Password Field cannot be empty';
               }
             },
           ),
@@ -477,7 +495,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             validator: (String value) {
               if (value.isEmpty) {
-                return 'Please enter some text';
+                return 'Confirmation Field cannot be empty.';
               }
             },
           ),
@@ -559,6 +577,31 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<FirebaseUser> get _handleSignIn async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final FirebaseUser user =
+        await _fireBaseAuth.signInWithCredential(credential);
+    print("signed in " + user.displayName);
+    return user;
+  }
+
+  Future<void> _googleHandleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+      Navigator.of(context).pushNamed(InputForm.tag);
+    } catch (error) {
+      print(error);
+    }
+  }
+
   Future<void> _authenticate() async {
     bool authenticated = false;
     try {
@@ -586,19 +629,57 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Example code for registration.
+  //  registration.
   void _register() async {
-    final FirebaseUser user = await _auth.createUserWithEmailAndPassword(
+    final FirebaseUser user =
+        await _fireBaseAuth.createUserWithEmailAndPassword(
       email: _signUpEmailController.text,
       password: _signUpPasswordController.text,
     );
+
     if (user != null) {
+      //Navigator.of(context).pushNamed(InputForm.tag);
       setState(() {
-        _success = true;
+        _successSignUp = true;
         _userEmail = user.email;
       });
     } else {
-      _success = false;
+      _successSignUp = false;
     }
+  }
+
+  // Email and Password Login.
+  void _signInEmailPassword() async {
+    final FirebaseUser userLogin =
+        await _fireBaseAuth.signInWithEmailAndPassword(
+      email: _signInEmailController.text,
+      password: _signInPasswordController.text,
+    );
+    if (userLogin != null) {
+      setState(() {
+        _successLogin = true;
+        _userEmail = userLogin.email;
+      });
+      if (_successLogin == true) {
+        Navigator.of(context).pushNamed(InputForm.tag);
+        print("LOGIN EMAIL succ $_userEmail");
+      }
+    } else {
+      _successLogin = false;
+      if (_successLogin == false) {
+        new AlertDialog(
+          title: Text('Error loggin in'),
+          content: Text('Re-enter ID/Passowrd'),
+        );
+        print("EMAIL OR PASSWORD INCRRECT");
+      }
+    }
+  }
+
+  Future<String> signIn(String email, String password) async {
+    FirebaseUser user = await _fireBaseAuth.signInWithEmailAndPassword(
+        email: _signInEmailController.text,
+        password: _signInPasswordController.text);
+    return user.uid;
   }
 }
