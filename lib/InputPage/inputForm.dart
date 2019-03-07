@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flyx/InputPage/gMap.dart';
 import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
+import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart'; //tmp only
+
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 
 class InputForm extends StatefulWidget {
@@ -17,63 +19,94 @@ class InputForm extends StatefulWidget {
 class _InputFormState extends State<InputForm> {
   var _fromSlider = 1;
   var _toSlider = 1; // Initial Slider Value
+  PageController _pageController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
+    dynamic _height = MediaQuery.of(context).size.height;
+    dynamic _width = MediaQuery.of(context).size.width;
+    dynamic _fourFifths = _width * .8;
+
     return Scaffold(
-      body: Container(
-        color: Colors.blue,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Column(
-              //alignment: Alignment.bottomCenter,
-              //overflow: Overflow.visible,
-              children: <Widget>[
-                Container(
-                  child: CustomGoogleMap(),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      backgroundColor: Colors.blueAccent,
+      bottomNavigationBar: _buildBottomAppBar(),
+      floatingActionButton: _buildFab(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      body: _buildSafeArea(context),
+    );
+  }
+
+  SafeArea _buildSafeArea(BuildContext context) {
+    return SafeArea(
+      
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        controller: _pageController,
+        
+        child: Container(
+          color: Colors.blue,
+          child: Column(
+            //controller: _pageController,
+            //scrollDirection: Axis.vertical,
+
+            ///mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Form(
+                key: _formKey,
+                child: Column(
+                  //alignment: Alignment.bottomCenter,
+                  //overflow: Overflow.visible,
                   children: <Widget>[
                     Container(
-                      child: originLocation(
-                          "From", FontAwesomeIcons.planeDeparture),
+                      child: CustomGoogleMap(),
                     ),
-                    Container(
-                      child:
-                          originLocation("To", FontAwesomeIcons.planeArrival),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          //height: _fourFifths,
+                          child: originLocation(
+                              "From", FontAwesomeIcons.planeDeparture),
+                        ),
+                        Container(
+                          //height: _fourFifths,
+                          child: originLocation(
+                              "To", FontAwesomeIcons.planeArrival),
+                        ),
+                      ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          child: buildFromSlider(),
+                        ),
+                        Container(
+                          child: buildToSlider(),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          child: new Cal(),
+                        ),
+                        Container(
+                          child: new Cal(),
+                        ),
+                      ],
+                    ),
+                    /*Container(
+                      child: buildMaterialButton(context),
+                    ),*/
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Container(
-                      child: buildFromSlider(),
-                    ),
-                    Container(
-                      child: buildToSlider(),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Container(
-                      child: new Cal(),
-                    ),
-                    Container(
-                      child: new Cal(),
-                    ),
-                  ],
-                ),
-                Container(
-                  child: buildMaterialButton(context),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -90,7 +123,7 @@ class _InputFormState extends State<InputForm> {
             children: <Widget>[
               Text("Origin Airport Radius"),
               Container(
-                // width: MediaQuery.of(context).size.width * .5,
+                width: MediaQuery.of(context).size.width * .5,
                 child: Slider(
                   value: _fromSlider.toDouble(),
                   min: 1.0,
@@ -144,7 +177,8 @@ class _InputFormState extends State<InputForm> {
 
   Container buildMaterialButton(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width*.5,
+      width: MediaQuery.of(context).size.width * .5,
+      height: MediaQuery.of(context).size.height * .075,
       padding: EdgeInsets.all(5),
       child: RaisedButton(
           highlightColor: Colors.transparent,
@@ -167,6 +201,7 @@ class _InputFormState extends State<InputForm> {
   Container originLocation(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width * .5,
+      height: MediaQuery.of(context).size.height * .1,
       child: Card(
         elevation: 8,
         child: Padding(
@@ -193,6 +228,57 @@ class _InputFormState extends State<InputForm> {
       ),
     );
   }
+
+  BottomAppBar _buildBottomAppBar() {
+    return BottomAppBar(
+      shape: CircularNotchedRectangle(),
+      child: new Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.menu),
+            color: Colors.black,
+            highlightColor: Colors.redAccent,
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.edit_location),
+            color: Colors.black,
+            highlightColor: Colors.redAccent,
+            onPressed: () {
+              Navigator.of(context).pushNamed(InputForm.tag);
+            },
+          ),
+          SizedBox(
+            height: 60,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications),
+            color: Colors.black,
+            highlightColor: Colors.redAccent,
+            onPressed: () {
+              // _scaffoldKey.currentState.openDrawer();
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.account_box),
+            color: Colors.black,
+            highlightColor: Colors.redAccent,
+            onPressed: () {
+              Navigator.of(context).pushNamed(FloatActBttn.tag);
+            },
+          )
+        ],
+      ),
+    );
+  }
 }
 
 class Cal extends StatelessWidget {
@@ -203,16 +289,18 @@ class Cal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width*.50,
+      width: MediaQuery.of(context).size.width * .5,
+      height: MediaQuery.of(context).size.height * .1,
       child: Card(
         elevation: 8,
-            child: FlatButton(
+        child: FlatButton(
             color: Colors.white,
             onPressed: () async {
               final List<DateTime> picked = await DateRagePicker.showDatePicker(
                   context: context,
                   initialFirstDate: new DateTime.now(),
-                  initialLastDate: (new DateTime.now()).add(new Duration(days: 7)),
+                  initialLastDate:
+                      (new DateTime.now()).add(new Duration(days: 7)),
                   firstDate: new DateTime(2015),
                   lastDate: new DateTime(2020));
               if (picked != null && picked.length == 2) {
@@ -223,4 +311,18 @@ class Cal extends StatelessWidget {
       ),
     );
   }
+}
+Widget _buildFab(BuildContext context) {
+  return FloatingActionButton(
+    onPressed: () {
+      Navigator.of(context).pushNamed(BttmAppBar.tag);
+    },
+    tooltip: 'fab',
+    elevation: 4.0,
+    highlightElevation: 12,
+    //shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    child: Icon(Icons.search),
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.lightGreen,
+  );
 }
