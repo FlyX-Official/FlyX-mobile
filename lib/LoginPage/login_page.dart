@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _successSignUp;
   bool _successLogin;
   String _userEmail;
-
+  String _errorMessage = "";
   //end SignUp Controllers
   //SignIn Controllers
   final TextEditingController _signInEmailController = TextEditingController();
@@ -53,6 +53,88 @@ class _LoginPageState extends State<LoginPage> {
   PageController _pageController;
   //_pageController =PageController();
   String _authorized = 'Not Authorized';
+
+  Object $userLoginEmailPassword;
+
+  Future<FirebaseUser> _signIn() async {
+    final formState = _formKey2.currentState;
+    bool alertError = false;
+    if (_formKey2.currentState.validate()) {
+      formState.save();
+      try {
+        GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+      FirebaseUser user = await _fireBaseAuth.signInWithCustomToken(
+        /*accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,*/
+        token: googleSignInAuthentication.accessToken,
+      );
+      print("userNAme: ${user.displayName}");
+      } catch (e) {
+      }
+    }
+
+    return Navigator.of(context).pushNamed(InputForm.tag);
+  }
+
+  Future<void> _emailPasswordSignIn() async {
+    final formState = _formKey2.currentState;
+    bool alertError = false;
+    if (_formKey2.currentState.validate()) {
+      formState.save();
+      try {
+        FirebaseUser userLoginEmailPassword;
+        userLoginEmailPassword = await _fireBaseAuth.signInWithEmailAndPassword(
+          email: _signInEmailController.text,
+          password: _signInPasswordController.text,
+        );
+        print("UserName: ${userLoginEmailPassword.displayName}");
+        Navigator.of(context).pushNamed(InputForm.tag);
+      } catch (e) {
+        print(e.message);
+        alertError = true;
+      }
+    }
+    if (alertError == true) {
+      return AlertDialog(
+        title: Text('Error loggin in'),
+        content: Text('Re-enter ID/Passowrd'),
+      );
+    }
+  }
+
+  /*dynamic _signInEmailPassword() async {
+    final FirebaseUser userLogin =
+        await _fireBaseAuth.signInWithEmailAndPassword(
+      email: _signInEmailController.text,
+      password: _signInPasswordController.text,
+    );
+    if (userLogin != null) {
+      setState(() {
+        _successLogin = true;
+        _userEmail = userLogin.email;
+      });
+      if (_successLogin == true) {
+        Navigator.of(context).pushNamed(InputForm.tag);
+        print("LOGIN EMAIL succ $_userEmail");
+      }
+    } else {
+      _successLogin = false;
+      //_errorMessage = message;
+      if (_successLogin == false) {
+        setState(() {
+          _successLogin = true;
+          _userEmail = userLogin.email;
+        });
+        new AlertDialog(
+          title: Text('Error loggin in'),
+          content: Text('Re-enter ID/Passowrd'),
+        );
+        print("EMAIL OR PASSWORD INCRRECT");
+      }
+    }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +186,9 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               //mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                Container(
+                  child: _showErrorMessage(),
+                ),
                 Container(
                   width: _fourFifths,
                   child: signUpName("Name", Icons.mail_outline),
@@ -308,13 +393,14 @@ class _LoginPageState extends State<LoginPage> {
             fontFamily: "Nunito",
           ),
         ),
-        onPressed: () async {
+        onPressed:
+            _emailPasswordSignIn, /*async {
           if (_formKey2.currentState.validate()) {
             _signInEmailPassword();
             //_handleSignIn;
             //Navigator.of(context).pushNamed(InputForm.tag);
           }
-        },
+        },*/
       ),
     );
   }
@@ -342,20 +428,26 @@ class _LoginPageState extends State<LoginPage> {
 
   FlatButton buildFlatButton(String text, dynamic fieldIcon) {
     return FlatButton(
-      color: Colors.white,
-      //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-      child: new Icon(
-        fieldIcon,
-      ),
-      onPressed: () {
+        color: Colors.white,
+        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: new Icon(
+          fieldIcon,
+        ),
+        onPressed: () async {
+          if (text == "Google") {
+            _signIn().then((FirebaseUser user) {
+              print(user);
+            }).catchError((error) => print(error));
+          }
+        } /*{
         if (text == "Google") {
           _googleHandleSignIn();
           print("gbutton signin" + "$_googleHandleSignIn()");
         } else {
           print("$text button pressed");
         }
-      },
-    );
+      },*/
+        );
   }
 
   Container signUpName(String text, dynamic fieldIcon) {
@@ -598,7 +690,17 @@ class _LoginPageState extends State<LoginPage> {
       await _googleSignIn.signIn();
       Navigator.of(context).pushNamed(InputForm.tag);
     } catch (error) {
+      if (error) {
+        new AlertDialog(
+          title: Text('Error loggin in'),
+          content: Text('$error Re-enter ID/Passowrd'),
+        );
+        print("EMAIL OR PASSWORD INCRRECT");
+      }
       print(error);
+      setState(() {
+        _errorMessage = error.message;
+      });
     }
   }
 
@@ -649,7 +751,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Email and Password Login.
-  void _signInEmailPassword() async {
+  /*dynamic _signInEmailPassword() async {
     final FirebaseUser userLogin =
         await _fireBaseAuth.signInWithEmailAndPassword(
       email: _signInEmailController.text,
@@ -666,13 +768,35 @@ class _LoginPageState extends State<LoginPage> {
       }
     } else {
       _successLogin = false;
+      //_errorMessage = message;
       if (_successLogin == false) {
+        setState(() {
+          _successLogin = true;
+          _userEmail = userLogin.email;
+        });
         new AlertDialog(
           title: Text('Error loggin in'),
           content: Text('Re-enter ID/Passowrd'),
         );
         print("EMAIL OR PASSWORD INCRRECT");
       }
+    }
+  }*/
+
+  Widget _showErrorMessage() {
+    if (_errorMessage.length > 0 && _errorMessage != null) {
+      return new Text(
+        _errorMessage,
+        style: TextStyle(
+            fontSize: 13.0,
+            color: Colors.red,
+            height: 1.0,
+            fontWeight: FontWeight.w300),
+      );
+    } else {
+      return new Container(
+        height: 0.0,
+      );
     }
   }
 

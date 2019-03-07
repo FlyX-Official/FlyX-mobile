@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "882535873724-46jd7bnr2ii7edq3rkqeasdtu3r1729c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flyx",
+            "certificate_hash": "36f9cc523d1456c78b1a56ca757b7ff3f69468a2"
+          }
+        },
+        {
           "client_id": "882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com",
           "client_type": 3
         }
