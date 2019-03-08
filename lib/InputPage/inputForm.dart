@@ -4,7 +4,7 @@ import 'package:flyx/InputPage/gMap.dart';
 import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
 import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart'; //tmp only
 
-import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
+import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 class InputForm extends StatefulWidget {
   static String tag = 'Input-Page';
@@ -92,7 +92,12 @@ class _InputFormState extends State<InputForm> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Container(
-                          child: new Cal(),
+                          child: Column(
+                            children: <Widget>[
+                              new Cal(),
+                              //Text(DateRangePicker),
+                            ],
+                          ),
                         ),
                         Container(
                           child: new Cal(),
@@ -296,7 +301,7 @@ class Cal extends StatelessWidget {
         child: FlatButton(
             color: Colors.white,
             onPressed: () async {
-              final List<DateTime> picked = await DateRagePicker.showDatePicker(
+              final List<DateTime> picked = await DateRangePicker.showDatePicker(
                   context: context,
                   initialFirstDate: new DateTime.now(),
                   initialLastDate:
