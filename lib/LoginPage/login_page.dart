@@ -42,7 +42,8 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _successSignUp;
   bool _successLogin;
-  String _userEmail;
+  String _userEmail ="";
+   String userEmailStore ="";
   String _errorMessage = "";
   //end SignUp Controllers
   //SignIn Controllers
@@ -90,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
           password: _signInPasswordController.text,
         );
         print("UserName: ${userLoginEmailPassword.displayName}");
+        userEmailStore = userLoginEmailPassword.displayName;
         Navigator.of(context).pushNamed(InputForm.tag);
       } catch (e) {
         print(e.message);
