@@ -3,8 +3,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flyx/InputPage/gMap.dart';
 import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
 import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart'; //tmp only
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flyx/LoginPage/login_page.dart';
+import 'package:flyx/settings/settings.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 class InputForm extends StatefulWidget {
   static String tag = 'Input-Page';
@@ -22,6 +28,21 @@ class _InputFormState extends State<InputForm> {
   PageController _pageController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  GoogleSignInAccount _currentUser;
+  @override
+  bool _mode = true;
+  void _onChangedMode(bool value) => setState(() => _mode = value);
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+    });
+    _googleSignIn.signInSilently();
+  }
+
   @override
   Widget build(BuildContext context) {
     dynamic _height = MediaQuery.of(context).size.height;
@@ -39,11 +60,9 @@ class _InputFormState extends State<InputForm> {
 
   SafeArea _buildSafeArea(BuildContext context) {
     return SafeArea(
-      
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         controller: _pageController,
-        
         child: Container(
           color: Colors.blue,
           child: Column(
@@ -243,15 +262,15 @@ class _InputFormState extends State<InputForm> {
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.menu),
-            color: Colors.black,
+            color: Colors.red,
             highlightColor: Colors.redAccent,
             onPressed: () {
               _scaffoldKey.currentState.openDrawer();
-            },
+            }, //showMenu,
           ),
           IconButton(
             icon: Icon(Icons.edit_location),
-            color: Colors.black,
+            color: Colors.blue,
             highlightColor: Colors.redAccent,
             onPressed: () {
               Navigator.of(context).pushNamed(InputForm.tag);
@@ -266,23 +285,94 @@ class _InputFormState extends State<InputForm> {
           ),
           IconButton(
             icon: Icon(Icons.notifications),
-            color: Colors.black,
+            color: Colors.green,
             highlightColor: Colors.redAccent,
             onPressed: () {
               // _scaffoldKey.currentState.openDrawer();
+              Navigator.of(context).pushNamed(LoginPage.tag);
             },
           ),
           IconButton(
             icon: Icon(Icons.account_box),
-            color: Colors.black,
+            color: Colors.orange,
             highlightColor: Colors.redAccent,
-            onPressed: () {
+            onPressed:
+                showModalMenu, /* () {
               Navigator.of(context).pushNamed(FloatActBttn.tag);
-            },
+            },*/
           )
         ],
       ),
     );
+  }
+
+  showModalMenu() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            color: Color(0xcFF737373),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: SafeArea(
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  color: Colors.green,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * .45,
+                          child: ListView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            children: <Widget>[
+                              Card(
+                                elevation: 8,
+                                child: UserAccountsDrawerHeader(
+                                  accountName: Text("Name: ${_currentUser.displayName}"),
+                                  accountEmail: Text("Email: ${_currentUser.email}"),
+                                  currentAccountPicture: Image.network(_currentUser.photoUrl),
+                                ),
+                              ),
+                              Card(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  leading: Icon(Icons.monetization_on),
+                                  title: Text("Currency"),
+                                ),
+                              ),
+                              Card(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  leading: Icon(Icons.monetization_on),
+                                  title: Text("Preferred Airport"),
+                                ),
+                              )
+                            ],
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
   }
 }
 
@@ -301,13 +391,14 @@ class Cal extends StatelessWidget {
         child: FlatButton(
             color: Colors.white,
             onPressed: () async {
-              final List<DateTime> picked = await DateRangePicker.showDatePicker(
-                  context: context,
-                  initialFirstDate: new DateTime.now(),
-                  initialLastDate:
-                      (new DateTime.now()).add(new Duration(days: 7)),
-                  firstDate: new DateTime(2015),
-                  lastDate: new DateTime(2020));
+              final List<DateTime> picked =
+                  await DateRangePicker.showDatePicker(
+                      context: context,
+                      initialFirstDate: new DateTime.now(),
+                      initialLastDate:
+                          (new DateTime.now()).add(new Duration(days: 7)),
+                      firstDate: new DateTime(2015),
+                      lastDate: new DateTime(2020));
               if (picked != null && picked.length == 2) {
                 print(picked);
               }
@@ -317,6 +408,7 @@ class Cal extends StatelessWidget {
     );
   }
 }
+
 Widget _buildFab(BuildContext context) {
   return FloatingActionButton(
     onPressed: () {
@@ -331,3 +423,71 @@ Widget _buildFab(BuildContext context) {
     foregroundColor: Colors.lightGreen,
   );
 }
+
+/* 
+ListTile(
+                                    title: Text(
+                                      "Inbox",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.inbox,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      "Starred",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.star_border,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      "Sent",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.send,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      "Trash",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      "Spam",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.error,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ),
+                                  ListTile(
+                                    title: Text(
+                                      "Drafts",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    leading: Icon(
+                                      Icons.mail_outline,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {},
+                                  ), */
