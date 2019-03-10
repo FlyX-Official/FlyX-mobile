@@ -438,7 +438,8 @@ class _InputFormState extends State<InputForm> {
           "DestinationDate": _destinationDate.toList(),
           "TimeStamp": DateTime.now(),
         });
-        //Navigator.of(context).pushNamed(BttmAppBar.tag);
+        Navigator.of(context).pushNamed(BttmAppBar.tag);
+        
       },
       tooltip: 'fab',
       elevation: 4.0,
