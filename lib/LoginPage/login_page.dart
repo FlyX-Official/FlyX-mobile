@@ -78,7 +78,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     dynamic _height = MediaQuery.of(context).size.height;
     dynamic _width = MediaQuery.of(context).size.width;
-    dynamic _fourFifths = _width * .80;
+    dynamic _fourFifthsWidth= _width * .85;
+    
     return Scaffold(
       body: Container(
         color: Color.fromARGB(225, 73, 144, 226),
@@ -86,8 +87,8 @@ class _LoginPageState extends State<LoginPage> {
           controller: _pageController,
           scrollDirection: Axis.horizontal,
           children: <Widget>[
-            Center(child: buildSignIn(_height, _width, _fourFifths)),
-            Center(child: buildSignUp(_height, _width, _fourFifths)),
+            Center(child: buildSignIn(_height, _width, _fourFifthsWidth)),
+            Center(child: buildSignUp(_height, _width, _fourFifthsWidth)),
           ],
         ),
       ),
@@ -95,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 //Login Code Begin
-  SingleChildScrollView buildSignIn(_height, _width, _fourFifths) {
+  SingleChildScrollView buildSignIn(_height, _width, _fourFifthsWidth) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       controller: _pageController,
@@ -107,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Container(
-              // height: _height * .4,
+               height: _height * .5,
               width: _width,
               //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
               child: FadeInImage.memoryNetwork(
@@ -126,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  width: _fourFifths,
+                  width: _fourFifthsWidth,
                   child: signInEmail("Email", Icons.mail_outline),
                 ),
                 Stack(
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                   overflow: Overflow.visible,
                   children: <Widget>[
                     Container(
-                      width: _fourFifths,
+                      width: _fourFifthsWidth,
                       child: signInPassword("Password", Icons.lock_outline),
                       margin: EdgeInsets.only(bottom: 25),
                     ),
@@ -364,7 +365,7 @@ class _LoginPageState extends State<LoginPage> {
 
 //SignUp Code Begin
 
-  SingleChildScrollView buildSignUp(_height, _width, _fourFifths) {
+  SingleChildScrollView buildSignUp(_height, _width, _fourFifthsWidth) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       controller: _pageController,
@@ -397,15 +398,15 @@ class _LoginPageState extends State<LoginPage> {
                   child: _showErrorMessage(),
                 ),
                 Container(
-                  width: _fourFifths,
+                  width: _fourFifthsWidth,
                   child: signUpName("Name", Icons.mail_outline),
                 ),
                 Container(
-                  width: _fourFifths,
+                  width: _fourFifthsWidth,
                   child: signUpEmail("Email", Icons.mail_outline),
                 ),
                 Container(
-                  width: _fourFifths,
+                  width: _fourFifthsWidth,
                   child: signUpPassword("Password", Icons.lock_outline),
                 ),
                 Stack(
@@ -413,7 +414,7 @@ class _LoginPageState extends State<LoginPage> {
                   overflow: Overflow.visible,
                   children: <Widget>[
                     Container(
-                      width: _fourFifths,
+                      width: _fourFifthsWidth,
                       margin: EdgeInsets.only(bottom: 25),
                       child: signUpPasswordConfirmation(
                           "Confirmation", Icons.lock_outline),

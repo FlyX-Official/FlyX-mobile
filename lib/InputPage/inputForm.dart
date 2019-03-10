@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flyx/LoginPage/login_page.dart';
 import 'package:flyx/settings/settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,6 +27,16 @@ class InputForm extends StatefulWidget {
 class _InputFormState extends State<InputForm> {
   var _fromSlider = 1;
   var _toSlider = 1; // Initial Slider Value
+  //String _from;
+  //String _to;
+  List<DateTime> _originDate ;
+  List<DateTime> _destinationDate;
+
+ TextEditingController _from =TextEditingController();
+ TextEditingController _to =TextEditingController();
+ 
+
+
   PageController _pageController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -63,6 +75,7 @@ class _InputFormState extends State<InputForm> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         controller: _pageController,
+        physics: AlwaysScrollableScrollPhysics(),
         child: Container(
           color: Colors.blue,
           child: Column(
@@ -91,7 +104,7 @@ class _InputFormState extends State<InputForm> {
                         ),
                         Container(
                           //height: _fourFifths,
-                          child: originLocation(
+                          child: destinationLocation(
                               "To", FontAwesomeIcons.planeArrival),
                         ),
                       ],
@@ -113,13 +126,13 @@ class _InputFormState extends State<InputForm> {
                         Container(
                           child: Column(
                             children: <Widget>[
-                              new Cal(),
+                              _originCal(context),
                               //Text(DateRangePicker),
                             ],
                           ),
                         ),
                         Container(
-                          child: new Cal(),
+                          child: _destinationCal(context),
                         ),
                       ],
                     ),
@@ -145,7 +158,7 @@ class _InputFormState extends State<InputForm> {
           padding: EdgeInsets.all(25),
           child: Column(
             children: <Widget>[
-              Text("Origin Airport Radius"),
+              Text("Origin Radius"),
               Container(
                 width: MediaQuery.of(context).size.width * .5,
                 child: Slider(
@@ -177,7 +190,7 @@ class _InputFormState extends State<InputForm> {
           padding: EdgeInsets.all(25),
           child: Column(
             children: <Widget>[
-              Text("Destination Airport Radius"),
+              Text("Destination Radius"),
               Container(
                 child: Slider(
                   value: _toSlider.toDouble(),
@@ -225,15 +238,49 @@ class _InputFormState extends State<InputForm> {
   Container originLocation(String text, dynamic fieldIcon) {
     return Container(
       width: MediaQuery.of(context).size.width * .5,
-      height: MediaQuery.of(context).size.height * .1,
+      //height: MediaQuery.of(context).size.height * .1,
       child: Card(
         elevation: 8,
         child: Padding(
           padding: EdgeInsets.all(25.0),
           child: TextFormField(
             autofocus: false,
+            autocorrect: true,
+            
             //focusNode: myFocusNodeEmailLogin,
-            //controller: loginEmailController,
+            controller: _from,
+            keyboardType: TextInputType.text,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.black,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  Container destinationLocation(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width * .5,
+      //height: MediaQuery.of(context).size.height * .1,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            autocorrect: true,
+            
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _to,
             keyboardType: TextInputType.text,
             style: TextStyle(
                 fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
@@ -341,9 +388,12 @@ class _InputFormState extends State<InputForm> {
                               Card(
                                 elevation: 8,
                                 child: UserAccountsDrawerHeader(
-                                  accountName: Text("Name: ${_currentUser.displayName}"),
-                                  accountEmail: Text("Email: ${_currentUser.email}"),
-                                  currentAccountPicture: Image.network(_currentUser.photoUrl),
+                                  accountName:
+                                      Text("Name: ${_currentUser.displayName}"),
+                                  accountEmail:
+                                      Text("Email: ${_currentUser.email}"),
+                                  currentAccountPicture:
+                                      Image.network(_currentUser.photoUrl),
                                 ),
                               ),
                               Card(
@@ -374,55 +424,87 @@ class _InputFormState extends State<InputForm> {
           );
         });
   }
-}
 
-class Cal extends StatelessWidget {
-  const Cal({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildFab(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        
+        Firestore.instance.collection("TicketQueries").document().setData({
+          'Origin': "${_from.text}",
+          'Destination': '${_to.text}',
+          'OriginAirportRadius': _fromSlider,
+          'DestinationAirportRadius': _toSlider,
+          "OriginDate": _originDate.toList(),
+          "DestinationDate": _destinationDate.toList(),
+          "TimeStamp": DateTime.now(),
+        });
+        //Navigator.of(context).pushNamed(BttmAppBar.tag);
+      },
+      tooltip: 'fab',
+      elevation: 4.0,
+      highlightElevation: 12,
+      //shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Icon(Icons.search),
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.lightGreen,
+    );
+  }
+  Widget _originCal(BuildContext context) {
+    dynamic dateTimeStamp = "Pick Date range";
     return Container(
       width: MediaQuery.of(context).size.width * .5,
       height: MediaQuery.of(context).size.height * .1,
       child: Card(
         elevation: 8,
         child: FlatButton(
-            color: Colors.white,
-            onPressed: () async {
-              final List<DateTime> picked =
-                  await DateRangePicker.showDatePicker(
-                      context: context,
-                      initialFirstDate: new DateTime.now(),
-                      initialLastDate:
-                          (new DateTime.now()).add(new Duration(days: 7)),
-                      firstDate: new DateTime(2015),
-                      lastDate: new DateTime(2020));
-              if (picked != null && picked.length == 2) {
-                print(picked);
-              }
-            },
-            child: new Text("Pick date range")),
+          color: Colors.white,
+          onPressed: () async {
+            final List<DateTime> originPicked = await DateRangePicker.showDatePicker(
+                context: context,
+                initialFirstDate: new DateTime.now(),
+                initialLastDate:
+                    (new DateTime.now()).add(new Duration(days: 7)),
+                firstDate: new DateTime(2019),
+                lastDate: new DateTime(2020));
+            if (originPicked != null && originPicked.length == 2) {
+              print(originPicked);
+              _originDate = originPicked.toList();
+            }
+          },
+          child: Text(dateTimeStamp),
+        ),
+      ),
+    );
+  }
+  Widget _destinationCal(BuildContext context) {
+    dynamic dateTimeStamp = "Pick Date range";
+    return Container(
+      width: MediaQuery.of(context).size.width * .5,
+      height: MediaQuery.of(context).size.height * .1,
+      child: Card(
+        elevation: 8,
+        child: FlatButton(
+          color: Colors.white,
+          onPressed: () async {
+            final List<DateTime> destinationPicked = await DateRangePicker.showDatePicker(
+                context: context,
+                initialFirstDate: new DateTime.now(),
+                initialLastDate:
+                    (new DateTime.now()).add(new Duration(days: 7)),
+                firstDate: new DateTime(2019),
+                lastDate: new DateTime(2020));
+            if (destinationPicked != null && destinationPicked.length == 2) {
+              print(destinationPicked);
+              _destinationDate =destinationPicked.toList();
+            }
+          },
+          child: Text(dateTimeStamp),
+        ),
       ),
     );
   }
 }
 
-Widget _buildFab(BuildContext context) {
-  return FloatingActionButton(
-    onPressed: () {
-      Navigator.of(context).pushNamed(BttmAppBar.tag);
-    },
-    tooltip: 'fab',
-    elevation: 4.0,
-    highlightElevation: 12,
-    //shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    child: Icon(Icons.search),
-    backgroundColor: Colors.white,
-    foregroundColor: Colors.lightGreen,
-  );
-}
 
 /* 
 ListTile(
