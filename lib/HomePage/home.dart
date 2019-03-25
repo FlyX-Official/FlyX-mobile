@@ -1,24 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flyx/InputPage/inputForm.dart';
-import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
-import 'package:flyx/SideBar/AppDrawer.dart';
-import 'package:flyx/TicketDisplayer/ticketViewer.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flyx/LoginPage/login_page.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_backdrop/flutter_backdrop.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:flyx/InputPage/gMap.dart';
-import 'package:flip_card/flip_card.dart';
-import 'package:http/http.dart' as http;
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:rounded_modal/rounded_modal.dart';
+import '../TicketDisplayer/ticketViewer.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -114,7 +105,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: MediaQuery.of(context).size.height*.1,
+      height: MediaQuery.of(context).size.height * .1,
       child: ListView.builder(
         reverse: true,
         itemCount: originData == null ? 0 : originData.length,
@@ -679,12 +670,10 @@ class _HomePageState extends State<HomePage>
                                       }
                                     },
                                     child: //Icon(Icons.date_range),
-                                    Text(
-                                     
-                                        '${DateTime.now().month}-${DateTime.now().day+7}-${DateTime.now().year} <-> '+
-                                        '${DateTime.now().month}-${DateTime.now().day+14}-${DateTime.now().year}'
-                                        
-                                      'yyyy-mm-dd <---> yyyy-mm-dd',
+                                        Text(
+                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year} <-> ' +
+                                          '${DateTime.now().month}-${DateTime.now().day + 14}-${DateTime.now().year}'
+                                          'yyyy-mm-dd <---> yyyy-mm-dd',
                                     ),
                                   ),
                                 ),
@@ -774,93 +763,63 @@ class _HomePageState extends State<HomePage>
   }
 
   void showModalMenu() {
-    showModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return Container(
-            height: 350.0,
-            color: Colors.transparent, //could change this to Color(0xFF737373),
-            //so you don't have to change MaterialApp canvasColor
-            child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(10.0),
-                        topRight: const Radius.circular(10.0))),
-                child: Center(
-                  child: Text("This is a modal sheet"),
-                )),
-          );
-        }
-
-        /*
+    showRoundedModalBottomSheet(
+      context: context,
+      radius: 16,
+      color: Colors.white,
+      builder: (BuildContext context) {
         return Container(
-          color: Color(0xcFF737373),
+          //color: Colors.black54,
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: SafeArea(
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                color: Colors.green,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    SizedBox(
-                        height: MediaQuery.of(context).size.height * .45,
-                        child: ListView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          children: <Widget>[
-                            Card(
-                              elevation: 8,
-                              child: UserAccountsDrawerHeader(
-                                accountName:
-                                    Text("Name: ${_currentUser.displayName}"),
-                                accountEmail:
-                                    Text("Email: ${_currentUser.email}"),
-                                currentAccountPicture:
-                                    Image.network(_currentUser.photoUrl),
-                              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                SizedBox(
+                    height: MediaQuery.of(context).size.height * .45,
+                    child: ListView(
+                      physics: NeverScrollableScrollPhysics(),
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 8,
+                            child: UserAccountsDrawerHeader(
+                              accountName:
+                                  Text("Name: ${_currentUser.displayName}"),
+                              accountEmail:
+                                  Text("Email: ${_currentUser.email}"),
+                              currentAccountPicture:
+                                  Image.network(_currentUser.photoUrl),
                             ),
-                            Card(
-                              elevation: 8,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: ListTile(
-                                leading: Icon(Icons.monetization_on),
-                                title: Text("Currency"),
-                              ),
-                            ),
-                            Card(
-                              elevation: 8,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: ListTile(
-                                leading: Icon(Icons.monetization_on),
-                                title: Text("Preferred Airport"),
-                              ),
-                            )
-                          ],
-                        )),
-                  ],
-                ),
-              ),
+                          ),
+                        ),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          child: ListTile(
+                            leading: Icon(Icons.monetization_on),
+                            title: Text("Currency"),
+                          ),
+                        ),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          child: ListTile(
+                            leading: Icon(Icons.monetization_on),
+                            title: Text("Preferred Airport"),
+                          ),
+                        )
+                      ],
+                    )),
+              ],
             ),
           ),
         );
-      },*/
-        );
+      },
+    );
   }
 
   Map<String, Object> postToGlitchServerData() {
@@ -903,7 +862,6 @@ class _HomePageState extends State<HomePage>
     ).then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
-
     });
 
 //http.read("https://olivine-pamphlet.glitch.me/").then(print);

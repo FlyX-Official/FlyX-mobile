@@ -32,6 +32,8 @@ dependencies:
   flutter_backdrop: ^1.0.3
   flip_card: ^0.2.1
   url_launcher: ^5.0.2
+  rounded_modal: ^1.0.0
+
 
   flutter:
     sdk: flutter
