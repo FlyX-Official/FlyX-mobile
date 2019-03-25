@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: 100,
+      height: MediaQuery.of(context).size.height*.1,
       child: ListView.builder(
         reverse: true,
         itemCount: originData == null ? 0 : originData.length,
@@ -678,14 +678,14 @@ class _HomePageState extends State<HomePage>
                                             returnDatePicked.toList();
                                       }
                                     },
-                                    child: Icon(Icons.date_range),
-                                    /*Text(
+                                    child: //Icon(Icons.date_range),
+                                    Text(
                                      
                                         '${DateTime.now().month}-${DateTime.now().day+7}-${DateTime.now().year} <-> '+
                                         '${DateTime.now().month}-${DateTime.now().day+14}-${DateTime.now().year}'
                                         
                                       'yyyy-mm-dd <---> yyyy-mm-dd',
-                                    ),*/
+                                    ),
                                   ),
                                 ),
                               ),
@@ -903,6 +903,7 @@ class _HomePageState extends State<HomePage>
     ).then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
+
     });
 
 //http.read("https://olivine-pamphlet.glitch.me/").then(print);
