@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flyx/TicketDisplayer/ticket.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class TicketListViewBuilder extends StatelessWidget {
   //final Ticket ticket;
   const TicketListViewBuilder({
     Key key,
     @required this.data,
+    this.search_par,
+    this.data_airlines,
+    this.data_duration,
+    this.data_route,
   }) : super(key: key);
 
   final List data;
+  final List search_par;
+  final List data_airlines;
+  final List data_duration;
+  final List data_route;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 251, 108, 112),
+      color: Colors.amber, //Color.fromARGB(255, 251, 108, 112),
       child: OrientationBuilder(
         builder: (context, orientation) {
           return new ListView.builder(
@@ -30,41 +41,38 @@ class TicketListViewBuilder extends StatelessWidget {
                 child: Card(
                   elevation: 8,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                      ),
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
                   child: Container(
                     padding: EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(
-                          //alignment: Alignment.center,
-
-                          child: Text(data[i]["from"] +
-                              "\n| |\n| |\nV\n" +
-                              data[i]["to"]),
-                        ),
                         Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text(
-                                " Price: " +
-                                    data[i]["pennyPrice"].toString() +
-                                    "\n Duration: " +
-                                    data[i]["duration"].toString(),
+                              Container(
+                                child: Text(
+                                    "'From': ${data[i]['flyFrom'].toString()}" +
+                                        "\n'To': ${data[i]['flyTo'].toString()}" +
+                                        "\n'Dollars': ${data[i]['price'].toString()}"),
                               ),
-                              Text(" \nDEPARTURE: " +
-                                  data[i]["departure"] +
-                                  "\nARRIVAL: " +
-                                  data[i]["arrival"] +
-                                  "\nColor: " +
-                                  data[i]['color'] +
-                                  "\nSourceLocation: " +
-                                  data[i]["sourceLocation"] +
-                                  "\nDestinationLocation: " +
-                                  data[i]["destLocation"]),
+                              Container(
+                                child: RaisedButton(
+                                  onPressed: () async {
+                                    String url = data[i]['deep_link'];
+                                    if (await canLaunch(url)) {
+                                      await launch(url);
+                                      print(url);
+                                    } else {
+                                      throw 'Could not launch $url';
+                                    }
+                                  },
+                                  child: Text('buy ticket $i'),
+                                ),
+                              ),
                             ]),
                       ],
                     ),
@@ -78,24 +86,3 @@ class TicketListViewBuilder extends StatelessWidget {
     );
   }
 }
-
-/* new ListTile(
-          leading:
-              new Text(data[i]["from"] + "\n| |\n| |\nV\n" + data[i]["to"]),
-          title: new Text(
-            " Price: " +
-                data[i]["pennyPrice"].toString() +
-                " Duration: " +
-                data[i]["duration"].toString(),
-          ),
-          subtitle: new Text(" \nDEPARTURE: " +
-              data[i]["departure"] +
-              "\nARRIVAL: " +
-              data[i]["arrival"] +
-              "\nColor: " +
-              data[i]['color'] +
-              "\nSourceLocation: " +
-              data[i]["sourceLocation"] +
-              "\nDestinationLocation: " +
-              data[i]["destLocation"]),
-        );*/

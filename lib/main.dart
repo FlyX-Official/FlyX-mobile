@@ -8,6 +8,7 @@ import 'package:flyx/TicketDisplayer/ticketViewer.dart';
 import 'package:flyx/profile/profile.dart';
 import 'package:flyx/InputPage/inputForm.dart';
 import 'package:flyx/settings/settings.dart';
+import 'package:flyx/HomePage/home.dart';
 // End of Local files
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),//BttmAppBar(),//InputForm(),
+      home: HomePage(),//BttmAppBar(),//InputForm(),
       routes: routes,
     );
   }
