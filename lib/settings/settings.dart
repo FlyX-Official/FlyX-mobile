@@ -2,6 +2,11 @@ import 'package:flyx/FloatingActionButton/fab_bottom_app_bar.dart';
 import 'package:flyx/FloatingActionButton/layout.dart';
 import 'package:flyx/SideBar/AppDrawer.dart';
 import 'package:flutter/material.dart';
+// pages
+import 'package:flyx/settings/pages/TermsNConditions.dart';
+import 'package:flyx/settings/pages/Notifications.dart';
+import 'package:flyx/settings/pages/About.dart';
+import 'package:flyx/settings/pages/Privacy.dart';
 
 class Settings extends StatefulWidget {
   // tag to main
@@ -67,6 +72,7 @@ class _Settings extends State<Settings> {
                         decoration: TextDecoration.underline),
                   ),
                   onTap: () {/* redirect to terms and conditions page */},
+                  leading: Icon(Icons.account_box),
                 ),
                 ListTile(
                   title: const Text(
@@ -76,7 +82,10 @@ class _Settings extends State<Settings> {
                         color: Colors.blueAccent,
                         decoration: TextDecoration.underline),
                   ),
-                  onTap: () {/* redirect to terms and conditions page */},
+                  onTap: () {/* redirect to terms and conditions page */
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>Privacy()));
+                  },
+                  leading: Icon(Icons.security),
                 ),
               ],
             ),
@@ -92,11 +101,13 @@ class _Settings extends State<Settings> {
                   title: Text('APP SETTINGS'),
                 ),
                 new SwitchListTile(
+                  
                   value: _mode,
                   onChanged: _onChangedMode,
                   title: new Text('App Mode',
                       style: new TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black)),
+                          
                 ),
                 ListTile(
                   title: const Text(
@@ -106,7 +117,10 @@ class _Settings extends State<Settings> {
                         color: Colors.blueAccent,
                         decoration: TextDecoration.underline),
                   ),
-                  onTap: () {/* redirect to terms and conditions page */},
+                  onTap: () {/* redirect to terms and conditions page */
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>Notifications()));
+                  },
+                  leading: Icon(Icons.notifications),
                 ),
               ],
             ),
@@ -122,24 +136,32 @@ class _Settings extends State<Settings> {
               ),
               ListTile(
                 title: const Text(
+                  'About ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                      decoration: TextDecoration.underline),
+                  
+                ),
+                onTap: () {/* redirect to terms and conditions page */
+                  Navigator.push(context, MaterialPageRoute(builder:(context)=>About()));
+                },
+                leading: Icon(Icons.airplanemode_active),
+              ),
+              ListTile(
+                title: const Text(
                   "Terms and Conditions",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.blueAccent,
                       decoration: TextDecoration.underline),
                 ),
-                onTap: () {/* redirect to terms and conditions page */},
+                onTap: () {/* redirect to terms and conditions page */
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TermsNConditions()));
+                },
+                leading: Icon(Icons.info),
               ),
-              ListTile(
-                title: const Text(
-                  'About ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                      decoration: TextDecoration.underline),
-                ),
-                onTap: () {/* redirect to terms and conditions page */},
-              )
+
             ]),
           ),
         ),
