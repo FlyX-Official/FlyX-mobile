@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:flyx/TicketDisplayer/ticketCard.dart';
 //import 'package:flyx/TicketDisplayer/testTicket.dart';
 import 'package:flyx/TicketDisplayer/ticket.dart';
+import 'package:flyx/TicketDisplayer/TicketCardExpand.dart';
+
+import 'package:flyx/TicketDisplayer/test.dart';
 
 class TicketView extends StatelessWidget {
   // This widget is the root of your application.
@@ -56,7 +59,7 @@ class _TicketViewPageState extends State<TicketViewPage>
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: TicketListViewBuilder(
+        child: TicketCardExpand( //TicketListViewBuilder( // MyApp(
       data: data,
     ));
   }

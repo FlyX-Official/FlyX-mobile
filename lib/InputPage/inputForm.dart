@@ -579,5 +579,3 @@ class _InputFormState extends State<InputForm> {
   }
 }
 
-void showModalBottomSheet(
-    {BuildContext context, Container Function(BuildContext context) builder}) {}
