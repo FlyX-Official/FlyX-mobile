@@ -88,9 +88,6 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:flyx/TicketDisplayer/ticket.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 class TicketListViewBuilder extends StatefulWidget {
@@ -181,6 +178,9 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
                               alignment: Alignment.center,
                               child: Text("From : ${widget.data[i]['flyFrom'].toString()}" +
                                   "\nTo : ${widget.data[i]['flyTo'].toString()}" +
+                                  "\nDistance : ${widget.data[i]['distance'].toString()}" +
+                                  "\nFly-Duration : ${widget.data[i]['fly_duration'].toString()}" +
+                                  "\nreturn-Duration : ${widget.data[i]['return_duration'].toString()}" +
                                   "\nDollars : ${widget.data[i]['price'].toString()}"),
                             ),
                         body: Container(

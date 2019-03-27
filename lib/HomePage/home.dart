@@ -5,6 +5,7 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flyx/TicketDisplayer/ticketCard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +41,8 @@ class _HomePageState extends State<HomePage>
   var _toSlider = 1;
   IconData fabIcon = Icons.search;
 
+  List responseTicketData;
+
   List<DateTime> _originDate;
   List<DateTime> _destinationDate;
   var ticketresponses;
@@ -65,15 +68,15 @@ class _HomePageState extends State<HomePage>
     _isToOpen = false;
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       _currentUser = account;
-      ticketresponses = TicketViewPage();
+      ticketresponses = TicketListViewBuilder(data: responseTicketData,);
 
       setState(() {
         _currentUser = account;
-        ticketresponses = TicketViewPage();
+        ticketresponses = TicketListViewBuilder(data: responseTicketData,);
       });
     });
     _googleSignIn.signInSilently();
-    TicketViewPage();
+    TicketListViewBuilder(data: responseTicketData,);
     _controller = AnimationController(vsync: this);
   }
 
@@ -274,6 +277,9 @@ class _HomePageState extends State<HomePage>
           child: Icon(fabIcon),
           onPressed: () {
             postToGlitchServer();
+            TicketListViewBuilder(
+              data: responseTicketData,
+            );
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -684,7 +690,7 @@ class _HomePageState extends State<HomePage>
                   children: <Widget>[
                     Container(
                         height: MediaQuery.of(context).size.height * .85,
-                        child: ticketresponses),
+                        child: Container(child: TicketListViewBuilder(data: responseTicketData,))),
                   ],
                 ),
               ),
@@ -850,6 +856,14 @@ class _HomePageState extends State<HomePage>
     ).then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
+      dynamic responseData = jsonDecode(response.body);
+      responseTicketData = responseData["data"];
+      TicketListViewBuilder(data: responseTicketData,);
+      setState(() {
+        var responseData = json.decode(response.body);
+        //search_par = responseData["tickets"]["search_params"];
+        responseTicketData = responseData["data"];
+      });
     });
 
 //http.read("https://olivine-pamphlet.glitch.me/").then(print);
