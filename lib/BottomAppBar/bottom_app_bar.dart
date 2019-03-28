@@ -3,7 +3,6 @@ import 'package:flyx/SideBar/AppDrawer.dart';
 import 'package:flyx/TicketDisplayer/ticketViewer.dart';
 import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
 import 'package:flyx/InputPage/inputForm.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flyx/LoginPage/login_page.dart';

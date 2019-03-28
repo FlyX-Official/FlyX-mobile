@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +21,7 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 class HomePage extends StatefulWidget {
+  static String tag = 'Home-page';
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -80,6 +82,7 @@ class _HomePageState extends State<HomePage>
 
       setState(() {
         _currentUser = account;
+
         ticketresponses = TicketListViewBuilder(
           data: responseTicketData,
         );
@@ -293,6 +296,8 @@ class _HomePageState extends State<HomePage>
         //body:,
         floatingActionButton: FloatingActionButton(
           child: Icon(fabIcon),
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.lightGreenAccent,
           onPressed: () {
             postToGlitchServer();
             TicketListViewBuilder(
@@ -311,15 +316,15 @@ class _HomePageState extends State<HomePage>
         //drawer,
         //endDrawer,
         //bottomSheet:,
-        backgroundColor: Color.fromARGB(255,247,247,247),
+        backgroundColor: Color.fromARGB(255, 247, 247, 247),
         body: SafeArea(
           child: PageView(
             onPageChanged: (i) {
-              if (i == 1) {
+              if (i == 0) {
                 setState(() {
                   fabIcon = Icons.search;
                 });
-              } else if (i == 2) {
+              } else if (i == 1) {
                 setState(() {
                   fabIcon = Icons.payment;
                 });
@@ -328,10 +333,7 @@ class _HomePageState extends State<HomePage>
             controller: _pageviewcontroller,
             scrollDirection: Axis.horizontal,
             children: <Widget>[
-              Container(
-                child: LoginPage(),
-              )
-              ,
+              //Container(child: LoginPage(),),
               SingleChildScrollView(
                 controller: _inputPage,
                 child: Container(
@@ -718,22 +720,20 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
               Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                        height: MediaQuery.of(context).size.height * .85,
-                        child: Container(
-                            child: TicketListViewBuilder(
-                          data: responseTicketData,
-                        ))),
-                  ],
+                child: Container(
+                  height: MediaQuery.of(context).size.height * .85,
+                  child: Container(
+                    child: TicketListViewBuilder(
+                      data: responseTicketData,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
         //resizeToAvoidBottomInset:,
+
         bottomNavigationBar: BottomAppBar(
           notchMargin: 8,
           elevation: 8,
@@ -746,7 +746,7 @@ class _HomePageState extends State<HomePage>
               Container(
                 child: IconButton(
                   icon: Icon(Icons.explore),
-                  color: Colors.red,
+                  color: Colors.black,
                   highlightColor: Colors.redAccent,
                   onPressed: () {
                     // _scaffoldKey.currentState.openDrawer();
@@ -756,7 +756,7 @@ class _HomePageState extends State<HomePage>
               Container(
                 child: IconButton(
                   icon: Icon(Icons.edit_location),
-                  color: Colors.green,
+                  color: Colors.black,
                   highlightColor: Colors.redAccent,
                   onPressed: () {
                     // _scaffoldKey.currentState.openDrawer();
@@ -772,7 +772,7 @@ class _HomePageState extends State<HomePage>
               Container(
                 child: IconButton(
                   icon: Icon(Icons.notifications),
-                  color: Colors.blue,
+                  color: Colors.black,
                   highlightColor: Colors.blue,
                   onPressed: () {
                     // _scaffoldKey.currentState.openDrawer();
@@ -781,7 +781,7 @@ class _HomePageState extends State<HomePage>
               ),
               IconButton(
                 icon: Icon(Icons.account_box),
-                color: Color.fromARGB(255,247,247,247),
+                color: Colors.black,
                 highlightColor: Colors.orange,
                 onPressed: () => showModalMenu(),
               ),

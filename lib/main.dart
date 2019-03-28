@@ -12,7 +12,6 @@ import 'package:flyx/HomePage/home.dart';
 // End of Local files
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui' as ui;
 
 void main() {
   SystemChrome.setEnabledSystemUIOverlays([]);
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),//BttmAppBar(),//InputForm(),
+      home: LoginPage(),
       routes: routes,
     );
   }

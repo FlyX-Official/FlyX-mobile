@@ -1,21 +1,16 @@
-import 'dart:ui';
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:local_auth/local_auth.dart';
-import 'package:flyx/Biometrics/bioAuth.dart';
-
+import 'package:flyx/HomePage/home.dart';
+import 'package:flyx/style/theme.dart' as Theme;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flyx/InputPage/inputForm.dart';
-import 'package:flyx/style/theme.dart' as Theme;
-
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../InputPage/inputForm.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -30,7 +25,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  PageController _pageController;
+  final _pageController = PageController();
   //SignIn Controllers
   final TextEditingController _signInEmailController = TextEditingController();
   final TextEditingController _signInPasswordController =
@@ -78,12 +73,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     dynamic _height = MediaQuery.of(context).size.height;
     dynamic _width = MediaQuery.of(context).size.width;
-    dynamic _fourFifthsWidth= _width * .85;
-    
+    dynamic _fourFifthsWidth = _width * .85;
+
     return Scaffold(
       body: Container(
-        color: Color.fromARGB(225, 73, 144, 226),
+        color: Color.fromARGB(255, 247, 247, 247),
         child: PageView(
+          physics: BouncingScrollPhysics(),
           controller: _pageController,
           scrollDirection: Axis.vertical,
           children: <Widget>[
@@ -108,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Container(
-               height: _height * .5,
+              height: _height * .3,
               width: _width,
               //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
               child: FadeInImage.memoryNetwork(
@@ -146,7 +142,24 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 Container(
-                  child: buildSeparator(),
+                  width: MediaQuery.of(context).size.width * .9,
+                  child: Divider(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+                Container(
+                  child: FlatButton(
+                    child: Text('Need an Account? Sign up'),
+                    onPressed: () {
+                      _pageController.jumpToPage(1);
+                    },
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * .9,
+                  child: Divider(
+                    color: Colors.blueGrey,
+                  ),
                 ),
                 Container(
                   child:
@@ -242,12 +255,12 @@ class _LoginPageState extends State<LoginPage> {
         splashColor: Theme.Colors.loginGradientEnd,
         color: Colors.lightGreenAccent,
         //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        icon: Icon(Icons.fingerprint),
+        icon: Icon(Icons.security),
         label: Text(
-          "LOGIN",
+          "Sign In",
           style: TextStyle(
             color: Colors.black,
-            fontSize: 25.0,
+            fontSize: 22.0,
             fontFamily: "Nunito",
           ),
         ),
@@ -326,19 +339,27 @@ class _LoginPageState extends State<LoginPage> {
 
   ButtonBar buildThirdPartySignIn() {
     return ButtonBar(
-      
       alignment: MainAxisAlignment.center,
       children: <Widget>[
-        FlatButton.icon(
+        RaisedButton.icon(
           color: Colors.white,
           icon: Icon(FontAwesomeIcons.google),
           label: Text("Google"),
           onPressed: () async {
             _signIn();
-            Navigator.of(context).pushNamed(InputForm.tag);
           },
         ),
-        //FlatButton(),
+        RaisedButton.icon(
+          color: Colors.white,
+          icon: Icon(FontAwesomeIcons.mailchimp),
+          label: Text("Guest Login"),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),
         //FlatButton(),
       ],
     );

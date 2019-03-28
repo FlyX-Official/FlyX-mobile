@@ -11,7 +11,7 @@ class Settings extends StatefulWidget {
   final String title;
 
   @override
-  _Settings createState() => new _Settings();
+  _Settings createState() => _Settings();
 }
 
 class _Settings extends State<Settings> {
@@ -39,18 +39,18 @@ class _Settings extends State<Settings> {
     return ListView(
       children: <Widget>[
         Container(
-          padding: new EdgeInsets.all(32.0),
-          child: new Center(
-            child: new Column(
+          padding: EdgeInsets.all(32.0),
+          child: Center(
+            child: Column(
               children: <Widget>[
-                new SwitchListTile(
+                SwitchListTile(
                   value: _mode,
                   onChanged: _onChangedMode,
-                  title: new Text('App Mode',
-                      style: new TextStyle(
+                  title: Text('Dark Mode',
+                      style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
-                new ListTile(
+                ListTile(
                   title: const Text(
                     "Terms and Conditions",
                     style: TextStyle(
