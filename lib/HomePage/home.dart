@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,12 +6,14 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flyx/LoginPage/login_page.dart';
 import 'package:flyx/TicketDisplayer/ticketCard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
 import '../InputPage/gMap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../TicketDisplayer/ticketViewer.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,6 +27,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
+
+  Completer<GoogleMapController> _customGoogleMapController = Completer();
+
   final _pageviewcontroller = PageController();
   final _formKey = GlobalKey<FormState>();
   //TextEditingController _from = TextEditingController();
@@ -68,15 +74,21 @@ class _HomePageState extends State<HomePage>
     _isToOpen = false;
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       _currentUser = account;
-      ticketresponses = TicketListViewBuilder(data: responseTicketData,);
+      ticketresponses = TicketListViewBuilder(
+        data: responseTicketData,
+      );
 
       setState(() {
         _currentUser = account;
-        ticketresponses = TicketListViewBuilder(data: responseTicketData,);
+        ticketresponses = TicketListViewBuilder(
+          data: responseTicketData,
+        );
       });
     });
     _googleSignIn.signInSilently();
-    TicketListViewBuilder(data: responseTicketData,);
+    TicketListViewBuilder(
+      data: responseTicketData,
+    );
     _controller = AnimationController(vsync: this);
   }
 
@@ -85,6 +97,12 @@ class _HomePageState extends State<HomePage>
     super.dispose();
     _controller.dispose();
   }
+
+  //GOogle map
+  void _onMapCreated(GoogleMapController controller) {
+    _customGoogleMapController.complete(controller);
+  }
+  //
 
 //autocomplete
 
@@ -280,6 +298,11 @@ class _HomePageState extends State<HomePage>
             TicketListViewBuilder(
               data: responseTicketData,
             );
+            _pageviewcontroller.animateToPage(
+              2,
+              duration: Duration(milliseconds: 1000),
+              curve: Curves.easeInOutExpo.flipped,
+            );
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -288,15 +311,15 @@ class _HomePageState extends State<HomePage>
         //drawer,
         //endDrawer,
         //bottomSheet:,
-        backgroundColor: Colors.amber,
+        backgroundColor: Color.fromARGB(255,247,247,247),
         body: SafeArea(
           child: PageView(
             onPageChanged: (i) {
-              if (i == 0) {
+              if (i == 1) {
                 setState(() {
                   fabIcon = Icons.search;
                 });
-              } else if (i == 1) {
+              } else if (i == 2) {
                 setState(() {
                   fabIcon = Icons.payment;
                 });
@@ -305,6 +328,10 @@ class _HomePageState extends State<HomePage>
             controller: _pageviewcontroller,
             scrollDirection: Axis.horizontal,
             children: <Widget>[
+              Container(
+                child: LoginPage(),
+              )
+              ,
               SingleChildScrollView(
                 controller: _inputPage,
                 child: Container(
@@ -319,7 +346,13 @@ class _HomePageState extends State<HomePage>
                           color: Color(0xc25737373),
                           child: Center(
                             child: Container(
-                              child: Text('Put Map here'), // CustomGoogleMap(),
+                              child: GoogleMap(
+                                onMapCreated: _onMapCreated,
+                                initialCameraPosition: CameraPosition(
+                                  target: LatLng(-33.852, 151.211),
+                                  zoom: 11.0,
+                                ),
+                              ), //Text('Put Map here'), // CustomGoogleMap(),
                             ),
                           ),
                         ),
@@ -690,7 +723,10 @@ class _HomePageState extends State<HomePage>
                   children: <Widget>[
                     Container(
                         height: MediaQuery.of(context).size.height * .85,
-                        child: Container(child: TicketListViewBuilder(data: responseTicketData,))),
+                        child: Container(
+                            child: TicketListViewBuilder(
+                          data: responseTicketData,
+                        ))),
                   ],
                 ),
               ),
@@ -745,7 +781,7 @@ class _HomePageState extends State<HomePage>
               ),
               IconButton(
                 icon: Icon(Icons.account_box),
-                color: Colors.amberAccent,
+                color: Color.fromARGB(255,247,247,247),
                 highlightColor: Colors.orange,
                 onPressed: () => showModalMenu(),
               ),
@@ -858,7 +894,9 @@ class _HomePageState extends State<HomePage>
       print("Response body: ${response.body}");
       dynamic responseData = jsonDecode(response.body);
       responseTicketData = responseData["data"];
-      TicketListViewBuilder(data: responseTicketData,);
+      TicketListViewBuilder(
+        data: responseTicketData,
+      );
       setState(() {
         var responseData = json.decode(response.body);
         //search_par = responseData["tickets"]["search_params"];
