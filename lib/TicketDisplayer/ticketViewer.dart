@@ -13,9 +13,7 @@ class TicketView extends StatelessWidget {
   static String tag = 'card-page';
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new TicketViewPage(),
-    );
+    return TicketViewPage();
   }
 }
 
@@ -24,29 +22,45 @@ class TicketViewPage extends StatefulWidget {
   _TicketViewPageState createState() => new _TicketViewPageState();
 }
 
-class _TicketViewPageState extends State<TicketViewPage> {
-  String url =
-      'https://my-json-server.typicode.com/We-Fly/flightsniffer-mobile/db';
+class _TicketViewPageState extends State<TicketViewPage>
+    with AutomaticKeepAliveClientMixin<TicketViewPage> {
+  String url = 'https://olivine-pamphlet.glitch.me/search';
+  //'https://my-json-server.typicode.com/We-Fly/flightsniffer-mobile/db';
   List data;
+
   Future<String> makeRequest() async {
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
 
+    var responseData = json.decode(response.body);
+    print('${responseData['tickets']['data'][0]['deep_link'].toString()}') ;
+    //search_par = responseData["tickets"]["search_params"];
+    data = responseData["tickets"]["data"];
     setState(() {
-      var extractdata = json.decode(response.body);
-      data = extractdata["tickets"];
-      
+      var responseData = json.decode(response.body);
+      //search_par = responseData["tickets"]["search_params"];
+      data = responseData["tickets"]["data"];
     });
-  
   }
 
   @override
   void initState() {
+    super.initState();
     this.makeRequest();
+    setState(() {
+      
+      this.makeRequest();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: TicketListViewBuilder(data: data));
+    return Container(
+        child: TicketListViewBuilder(
+      data: data,
+    ));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
