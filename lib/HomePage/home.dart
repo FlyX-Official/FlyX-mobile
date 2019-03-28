@@ -1,24 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flyx/InputPage/inputForm.dart';
-import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
-import 'package:flyx/SideBar/AppDrawer.dart';
-import 'package:flyx/TicketDisplayer/ticketViewer.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flyx/LoginPage/login_page.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_backdrop/flutter_backdrop.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:flyx/InputPage/gMap.dart';
-import 'package:flip_card/flip_card.dart';
-import 'package:http/http.dart' as http;
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flyx/TicketDisplayer/ticketCard.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:rounded_modal/rounded_modal.dart';
+import '../InputPage/gMap.dart';
+import '../TicketDisplayer/ticketViewer.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -48,6 +41,8 @@ class _HomePageState extends State<HomePage>
   var _toSlider = 1;
   IconData fabIcon = Icons.search;
 
+  List responseTicketData;
+
   List<DateTime> _originDate;
   List<DateTime> _destinationDate;
   var ticketresponses;
@@ -63,6 +58,8 @@ class _HomePageState extends State<HomePage>
   String _searchFromField = "";
   String _searchToField = "";
 
+  PageController _inputPage;
+
   @override
   void initState() {
     super.initState();
@@ -71,15 +68,15 @@ class _HomePageState extends State<HomePage>
     _isToOpen = false;
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       _currentUser = account;
-      ticketresponses = TicketViewPage();
+      ticketresponses = TicketListViewBuilder(data: responseTicketData,);
 
       setState(() {
         _currentUser = account;
-        ticketresponses = TicketViewPage();
+        ticketresponses = TicketListViewBuilder(data: responseTicketData,);
       });
     });
     _googleSignIn.signInSilently();
-    TicketViewPage();
+    TicketListViewBuilder(data: responseTicketData,);
     _controller = AnimationController(vsync: this);
   }
 
@@ -114,7 +111,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: 100,
+      height: MediaQuery.of(context).size.height * .1,
       child: ListView.builder(
         reverse: true,
         itemCount: originData == null ? 0 : originData.length,
@@ -153,7 +150,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: 100,
+      height: MediaQuery.of(context).size.height * .1,
       child: ListView.builder(
         reverse: true,
         itemCount: destData == null ? 0 : destData.length,
@@ -233,43 +230,6 @@ class _HomePageState extends State<HomePage>
     return suggestedWords;
   }
 
-  /*dynamic _buildSearchList() async {
-    if (_searchFromField.isEmpty) {
-      _searchFromList = List();
-      return List();
-    } else {
-      _searchFromList = await _getSuggestion(_searchFromField) ?? List();
-      //..add(_searchFromField);
-
-      List<ListTile> childItems = new List();
-      for (var value in _searchFromList) {
-        childItems.add(_getListTile(value));
-      }
-      return childItems;
-    }
-  }*/
-/*
-  ListTile _getListTile(String suggestedPhrase) {
-    return new ListTile(
-      dense: true,
-      title: new Text(
-        suggestedPhrase,
-        style: Theme.of(context).textTheme.body2,
-      ),
-      onTap: () {
-        setState(() {
-          _onTap = true;
-          _isSearching = false;
-          _isFromOpen = true;
-          _onTapTextLength = suggestedPhrase.length;
-          _from.text = suggestedPhrase;
-        });
-        _from.selection = TextSelection.fromPosition(
-            new TextPosition(offset: suggestedPhrase.length));
-      },
-    );
-  }*/
-
   _HomePageState() {
     _from.addListener(() {
       if (_from.text.isEmpty) {
@@ -317,6 +277,9 @@ class _HomePageState extends State<HomePage>
           child: Icon(fabIcon),
           onPressed: () {
             postToGlitchServer();
+            TicketListViewBuilder(
+              data: responseTicketData,
+            );
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -342,374 +305,394 @@ class _HomePageState extends State<HomePage>
             controller: _pageviewcontroller,
             scrollDirection: Axis.horizontal,
             children: <Widget>[
-              Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                children: <Widget>[
-                  //Container(child: CustomGoogleMap(),),
-                  Container(
-                    margin: EdgeInsets.all(8),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+              SingleChildScrollView(
+                controller: _inputPage,
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        height: MediaQuery.of(context).size.height * .3,
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.all(8),
+                        //color: Color(0xc25737373),
+                        child: Card(
+                          color: Color(0xc25737373),
+                          child: Center(
+                            child: Container(
+                              child: Text('Put Map here'), // CustomGoogleMap(),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Stack(
+                        alignment: AlignmentDirectional.bottomCenter,
                         children: <Widget>[
                           Container(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          .1),
-                                  child: Container(
-                                      child:
-                                          _isFromOpen //(_isSearching && (!_onTap))
-                                              ? getFromWidget()
-                                              : null),
-                                ),
-                                Container(
-                                  //margin: EdgeInsets.only(top: 90),
-                                  child: Card(
-                                    elevation: 0,
-                                    child: Padding(
-                                      child: TextFormField(
-                                        controller: _from,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Field cannot be empty';
-                                          }
-                                        },
-                                        onFieldSubmitted: (String value) {
-                                          print("$value submitted");
-                                          setState(() {
-                                            _from.text = value;
-                                            _onTap = true;
-                                          });
-                                        },
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            FontAwesomeIcons.planeDeparture,
-                                            color: Colors.blue,
-                                            //size: 22.0,
+                            height: MediaQuery.of(context).size.height * .6,
+                            margin: EdgeInsets.all(8),
+                            child: Card(
+                              color: Color(0xc25737373),
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    .1),
+                                            child: Container(
+                                                child:
+                                                    _isFromOpen //(_isSearching && (!_onTap))
+                                                        ? getFromWidget()
+                                                        : null),
                                           ),
-                                          hintText: 'Flying From',
-                                          hintStyle: TextStyle(
-                                              fontFamily: "Nunito",
-                                              fontSize: 17.0),
-                                        ),
+                                          Container(
+                                            //margin: EdgeInsets.only(top: 90),
+                                            child: Card(
+                                              elevation: 8,
+                                              child: Padding(
+                                                child: TextFormField(
+                                                  controller: _from,
+                                                  //focusNode: _flyingFromFocusNode,
+                                                  validator: (value) {
+                                                    if (value.isEmpty) {
+                                                      return 'Field cannot be empty';
+                                                    }
+                                                  },
+                                                  onFieldSubmitted:
+                                                      (String value) {
+                                                    print("$value submitted");
+                                                    setState(() {
+                                                      _from.text = value;
+                                                      _onTap = true;
+                                                    });
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    icon: Icon(
+                                                      FontAwesomeIcons
+                                                          .planeDeparture,
+                                                      color: Colors.blue,
+                                                      //size: 22.0,
+                                                    ),
+                                                    hintText: 'Flying From',
+                                                    hintStyle: TextStyle(
+                                                        fontFamily: "Nunito",
+                                                        fontSize: 17.0),
+                                                  ),
+                                                ),
+                                                padding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ),
+                                          // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    .4),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .6,
+                                            child: Card(
+                                              elevation: 8,
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: <Widget>[
+                                                  Container(
+                                                    child: Slider(
+                                                      value: _fromSlider
+                                                          .toDouble(),
+                                                      min: 0.0,
+                                                      max: 100.0,
+                                                      divisions: 5,
+                                                      label:
+                                                          '$_fromSlider', //var _fromSlider = 1;,
+                                                      onChanged:
+                                                          (double newValue) {
+                                                        setState(() {
+                                                          _fromSlider =
+                                                              newValue.round();
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Text("$_fromSlider Mi"),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      padding: EdgeInsets.all(10),
                                     ),
-                                  ),
-                                ),
-                                // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                                Container(
-                                  margin: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          .4),
-                                  width: MediaQuery.of(context).size.width * .6,
-                                  child: Card(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    elevation: 0,
-                                    child: Row(
+                                    Container(
+                                      child: SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                .025,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                      ),
+                                    ),
+                                    Container(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    .1),
+                                            child: Container(
+                                                child:
+                                                    _isToOpen //(_isSearching && (!_onTap))
+                                                        ? getToWidget()
+                                                        : null),
+                                          ),
+                                          Container(
+                                            //margin: EdgeInsets.only(top: 90),
+                                            child: Card(
+                                              elevation: 8,
+                                              child: Padding(
+                                                child: TextFormField(
+                                                  controller: _to,
+                                                  validator: (value) {
+                                                    if (value.isEmpty) {
+                                                      return 'Field cannot be empty';
+                                                    }
+                                                  },
+                                                  onFieldSubmitted:
+                                                      (String value) {
+                                                    print("$value submitted");
+                                                    setState(() {
+                                                      _to.text = value;
+                                                      _onTap = true;
+                                                    });
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    icon: Icon(
+                                                      FontAwesomeIcons
+                                                          .planeDeparture,
+                                                      color: Colors.blue,
+                                                      //size: 22.0,
+                                                    ),
+                                                    hintText: 'Flying To',
+                                                    hintStyle: TextStyle(
+                                                        fontFamily: "Nunito",
+                                                        fontSize: 17.0),
+                                                  ),
+                                                ),
+                                                padding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ),
+                                          // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    .4),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .6,
+                                            child: Card(
+                                              elevation: 8,
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: <Widget>[
+                                                  Container(
+                                                    child: Slider(
+                                                      value: _toSlider
+                                                          .ceilToDouble(),
+                                                      min: 0.0,
+                                                      max: 100.0,
+                                                      divisions: 5,
+                                                      label:
+                                                          '$_toSlider', //var _toSlider = 1;,
+                                                      onChanged:
+                                                          (double newValue) {
+                                                        setState(() {
+                                                          _toSlider =
+                                                              newValue.round();
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Text("$_toSlider Mi"),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      child: SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                .025,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                      ),
+                                    ),
+                                    Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.start,
                                       children: <Widget>[
                                         Container(
-                                          child: Slider(
-                                            value: _fromSlider.toDouble(),
-                                            min: 1.0,
-                                            max: 50.0,
-                                            divisions: 10,
-                                            label:
-                                                '$_fromSlider', //var _fromSlider = 1;,
-                                            onChanged: (double newValue) {
-                                              setState(() {
-                                                _fromSlider = newValue.round();
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        Text("$_fromSlider Mi"),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * .025,
-                              width: MediaQuery.of(context).size.width,
-                            ),
-                          ),
-                          Container(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          .1),
-                                  child: Container(
-                                      child:
-                                          _isToOpen //(_isSearching && (!_onTap))
-                                              ? getToWidget()
-                                              : null),
-                                ),
-                                Container(
-                                  //margin: EdgeInsets.only(top: 90),
-                                  child: Card(
-                                    elevation: 0,
-                                    child: Padding(
-                                      child: TextFormField(
-                                        controller: _to,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Field cannot be empty';
-                                          }
-                                        },
-                                        onFieldSubmitted: (String value) {
-                                          print("$value submitted");
-                                          setState(() {
-                                            _to.text = value;
-                                            _onTap = true;
-                                          });
-                                        },
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            FontAwesomeIcons.planeDeparture,
-                                            color: Colors.blue,
-                                            //size: 22.0,
-                                          ),
-                                          hintText: 'Flying To',
-                                          hintStyle: TextStyle(
-                                              fontFamily: "Nunito",
-                                              fontSize: 17.0),
-                                        ),
-                                      ),
-                                      padding: EdgeInsets.all(10),
-                                    ),
-                                  ),
-                                ),
-                                // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                                Container(
-                                  margin: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          .4),
-                                  width: MediaQuery.of(context).size.width * .6,
-                                  child: Card(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    elevation: 0,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Container(
-                                          child: Slider(
-                                            value: _toSlider.toDouble(),
-                                            min: 1.0,
-                                            max: 50.0,
-                                            divisions: 10,
-                                            label:
-                                                '$_toSlider', //var _toSlider = 1;,
-                                            onChanged: (double newValue) {
-                                              setState(() {
-                                                _toSlider = newValue.round();
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        Text("$_toSlider Mi"),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          /*Container(
-                            child: Stack(
-                              alignment: Alignment.topRight,
-                              overflow: Overflow.visible,
-                              children: <Widget>[
-                                Container(
-                                  child: Card(
-                                    elevation: 0,
-                                    child: Padding(
-                                      child: TextFormField(
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Field cannot be empty';
-                                          }
-                                        },
-                                        onFieldSubmitted: (String value) {
-                                          print("$value submitted");
-                                          setState(() {
-                                            _to.text = value;
-                                            _onTap = true;
-                                            
-                                          });
-                                        },
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            FontAwesomeIcons.planeArrival,
-                                            color: Colors.blue,
-                                            //size: 22.0,
-                                          ),
-                                          hintText: 'Flyting To',
-                                          hintStyle: TextStyle(
-                                              fontFamily: "Nunito",
-                                              fontSize: 17.0),
-                                        ),
-                                      ),
-                                      padding: EdgeInsets.all(10),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 60),
-                                  width: MediaQuery.of(context).size.width * .6,
-                                  child: Card(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    elevation: 0,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Container(
-                                          child: Slider(
-                                            value: _toSlider.toDouble(),
-                                            min: 1.0,
-                                            max: 50.0,
-                                            divisions: 10,
-                                            label:
-                                                '$_toSlider', //var _toSlider = 1;,
-                                            onChanged: (double newValue) {
-                                              setState(() {
-                                                _toSlider = newValue.round();
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        Text("$_toSlider Mi"),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          */
-                          Container(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * .025,
-                              width: MediaQuery.of(context).size.width,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                width: MediaQuery.of(context).size.width * .47,
-                                height: MediaQuery.of(context).size.height * .1,
-                                child: Card(
-                                  color: Color.fromARGB(200, 255, 255, 255),
-                                  elevation: 0,
-                                  child: FlatButton(
-                                    color: Colors.white,
-                                    onPressed: () async {
-                                      final List<DateTime> originPicked =
-                                          await DateRangePicker.showDatePicker(
-                                              context: context,
-                                              initialFirstDate:
-                                                  new DateTime.now(),
-                                              initialLastDate:
-                                                  (new DateTime.now()).add(
-                                                      new Duration(days: 7)),
-                                              firstDate: new DateTime(2019),
-                                              lastDate: new DateTime(2020));
-                                      if (originPicked != null &&
-                                          originPicked.length == 2) {
-                                        print(originPicked);
-                                        _originDate = originPicked.toList();
-                                      }
-                                    },
-                                    child: Icon(Icons.date_range),
-                                    /*child: Text(
-                                        '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                            '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                            '$_originDate'
-                                            'yyyy-mm-dd <---> yyyy-mm-dd'
-                                        ),*/
-                                    //'Departure Date Picker'),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * .47,
-                                height: MediaQuery.of(context).size.height * .1,
-                                child: Card(
-                                  color: Color.fromARGB(200, 255, 255, 255),
-                                  elevation: 0,
-                                  child: FlatButton(
-                                    color: Colors.white,
-                                    onPressed: () async {
-                                      final List<DateTime> returnDatePicked =
-                                          await DateRangePicker.showDatePicker(
-                                              context: context,
-                                              initialFirstDate:
-                                                  new DateTime.now()
-                                                      .add(Duration(days: 7)),
-                                              initialLastDate:
-                                                  (new DateTime.now()).add(
-                                                      new Duration(days: 14)),
-                                              firstDate: new DateTime(2019),
-                                              lastDate: new DateTime(2020));
-                                      if (returnDatePicked != null &&
-                                          returnDatePicked.length == 2) {
-                                        print(returnDatePicked);
-                                        _destinationDate =
-                                            returnDatePicked.toList();
-                                      }
-                                    },
-                                    child: Icon(Icons.date_range),
-                                    /*Text(
-                                     
-                                        '${DateTime.now().month}-${DateTime.now().day+7}-${DateTime.now().year} <-> '+
-                                        '${DateTime.now().month}-${DateTime.now().day+14}-${DateTime.now().year}'
-                                        
-                                      'yyyy-mm-dd <---> yyyy-mm-dd',
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .47,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              .1,
+                                          child: Card(
+                                            elevation: 8,
+                                            color: Color.fromARGB(
+                                                200, 255, 255, 255),
+                                            child: FlatButton(
+                                              color: Colors.white,
+                                              onPressed: () async {
+                                                final List<DateTime>
+                                                    originPicked =
+                                                    await DateRangePicker
+                                                        .showDatePicker(
+                                                            context: context,
+                                                            initialFirstDate:
+                                                                new DateTime
+                                                                    .now(),
+                                                            initialLastDate:
+                                                                (new DateTime
+                                                                        .now())
+                                                                    .add(new Duration(
+                                                                        days:
+                                                                            7)),
+                                                            firstDate:
+                                                                new DateTime(
+                                                                    2019),
+                                                            lastDate:
+                                                                new DateTime(
+                                                                    2020));
+                                                if (originPicked != null &&
+                                                    originPicked.length == 2) {
+                                                  print(originPicked);
+                                                  _originDate =
+                                                      originPicked.toList();
+                                                }
+                                              },
+                                              child: Icon(Icons.date_range),
+                                              /*child: Text(
+                                    '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                        '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                        '$_originDate'
+                                        'yyyy-mm-dd <---> yyyy-mm-dd'
                                     ),*/
-                                  ),
+                                              //'Departure Date Picker'),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .47,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              .1,
+                                          child: Card(
+                                            elevation: 8,
+                                            color: Color.fromARGB(
+                                                200, 255, 255, 255),
+                                            child: FlatButton(
+                                              color: Colors.white,
+                                              onPressed: () async {
+                                                final List<DateTime>
+                                                    returnDatePicked =
+                                                    await DateRangePicker.showDatePicker(
+                                                        context: context,
+                                                        initialFirstDate:
+                                                            new DateTime.now()
+                                                                .add(Duration(
+                                                                    days: 7)),
+                                                        initialLastDate:
+                                                            (new DateTime.now())
+                                                                .add(new Duration(
+                                                                    days: 14)),
+                                                        firstDate:
+                                                            new DateTime(2019),
+                                                        lastDate:
+                                                            new DateTime(2020));
+                                                if (returnDatePicked != null &&
+                                                    returnDatePicked.length ==
+                                                        2) {
+                                                  print(returnDatePicked);
+                                                  _destinationDate =
+                                                      returnDatePicked.toList();
+                                                }
+                                              },
+                                              child: Icon(Icons.date_range),
+                                              /*Text(
+                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year} <-> ' +
+                                      '${DateTime.now().month}-${DateTime.now().day + 14}-${DateTime.now().year}'
+                                      'yyyy-mm-dd <---> yyyy-mm-dd',
+                                ),*/
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      //color: Colors.red,
+                                      child: SizedBox(
+                                        height: 20,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                          Container(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * .05,
-                              width: MediaQuery.of(context).size.width,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                      height: MediaQuery.of(context).size.height * .85,
-                      child: ticketresponses),
-                ],
+              Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                        height: MediaQuery.of(context).size.height * .85,
+                        child: Container(child: TicketListViewBuilder(data: responseTicketData,))),
+                  ],
+                ),
               ),
             ],
           ),
@@ -774,93 +757,63 @@ class _HomePageState extends State<HomePage>
   }
 
   void showModalMenu() {
-    showModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return Container(
-            height: 350.0,
-            color: Colors.transparent, //could change this to Color(0xFF737373),
-            //so you don't have to change MaterialApp canvasColor
-            child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(10.0),
-                        topRight: const Radius.circular(10.0))),
-                child: Center(
-                  child: Text("This is a modal sheet"),
-                )),
-          );
-        }
-
-        /*
+    showRoundedModalBottomSheet(
+      context: context,
+      radius: 16,
+      color: Colors.white,
+      builder: (BuildContext context) {
         return Container(
-          color: Color(0xcFF737373),
+          //color: Colors.black54,
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: SafeArea(
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                color: Colors.green,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    SizedBox(
-                        height: MediaQuery.of(context).size.height * .45,
-                        child: ListView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          children: <Widget>[
-                            Card(
-                              elevation: 8,
-                              child: UserAccountsDrawerHeader(
-                                accountName:
-                                    Text("Name: ${_currentUser.displayName}"),
-                                accountEmail:
-                                    Text("Email: ${_currentUser.email}"),
-                                currentAccountPicture:
-                                    Image.network(_currentUser.photoUrl),
-                              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                SizedBox(
+                    height: MediaQuery.of(context).size.height * .45,
+                    child: ListView(
+                      physics: NeverScrollableScrollPhysics(),
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 8,
+                            child: UserAccountsDrawerHeader(
+                              accountName:
+                                  Text("Name: ${_currentUser.displayName}"),
+                              accountEmail:
+                                  Text("Email: ${_currentUser.email}"),
+                              currentAccountPicture:
+                                  Image.network(_currentUser.photoUrl),
                             ),
-                            Card(
-                              elevation: 8,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: ListTile(
-                                leading: Icon(Icons.monetization_on),
-                                title: Text("Currency"),
-                              ),
-                            ),
-                            Card(
-                              elevation: 8,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: ListTile(
-                                leading: Icon(Icons.monetization_on),
-                                title: Text("Preferred Airport"),
-                              ),
-                            )
-                          ],
-                        )),
-                  ],
-                ),
-              ),
+                          ),
+                        ),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          child: ListTile(
+                            leading: Icon(Icons.monetization_on),
+                            title: Text("Currency"),
+                          ),
+                        ),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          child: ListTile(
+                            leading: Icon(Icons.monetization_on),
+                            title: Text("Preferred Airport"),
+                          ),
+                        )
+                      ],
+                    )),
+              ],
             ),
           ),
         );
-      },*/
-        );
+      },
+    );
   }
 
   Map<String, Object> postToGlitchServerData() {
@@ -903,328 +856,16 @@ class _HomePageState extends State<HomePage>
     ).then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
+      dynamic responseData = jsonDecode(response.body);
+      responseTicketData = responseData["data"];
+      TicketListViewBuilder(data: responseTicketData,);
+      setState(() {
+        var responseData = json.decode(response.body);
+        //search_par = responseData["tickets"]["search_params"];
+        responseTicketData = responseData["data"];
+      });
     });
 
 //http.read("https://olivine-pamphlet.glitch.me/").then(print);
   }
 }
-
-/*
-class _Page {
-  _Page({ widget,  widget1});
-  final StatefulWidget widget;
-  final StatelessWidget widget1;
-}
-
-List<_Page> _allPages = <_Page>[
-  _Page(widget: LoginPage()),
-  _Page(widget: InputForm()),
-  _Page(widget1: TicketView()),
-];
-
-class HomePage extends StatefulWidget {
-  final Widget child;
-
-  HomePage({Key key,  child}) : super(key: key);
-
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  var _scaffoldKey = new GlobalKey<ScaffoldState>();
-  var _pageSelected;
-  TabController _controller;
-
-  GoogleSignInAccount _currentUser;
-  @override
-  void initState() {
-    super.initState();
-    _controller = TabController(vsync: this, length: _allPages.length);
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      setState(() {
-        _currentUser = account;
-      });
-    });
-    _googleSignIn.signInSilently();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    PageController _pageController;
-    return Scaffold(
-      backgroundColor: Colors.blueAccent, //Color.fromARGB(255, 251, 108, 112),
-      key: _scaffoldKey,
-      //bottomSheet: showMenu(),
-      appBar: _buildAppBar(),
-      drawer: AppDrawer(),
-      body: TabBarView(
-          controller: _controller,
-          children: _allPages.map<Widget>((_Page page) {
-            return Container(
-                key: ObjectKey(page.widget),
-                //padding: const EdgeInsets.all(12.0),
-                child: page.widget);
-          }).toList()), //new _BuildBody(pageController: _pageController),
-      //TicketView(),
-      floatingActionButton: _buildFab(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
-        child: _buildBottomAppBar(),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar() => AppBar(
-        leading: Icon(
-          Icons.menu,
-          color: Colors.black,
-        ),
-        backgroundColor: Colors.white,
-      );
-
-  BottomAppBar _buildBottomAppBar() {
-    return BottomAppBar(
-      //shape: CircularNotchedRectangle(),
-      child: new Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.explore),
-            color: Colors.red,
-            highlightColor: Colors.redAccent,
-            onPressed: () {
-              _scaffoldKey.currentState.openDrawer();
-            }, //showMenu,
-          ),
-          IconButton(
-            icon: Icon(Icons.edit_location),
-            color: Colors.blue,
-            highlightColor: Colors.redAccent,
-            onPressed: () {
-              //Navigator.of(context).pushNamed(InputForm.tag);
-            },
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * .075,
-            width: MediaQuery.of(context).size.width * .10,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications),
-            color: Colors.green,
-            highlightColor: Colors.redAccent,
-            onPressed: () {
-              // _scaffoldKey.currentState.openDrawer();
-            },
-          ),
-          IconButton(
-              icon: Icon(Icons.account_box),
-              color: Colors.orange,
-              highlightColor: Colors.redAccent,
-              onPressed: showModalMenu
-              // () {
-              //Navigator.of(context).pushNamed(FloatActBttn.tag);
-            //},
-              ),
-        ],
-      ),
-    );
-  }
-
-  showModalMenu() {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                topRight: Radius.circular(16.0),
-              ),
-              color: Color(0xff232f34),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Container(
-                  height: 36,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * .25,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16.0),
-                        topRight: Radius.circular(16.0),
-                      ),
-                      color: Color(0xff344955),
-                    ),
-                    child: Stack(
-                      alignment: Alignment(0, 0),
-                      overflow: Overflow.visible,
-                      children: <Widget>[
-                        Positioned(
-                          top: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50)),
-                                border: Border.all(
-                                    color: Color(0xff232f34), width: 10)),
-                            child: Center(
-                              child: ClipOval(
-                                child: Image.network(
-                                  _currentUser.photoUrl,
-                                  fit: BoxFit.cover,
-                                  height:
-                                      MediaQuery.of(context).size.height * .075,
-                                  width:
-                                      MediaQuery.of(context).size.height * .075,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          child: ListView(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            children: <Widget>[
-                              ListTile(
-                                title: Text(
-                                  "Inbox",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                leading: Icon(
-                                  Icons.inbox,
-                                  color: Colors.white,
-                                ),
-                                onTap: () {},
-                              ),
-                              ListTile(
-                                title: Text(
-                                  "Starred",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                leading: Icon(
-                                  Icons.star_border,
-                                  color: Colors.white,
-                                ),
-                                onTap: () {},
-                              ),
-                              ListTile(
-                                title: Text(
-                                  "Sent",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                leading: Icon(
-                                  Icons.send,
-                                  color: Colors.white,
-                                ),
-                                onTap: () {},
-                              ),
-                              ListTile(
-                                title: Text(
-                                  "Sign Out",
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                onTap: () async {
-                                  final FirebaseUser user =
-                                      await _auth.currentUser();
-                                  if (user == null) {
-                                    Scaffold.of(context).showSnackBar(SnackBar(
-                                      content:
-                                          const Text('No one has signed in.'),
-                                    ));
-                                    return;
-                                  }
-                                  _signOut();
-                                  final String uid = user.uid;
-                                  Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        uid + ' has successfully signed out.'),
-                                  ));
-                                },
-                                leading: Icon(Icons.exit_to_app),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
-  void _signOut() async {
-    await _auth.signOut();
-  }
-}
-
-Widget _buildFab(BuildContext context) {
-  return FloatingActionButton.extended(
-    onPressed: () {
-      AppDrawer();
-    },
-    tooltip: 'fab',
-    elevation: 4.0,
-    foregroundColor: Colors.white,
-    backgroundColor: Colors.lightGreen,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8))),
-    //icon: Icon(FontAwesomeIcons.plane),
-    label: Text('SEARCH'),
-  );
-}
-
-class _BuildBody extends StatelessWidget {
-  const _BuildBody({
-    Key key,
-    @required PageController pageController,
-  })  : _pageController = pageController,
-        super(key: key);
-
-  final PageController _pageController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Color.fromARGB(225, 73, 144, 226),
-      child: PageView(
-        reverse: false, // if flase adds pages on the right of main page
-        pageSnapping: true,
-        physics: AlwaysScrollableScrollPhysics(),
-        controller: _pageController,
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          //Center(
-          //  child: LoginPage(),
-          //),
-          Center(
-            child: InputForm(),
-          ),
-          Center(
-            child: TicketView(),
-          ),
-
-          //Center(child: buildSignIn(_height, _width, _fourFifthsWidth)),
-          //Center(child: buildSignUp(_height, _width, _fourFifthsWidth)),
-        ],
-      ),
-    );
-  }
-}
-*/

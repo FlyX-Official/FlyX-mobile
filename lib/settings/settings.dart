@@ -2,24 +2,34 @@ import 'package:flyx/FloatingActionButton/fab_bottom_app_bar.dart';
 import 'package:flyx/FloatingActionButton/layout.dart';
 import 'package:flyx/SideBar/AppDrawer.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 // pages
 import 'package:flyx/settings/pages/TermsNConditions.dart';
 import 'package:flyx/settings/pages/Notifications.dart';
 import 'package:flyx/settings/pages/About.dart';
 import 'package:flyx/settings/pages/Privacy.dart';
+import 'package:flyx/settings/pages/Bloc.dart';
 
-class Settings extends StatefulWidget {
-  // tag to main
-  static String tag = 'settings-page';
-  Settings({Key key, this.title}) : super(key: key);
+// class Settings extends StatefulWidget {
+//   // tag to main
+//   static String tag = 'settings-page';
+//   Settings({Key key, this.title}) : super(key: key);
 
-  final String title;
+//   final String title;
 
-  @override
-  _Settings createState() => new _Settings();
-}
+//   // dark mode
 
-class _Settings extends State<Settings> {
+//   @override
+//   _Settings createState() => new _Settings();
+// }
+
+class Settings extends StatelessWidget {
+ 
+  final bool darkThemeEnabled;
+  Settings(this.darkThemeEnabled);
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +44,7 @@ class _Settings extends State<Settings> {
 
   // functions
   // function for day/night mode
-  void _onChangedMode(bool value) => setState(() => _mode = value);
+
 
   // function to run as soon as app opens
   void initState() {}
@@ -100,10 +110,10 @@ class _Settings extends State<Settings> {
                 ListTile(
                   title: Text('APP SETTINGS'),
                 ),
-                new SwitchListTile(
+                SwitchListTile(
                   
-                  value: _mode,
-                  onChanged: _onChangedMode,
+                  value: darkThemeEnabled,
+                  onChanged: bloc.changeTheme,
                   title: new Text('App Mode',
                       style: new TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black)),
