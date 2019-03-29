@@ -2,20 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flyx/LoginPage/login_page.dart';
-import 'package:flyx/TicketDisplayer/ticketCard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
-import '../InputPage/gMap.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../TicketDisplayer/ticketViewer.dart';
+
+import '../TicketDisplayer/ticketCard.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -350,6 +347,7 @@ class _HomePageState extends State<HomePage>
                             child: Container(
                               child: GoogleMap(
                                 onMapCreated: _onMapCreated,
+                                
                                 initialCameraPosition: CameraPosition(
                                   target: LatLng(-33.852, 151.211),
                                   zoom: 11.0,
@@ -734,58 +732,61 @@ class _HomePageState extends State<HomePage>
         ),
         //resizeToAvoidBottomInset:,
 
-        bottomNavigationBar: BottomAppBar(
-          notchMargin: 8,
-          elevation: 8,
-          clipBehavior: Clip.antiAlias,
-          shape: CircularNotchedRectangle(),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.explore),
+        bottomNavigationBar: Container(
+          child: BottomAppBar(
+            notchMargin: 8,
+            elevation: 8,
+            color: Colors.white70,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shape: CircularNotchedRectangle(),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Container(
+                  child: IconButton(
+                    icon: Icon(Icons.explore),
+                    color: Colors.black,
+                    highlightColor: Colors.redAccent,
+                    onPressed: () {
+                      // _scaffoldKey.currentState.openDrawer();
+                    }, //showMenu,
+                  ),
+                ),
+                Container(
+                  child: IconButton(
+                    icon: Icon(Icons.edit_location),
+                    color: Colors.black,
+                    highlightColor: Colors.redAccent,
+                    onPressed: () {
+                      // _scaffoldKey.currentState.openDrawer();
+                    }, //showMenu,
+                  ),
+                ),
+                Container(
+                  child: Icon(
+                    FontAwesomeIcons.envira,
+                    color: Color.fromARGB(0, 0, 0, 0),
+                  ),
+                ),
+                Container(
+                  child: IconButton(
+                    icon: Icon(Icons.notifications),
+                    color: Colors.black,
+                    highlightColor: Colors.blue,
+                    onPressed: () {
+                      // _scaffoldKey.currentState.openDrawer();
+                    }, //showMenu,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.account_box),
                   color: Colors.black,
-                  highlightColor: Colors.redAccent,
-                  onPressed: () {
-                    // _scaffoldKey.currentState.openDrawer();
-                  }, //showMenu,
+                  highlightColor: Colors.orange,
+                  onPressed: () => showModalMenu(),
                 ),
-              ),
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.edit_location),
-                  color: Colors.black,
-                  highlightColor: Colors.redAccent,
-                  onPressed: () {
-                    // _scaffoldKey.currentState.openDrawer();
-                  }, //showMenu,
-                ),
-              ),
-              Container(
-                child: Icon(
-                  FontAwesomeIcons.envira,
-                  color: Color.fromARGB(0, 0, 0, 0),
-                ),
-              ),
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.notifications),
-                  color: Colors.black,
-                  highlightColor: Colors.blue,
-                  onPressed: () {
-                    // _scaffoldKey.currentState.openDrawer();
-                  }, //showMenu,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.account_box),
-                color: Colors.black,
-                highlightColor: Colors.orange,
-                onPressed: () => showModalMenu(),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -796,7 +797,7 @@ class _HomePageState extends State<HomePage>
     showRoundedModalBottomSheet(
       context: context,
       radius: 16,
-      color: Colors.white,
+      color: Color.fromARGB(255, 247, 247, 247),
       builder: (BuildContext context) {
         return Container(
           //color: Colors.black54,
@@ -824,22 +825,29 @@ class _HomePageState extends State<HomePage>
                             ),
                           ),
                         ),
-                        Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          child: ListTile(
-                            leading: Icon(Icons.monetization_on),
-                            title: Text("Currency"),
-                          ),
-                        ),
-                        Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          child: ListTile(
-                            leading: Icon(Icons.monetization_on),
-                            title: Text("Preferred Airport"),
+                        Container(
+                          margin: EdgeInsets.all(10),
+                          child: Column(
+                            children: <Widget>[
+                              Card(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  leading: Icon(Icons.attach_money),
+                                  title: Text("Currency"),
+                                ),
+                              ),
+                              Card(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  leading: Icon(Icons.monetization_on),
+                                  title: Text("Preferred Airport"),
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       ],

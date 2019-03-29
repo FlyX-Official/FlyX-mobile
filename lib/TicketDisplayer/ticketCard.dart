@@ -94,17 +94,9 @@ class TicketListViewBuilder extends StatefulWidget {
   const TicketListViewBuilder({
     Key key,
     @required this.data,
-    this.search_par,
-    this.data_airlines,
-    this.data_duration,
-    this.data_route,
   }) : super(key: key);
 
   final List data;
-  final List search_par;
-  final List data_airlines;
-  final List data_duration;
-  final List data_route;
 
   @override
   _TicketListViewBuilder createState() => _TicketListViewBuilder();

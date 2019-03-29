@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,6 +27,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _pageController = PageController();
+  final _loginPageController = PageController();
+  final _signUpPageController = PageController();
   //SignIn Controllers
   final TextEditingController _signInEmailController = TextEditingController();
   final TextEditingController _signInPasswordController =
@@ -76,16 +79,50 @@ class _LoginPageState extends State<LoginPage> {
     dynamic _fourFifthsWidth = _width * .85;
 
     return Scaffold(
-      body: Container(
-        color: Color.fromARGB(255, 247, 247, 247),
-        child: PageView(
-          physics: BouncingScrollPhysics(),
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          children: <Widget>[
-            Center(child: buildSignIn(_height, _width, _fourFifthsWidth)),
-            Center(child: buildSignUp(_height, _width, _fourFifthsWidth)),
-          ],
+      body: Center(
+        child: Container(
+          color: Color.fromARGB(255, 247, 247, 247),
+          child: PageView(
+            physics: BouncingScrollPhysics(),
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            children: <Widget>[
+              Container(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      child: buildSignIn(_height, _width, _fourFifthsWidth)),
+                  Container(
+                    child: FlatButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('Need an Account?'),
+                          Text(
+                            ' Sign up',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onPressed: () {
+                        _pageController.animateToPage(
+                          1,
+                          curve: Curves.easeInOutExpo,
+                          duration: Duration(milliseconds: 1000),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              )),
+              Center(
+                  child: Container(
+                      child: buildSignUp(_height, _width, _fourFifthsWidth))),
+            ],
+          ),
         ),
       ),
     );
@@ -95,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
   SingleChildScrollView buildSignIn(_height, _width, _fourFifthsWidth) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      controller: _pageController,
+      controller: _loginPageController,
       child: Form(
         key: _signInFormKey,
         child: Column(
@@ -140,26 +177,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: buildLoginCard(),
                     ),
                   ],
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * .9,
-                  child: Divider(
-                    color: Colors.blueGrey,
-                  ),
-                ),
-                Container(
-                  child: FlatButton(
-                    child: Text('Need an Account? Sign up'),
-                    onPressed: () {
-                      _pageController.jumpToPage(1);
-                    },
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * .9,
-                  child: Divider(
-                    color: Colors.blueGrey,
-                  ),
                 ),
                 Container(
                   child:
@@ -354,15 +371,58 @@ class _LoginPageState extends State<LoginPage> {
           icon: Icon(FontAwesomeIcons.mailchimp),
           label: Text("Guest Login"),
           onPressed: () {
+            //_signInAnonymously();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => HomePage()),
             );
           },
         ),
-        //FlatButton(),
+        /*RaisedButton.icon(
+          color: Colors.white,
+          icon: Icon(FontAwesomeIcons.acquisitionsIncorporated),
+          label: Text("Anonymous Login"),
+          onPressed: () {
+            _signInAnonymously();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),*/
       ],
     );
+  }
+
+  void _signInAnonymously() async {
+    final FirebaseUser user = await _auth.signInAnonymously();
+    assert(user != null);
+    assert(user.isAnonymous);
+    assert(!user.isEmailVerified);
+    assert(await user.getIdToken() != null);
+    if (Platform.isIOS) {
+      // Anonymous auth doesn't show up as a provider on iOS
+      assert(user.providerData.isEmpty);
+    } else if (Platform.isAndroid) {
+      // Anonymous auth does show up as a provider on Android
+      assert(user.providerData.length == 1);
+      assert(user.providerData[0].providerId == 'firebase');
+      assert(user.providerData[0].uid != null);
+      assert(user.providerData[0].displayName == null);
+      assert(user.providerData[0].photoUrl == null);
+      assert(user.providerData[0].email == null);
+    }
+
+    final FirebaseUser fireCurrentUser = await _auth.currentUser();
+    assert(user.uid == fireCurrentUser.uid);
+    setState(() {
+      if (user != null) {
+        _success = true;
+        _userID = user.uid;
+      } else {
+        _success = false;
+      }
+    });
   }
 
   Future<void> _signIn() async {
@@ -389,7 +449,7 @@ class _LoginPageState extends State<LoginPage> {
   SingleChildScrollView buildSignUp(_height, _width, _fourFifthsWidth) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      controller: _pageController,
+      controller: _signUpPageController,
       //height: _height * .5,
       //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
       child: Form(
