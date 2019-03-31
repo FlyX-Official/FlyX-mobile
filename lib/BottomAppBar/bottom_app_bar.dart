@@ -1,12 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flyx/SideBar/AppDrawer.dart';
-import 'package:flyx/TicketDisplayer/ticketViewer.dart';
-import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
-import 'package:flyx/InputPage/inputForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flyx/LoginPage/login_page.dart';
-import 'package:flyx/settings/settings.dart';
+
+import '../InputPage/inputForm.dart';
+import '../SideBar/AppDrawer.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();

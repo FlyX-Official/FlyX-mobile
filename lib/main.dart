@@ -1,17 +1,16 @@
 
 //import 'package:flyx/FloatingActionButton/fab_with_icons.dart';
-import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
+import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart';
+import 'package:flyx/InputPage/inputForm.dart';
 import 'package:flyx/LoginPage/login_page.dart';
 import 'package:flyx/SideBar/AppDrawer.dart';
 import 'package:flyx/TicketDisplayer/ticketViewer.dart';
 import 'package:flyx/profile/profile.dart';
-import 'package:flyx/InputPage/inputForm.dart';
 import 'package:flyx/settings/settings.dart';
-import 'package:flyx/HomePage/home.dart';
-// End of Local files
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
   SystemChrome.setEnabledSystemUIOverlays([]);
@@ -19,6 +18,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  GoogleSignInAccount _currentUser;
   final routes = <String, WidgetBuilder>{
     FloatActBttn.tag: (context) => FloatActBttn(),
     LoginPage.tag: (context) => LoginPage(),

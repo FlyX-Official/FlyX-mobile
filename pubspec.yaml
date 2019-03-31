@@ -33,7 +33,7 @@ dependencies:
   flip_card: ^0.2.1
   url_launcher: ^5.0.2
   rounded_modal: ^1.0.0
-
+  geohash: ^0.2.1
 
   flutter:
     sdk: flutter

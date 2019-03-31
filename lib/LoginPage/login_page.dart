@@ -5,12 +5,12 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flyx/HomePage/home.dart';
 import 'package:flyx/style/theme.dart' as Theme;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import '../HomePage/home.dart';
 import '../InputPage/inputForm.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -62,11 +62,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       setState(() {
         _currentUser = account;
         if (_googleSignIn.isSignedIn == true) {
-          Navigator.of(context).pushNamed(InputForm.tag);
+          Navigator.of(context).pushNamed(HomePage.tag);
         }
       });
     });

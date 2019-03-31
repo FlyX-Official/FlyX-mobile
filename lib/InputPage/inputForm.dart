@@ -1,19 +1,16 @@
-import 'dart:io';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flyx/InputPage/gMap.dart';
-import 'package:flyx/BottomAppBar/bottom_app_bar.dart';
-import 'package:flyx/FloatingActionButton/floating_action_button_homepage.dart'; //tmp only
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flyx/LoginPage/login_page.dart';
-import 'package:flyx/settings/settings.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
-import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
+
+import '../BottomAppBar/bottom_app_bar.dart';
+import '../LoginPage/login_page.dart';
+import 'gMap.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
