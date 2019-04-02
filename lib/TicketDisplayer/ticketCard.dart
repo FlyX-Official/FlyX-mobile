@@ -68,16 +68,14 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
                     },
                     children: [
                       ExpansionPanel(
+                        
                         isExpanded: _currentIndexCounter == i,
                         headerBuilder: (BuildContext context,
                                 bool isExpanded) =>
                             Container(
                               height: MediaQuery.of(context).size.height * .33,
                               padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
-                              ),
+                              
                               alignment: Alignment.center,
                               child: Text("From : ${widget.data[i]['flyFrom'].toString()} ( ${widget.data[i]['cityFrom'].toString()} )" +
                                   "\nTo : ${widget.data[i]['flyTo'].toString()} ( ${widget.data[i]['cityTo'].toString()} )" +

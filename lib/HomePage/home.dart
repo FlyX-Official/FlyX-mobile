@@ -11,8 +11,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:rounded_modal/rounded_modal.dart';
+//import 'package:rounded_modal/rounded_modal.dart';
+import 'package:groovin_widgets/groovin_widgets.dart';
+import 'package:rubber/rubber.dart';
+
 import 'package:geohash/geohash.dart';
+import 'package:rounded_modal/rounded_modal.dart';
 
 import '../TicketDisplayer/ticketCard.dart';
 
@@ -28,6 +32,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
+
+  RubberAnimationController _rubberController;
 
   Completer<GoogleMapController> _customGoogleMapController = Completer();
 
@@ -59,6 +65,8 @@ class _HomePageState extends State<HomePage>
   List<String> destData;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
+  Map<MarkerId, Marker> markers1 = <MarkerId, Marker>{};
   MarkerId selectedMarker;
   int _markerIdCounter = 1;
 
@@ -81,6 +89,14 @@ class _HomePageState extends State<HomePage>
     _isFromOpen = false;
     _isToOpen = false;
 
+    _rubberController = RubberAnimationController(
+        vsync: this,
+        dismissable: true,
+        halfBoundValue: AnimationControllerValue(percentage: 0.66),
+        lowerBoundValue: AnimationControllerValue(pixel: 50),
+        duration: Duration(milliseconds: 200));
+    _rubberController.addStatusListener(_statusListener);
+
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       _currentUser = account;
       ticketresponses = TicketListViewBuilder(
@@ -99,13 +115,27 @@ class _HomePageState extends State<HomePage>
     TicketListViewBuilder(
       data: responseTicketData,
     );
-    _controller = AnimationController(vsync: this);
+    //_controller = AnimationController(vsync: this);
   }
 
   @override
   void dispose() {
     super.dispose();
+    _rubberController.removeStatusListener(_statusListener);
+    _rubberController.dispose();
     _controller.dispose();
+  }
+
+  void _statusListener(AnimationStatus status) {
+    print("changed State ${_rubberController.animationState}");
+  }
+
+  void _halfExpand() {
+    _rubberController.halfExpand();
+  }
+
+  void _collapse() {
+    _rubberController.collapse();
   }
 
   //GOogle map
@@ -139,7 +169,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: MediaQuery.of(context).size.height * .1,
+      height: 60,
       child: ListView.builder(
         reverse: true,
         itemCount: originData == null ? 0 : originData.length,
@@ -178,7 +208,7 @@ class _HomePageState extends State<HomePage>
 
     return Container(
       color: Colors.white,
-      height: MediaQuery.of(context).size.height * .1,
+      height: 60,
       child: ListView.builder(
         reverse: true,
         itemCount: destData == null ? 0 : destData.length,
@@ -324,14 +354,14 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  void _addAirportMarkers() {
+  void _addOriginAirportMarkers() {
     final int markerCount = markers.length;
 
     if (markerCount == 12) {
       return;
     }
 
-    final String markerIdVal = 'marker_id_$_markerIdCounter';
+    final String markerIdVal = '${_from.text}';
     _markerIdCounter++;
     final MarkerId markerId = MarkerId(markerIdVal);
 
@@ -341,7 +371,7 @@ class _HomePageState extends State<HomePage>
         decodedGeoHash.latitude,
         decodedGeoHash.longitude,
       ),
-      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      infoWindow: InfoWindow(title: markerIdVal, snippet: 'Travelling From'),
       onTap: () {
         _onMarkerTapped(markerId);
       },
@@ -349,6 +379,34 @@ class _HomePageState extends State<HomePage>
 
     setState(() {
       markers[markerId] = marker;
+    });
+  }
+
+  void _addDestinationAirportMarkers() {
+    final int markerCount1 = markers1.length;
+
+    if (markerCount1 == 12) {
+      return;
+    }
+
+    final String markerIdVal1 = '${_to.text}';
+    _markerIdCounter++;
+    final MarkerId markerId1 = MarkerId(markerIdVal1);
+
+    final Marker marker1 = Marker(
+      markerId: markerId1,
+      position: LatLng(
+        decodedGeoHash.latitude,
+        decodedGeoHash.longitude,
+      ),
+      infoWindow: InfoWindow(title: markerIdVal1, snippet: 'Travelling To'),
+      onTap: () {
+        _onMarkerTapped(markerId1);
+      },
+    );
+
+    setState(() {
+      markers[markerId1] = marker1;
     });
   }
 
@@ -360,6 +418,11 @@ class _HomePageState extends State<HomePage>
         //body:,
         floatingActionButton: FloatingActionButton(
           child: Icon(fabIcon),
+          elevation: 16,
+          highlightElevation: 4,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: Colors.black, width: 2)),
           foregroundColor: Colors.black,
           backgroundColor: Colors.lightGreenAccent,
           onPressed: () {
@@ -374,497 +437,440 @@ class _HomePageState extends State<HomePage>
             );
           },
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        //floatingActionButtonAnimator,
+        floatingActionButtonLocation: FloatingActionButtonLocation
+            .centerDocked, //floatingActionButtonAnimator,
         //persistentFooterButtons,
         //drawer,
         //endDrawer,
-        //bottomSheet:,
+        //bottomSheet: ,
         backgroundColor: Color.fromARGB(255, 247, 247, 247),
-        body: SafeArea(
-          child: PageView(
-            onPageChanged: (i) {
-              if (i == 0) {
-                setState(() {
-                  fabIcon = Icons.search;
-                });
-              } else if (i == 1) {
-                setState(() {
-                  fabIcon = Icons.payment;
-                });
-              }
-            },
-            controller: _pageviewcontroller,
-            physics: BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
+        body: Container(
+          child: RubberBottomSheet(
+            lowerLayer: _getLowerLayer(context),
+            animationController: _rubberController,
+            upperLayer: _getUpperLayer(),
+          ),
+        ), //_getLowerLayer(context),
+        resizeToAvoidBottomInset: false,
+        bottomNavigationBar: BottomAppBar(
+          notchMargin: 8,
+          elevation: 0,
+          //shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              //Container(child: LoginPage(),),
-              SingleChildScrollView(
-                physics: ClampingScrollPhysics(),
-                controller: _inputPage,
-                child: Container(
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: <Widget>[
-                      Container(
-                        height: MediaQuery.of(context).size.height * .5,
-
-                        //margin: EdgeInsets.all(8),
-                        //color: Color(0xc25737373),
-                        child: Card(
-                          color: Color(0xc25737373),
-                          child: Center(
-                            child: Container(
-                              child: GoogleMap(
-                                mapType: MapType.normal,
-                                myLocationEnabled: true,
-                                compassEnabled: true,
-                                onMapCreated: _onMapCreated,
-                                zoomGesturesEnabled: true,
-                                markers: Set<Marker>.of(markers.values),
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(40.5436, -101.9734347),
-                                  zoom: 1.0,
-                                  tilt: 45,
-                                ),
-                              ), //Text('Put Map here'), // CustomGoogleMap(),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).size.height * .4),
-                        child: Stack(
-                          alignment: AlignmentDirectional.bottomCenter,
-                          children: <Widget>[
-                            Container(
-                              height: MediaQuery.of(context).size.height * .66,
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(24),
-                                  topRight: Radius.circular(24),
-                                ),
-                              ),
-                              //color: Colors.blue,
-                              child: Container(
-                                margin: EdgeInsets.only(top: 24),
-                                child: SingleChildScrollView(
-                                  //height: MediaQuery.of(context).size.height * .6,
-                                  //margin: EdgeInsets.all(8),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: <Widget>[
-                                              FlatButton(
-                                                child: Text('ONE WAY'),
-                                                color: Colors.white70,
-                                                onPressed: _addAirportMarkers,
-                                              ),
-                                              FlatButton(
-                                                child: Text(''),
-                                                color: Colors.transparent,
-                                                onPressed: () {},
-                                              ),
-                                              FlatButton(
-                                                child: Text('ROUND TRIP'),
-                                                color: Colors.white70,
-                                                onPressed: () {},
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              Container(
-                                                padding: EdgeInsets.only(
-                                                    left: MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        .1),
-                                                child: Container(
-                                                    child:
-                                                        _isFromOpen //(_isSearching && (!_onTap))
-                                                            ? getFromWidget()
-                                                            : null),
-                                              ),
-                                              Container(
-                                                //margin: EdgeInsets.only(top: 90),
-                                                child: Card(
-                                                  elevation: 8,
-                                                  child: Padding(
-                                                    child: TextFormField(
-                                                      controller: _from,
-                                                      //focusNode: _flyingFromFocusNode,
-                                                      validator: (value) {
-                                                        if (value.isEmpty) {
-                                                          return 'Field cannot be empty';
-                                                        }
-                                                      },
-                                                      onFieldSubmitted:
-                                                          (String value) {
-                                                        print(
-                                                            "$value submitted");
-                                                        setState(() {
-                                                          _from.text = value;
-                                                          _onTap = true;
-                                                        });
-                                                      },
-                                                      decoration:
-                                                          InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
-                                                        icon: Icon(
-                                                          FontAwesomeIcons
-                                                              .planeDeparture,
-                                                          color: Colors.blue,
-                                                          //size: 22.0,
-                                                        ),
-                                                        hintText: 'Flying From',
-                                                        hintStyle: TextStyle(
-                                                            fontFamily:
-                                                                "Nunito",
-                                                            fontSize: 17.0),
-                                                      ),
-                                                    ),
-                                                    padding: EdgeInsets.all(8),
-                                                  ),
-                                                ),
-                                              ),
-                                              // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                                              InkWell(
-                                                onTap: () {
-                                                  _addAirportMarkers();
-                                                },
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      .6,
-                                                  child: Card(
-                                                    elevation: 8,
-                                                    color: Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          child: Slider(
-                                                            value: _fromSlider
-                                                                .toDouble(),
-                                                            min: 1.0,
-                                                            max: 100.0,
-                                                            divisions: 5,
-                                                            label:
-                                                                '$_fromSlider', //var _fromSlider = 1;,
-                                                            onChanged:
-                                                                (double Value) {
-                                                              _addAirportMarkers();
-                                                              setState(() {
-                                                                _fromSlider =
-                                                                    Value
-                                                                        .floor();
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        Text("$_fromSlider Mi"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          child: SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                .025,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                          ),
-                                        ),
-                                        Container(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Container(
-                                                padding: EdgeInsets.only(
-                                                    left: MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        .1),
-                                                child: Container(
-                                                    child:
-                                                        _isToOpen //(_isSearching && (!_onTap))
-                                                            ? getToWidget()
-                                                            : null),
-                                              ),
-                                              Container(
-                                                //margin: EdgeInsets.only(top: 90),
-                                                child: Card(
-                                                  elevation: 8,
-                                                  child: Padding(
-                                                    child: TextFormField(
-                                                      controller: _to,
-                                                      validator: (value) {
-                                                        if (value.isEmpty) {
-                                                          return 'Field cannot be empty';
-                                                        }
-                                                      },
-                                                      onFieldSubmitted:
-                                                          (String value) {
-                                                        print(
-                                                            "$value submitted");
-                                                        setState(() {
-                                                          _to.text = value;
-                                                          _onTap = true;
-                                                        });
-                                                      },
-                                                      decoration:
-                                                          InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
-                                                        icon: Icon(
-                                                          FontAwesomeIcons
-                                                              .planeDeparture,
-                                                          color: Colors.blue,
-                                                          //size: 22.0,
-                                                        ),
-                                                        hintText: 'Flying To',
-                                                        hintStyle: TextStyle(
-                                                            fontFamily:
-                                                                "Nunito",
-                                                            fontSize: 17.0),
-                                                      ),
-                                                    ),
-                                                    padding: EdgeInsets.all(8),
-                                                  ),
-                                                ),
-                                              ),
-                                              // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                                              InkWell(
-                                                onTap: () {
-                                                  _addAirportMarkers();
-                                                },
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      .6,
-                                                  child: Card(
-                                                    elevation: 8,
-                                                    color: Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          child: Slider(
-                                                            value: _toSlider
-                                                                .ceilToDouble(),
-                                                            min: 1.0,
-                                                            max: 100.0,
-                                                            divisions: 5,
-                                                            label:
-                                                                '$_toSlider', //var _toSlider = 1;,
-                                                            onChanged:
-                                                                (double Value) {
-                                                              _addAirportMarkers();
-                                                              setState(() {
-                                                                _toSlider = Value
-                                                                    .round();
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        Text("$_toSlider Mi"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          child: SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                .025,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                          ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: <Widget>[
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .5,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  .085,
-                                              child: Card(
-                                                elevation: 8,
-                                                color: Color.fromARGB(
-                                                    200, 255, 255, 255),
-                                                child: FlatButton(
-                                                  color: Colors.white,
-                                                  onPressed: () async {
-                                                    final List<DateTime>
-                                                        originPicked =
-                                                        await DateRangePicker
-                                                            .showDatePicker(
-                                                                context:
-                                                                    context,
-                                                                initialFirstDate:
-                                                                    DateTime
-                                                                        .now(),
-                                                                initialLastDate: (DateTime
-                                                                        .now())
-                                                                    .add(Duration(
-                                                                        days:
-                                                                            7)),
-                                                                firstDate:
-                                                                    DateTime(
-                                                                        2019),
-                                                                lastDate:
-                                                                    DateTime(
-                                                                        2020));
-                                                    if (originPicked != null &&
-                                                        originPicked.length ==
-                                                            2) {
-                                                      print(originPicked);
-                                                      _originDate =
-                                                          originPicked.toList();
-                                                    }
-                                                  },
-                                                  child: Icon(Icons.date_range),
-                                                  /*child: Text(
-                                        '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                            '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                            '$_originDate'
-                                            'yyyy-mm-dd <---> yyyy-mm-dd'
-                                        ),*/
-                                                  //'Departure Date Picker'),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .5,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  .085,
-                                              child: Card(
-                                                elevation: 8,
-                                                color: Color.fromARGB(
-                                                    200, 255, 255, 255),
-                                                child: FlatButton(
-                                                  color: Colors.white,
-                                                  onPressed: () async {
-                                                    final List<DateTime>
-                                                        returnDatePicked =
-                                                        await DateRangePicker.showDatePicker(
-                                                            context: context,
-                                                            initialFirstDate:
-                                                                DateTime.now()
-                                                                    .add(Duration(
-                                                                        days:
-                                                                            7)),
-                                                            initialLastDate:
-                                                                (DateTime.now())
-                                                                    .add(Duration(
-                                                                        days:
-                                                                            14)),
-                                                            firstDate:
-                                                                DateTime(2019),
-                                                            lastDate:
-                                                                DateTime(2020));
-                                                    if (returnDatePicked !=
-                                                            null &&
-                                                        returnDatePicked
-                                                                .length ==
-                                                            2) {
-                                                      print(returnDatePicked);
-                                                      _destinationDate =
-                                                          returnDatePicked
-                                                              .toList();
-                                                    }
-                                                  },
-                                                  child: Icon(Icons.date_range),
-                                                  /*Text(
-                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year} <-> ' +
-                                          '${DateTime.now().month}-${DateTime.now().day + 14}-${DateTime.now().year}'
-                                          'yyyy-mm-dd <---> yyyy-mm-dd',
-                                    ),*/
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              Container(
+                child: IconButton(
+                  icon: Icon(Icons.explore),
+                  color: Colors.black,
+                  highlightColor: Colors.redAccent,
+                  onPressed: () {
+                    _rubberController
+                        .setVisibility(!_rubberController.visibility.value);
+                  }, //() async => await _buildShowRoundedModalBottomSheet(context), //showMenu,
                 ),
               ),
               Container(
-                child: Container(
-                  height: MediaQuery.of(context).size.height * .85,
-                  child: Container(
-                    child: TicketListViewBuilder(
-                      data: responseTicketData,
-                    ),
-                  ),
+                child: IconButton(
+                  icon: Icon(Icons.edit_location),
+                  color: Colors.black,
+                  highlightColor: Colors.redAccent,
+                  onPressed: _halfExpand, //showMenu,
                 ),
+              ),
+              Container(
+                child: Icon(
+                  FontAwesomeIcons.envira,
+                  color: Color.fromARGB(0, 0, 0, 0),
+                ),
+              ),
+              Container(
+                child: IconButton(
+                  icon: Icon(Icons.notifications),
+                  color: Colors.black,
+                  highlightColor: Colors.blue,
+                  onPressed: () {
+                    // _scaffoldKey.currentState.openDrawer();
+                  }, //showMenu,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.account_box),
+                color: Colors.black,
+                highlightColor: Colors.orange,
+                onPressed: () => showModalMenu(),
               ),
             ],
           ),
         ),
-        //resizeToAvoidBottomInset:,
+      ),
+    );
+  }
+
+  Widget _getUpperLayer() {
+    return Container(
+      color: Colors.black54,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ModalDrawerHandle(),
+            ),
+          ),
+          Container(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        FlatButton(
+                          child: Text('ONE WAY'),
+                          color: Colors.white,
+                          onPressed: () {},
+                        ),
+                        FlatButton(
+                          child: Text(''),
+                          color: Colors.transparent,
+                          onPressed: () {},
+                        ),
+                        FlatButton(
+                          child: Text('ROUND TRIP'),
+                          color: Colors.white,
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * .1),
+                          child: Container(
+                              child: _isFromOpen //(_isSearching && (!_onTap))
+                                  ? getFromWidget()
+                                  : null),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 8, right: 8),
+                          child: Card(
+                            elevation: 8,
+                            color: Colors.white,
+                            child: Padding(
+                              child: TextFormField(
+                                controller: _from,
+                                //focusNode: _flyingFromFocusNode,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Field cannot be empty';
+                                  }
+                                },
+                                onFieldSubmitted: (String value) {
+                                  print("$value submitted");
+                                  setState(() {
+                                    _from.text = value;
+                                    _onTap = true;
+                                  });
+                                },
+
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  icon: Icon(
+                                    FontAwesomeIcons.planeDeparture,
+                                    color: Colors.blue,
+                                    //size: 22.0,
+                                  ),
+                                  hintText: 'Flying From',
+                                  hintStyle: TextStyle(
+                                      fontFamily: "Nunito", fontSize: 17.0),
+                                ),
+                              ),
+                              padding: EdgeInsets.only(
+                                left: 16,
+                                bottom: 8,
+                                top: 8,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                        InkWell(
+                          onTap: () {
+                            _addOriginAirportMarkers();
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * .6,
+                            child: Card(
+                              elevation: 4,
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Slider(
+                                      value: _fromSlider.toDouble(),
+                                      min: 1.0,
+                                      max: 100.0,
+                                      divisions: 5,
+                                      label: '$_fromSlider',
+                                      onChanged: (double Value) {
+                                        _addOriginAirportMarkers();
+                                        setState(
+                                          () {
+                                            _fromSlider = Value.floor();
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Text("$_fromSlider Mi"),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * .1),
+                          child: Container(
+                              child: _isToOpen //(_isSearching && (!_onTap))
+                                  ? getToWidget()
+                                  : null),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(right: 8, left: 8),
+                          child: Card(
+                            elevation: 8,
+                            child: Padding(
+                              child: TextFormField(
+                                controller: _to,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Field cannot be empty';
+                                  }
+                                },
+                                onFieldSubmitted: (String value) {
+                                  print("$value submitted");
+                                  setState(() {
+                                    _to.text = value;
+                                    _onTap = true;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  icon: Icon(
+                                    FontAwesomeIcons.planeDeparture,
+                                    color: Colors.blue,
+                                    //size: 22.0,
+                                  ),
+                                  hintText: 'Flying To',
+                                  hintStyle: TextStyle(
+                                      fontFamily: "Nunito", fontSize: 17.0),
+                                ),
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                            ),
+                          ),
+                        ),
+                        // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                        InkWell(
+                          onTap: () {
+                            _addDestinationAirportMarkers();
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * .6,
+                            child: Card(
+                              elevation: 8,
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Slider(
+                                      value: _toSlider.ceilToDouble(),
+                                      min: 1.0,
+                                      max: 100.0,
+                                      divisions: 5,
+                                      label: '$_toSlider', //var _toSlider = 1;,
+                                      onChanged: (double Value) {
+                                        _addDestinationAirportMarkers();
+                                        setState(() {
+                                          _toSlider = Value.round();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Text("$_toSlider Mi"),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Card(
+                            margin:
+                                EdgeInsets.only(top: 8, left: 16, right: 16),
+                            elevation: 8,
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            child: FlatButton(
+                              color: Colors.white,
+                              onPressed: () async {
+                                final List<DateTime> originPicked =
+                                    await DateRangePicker.showDatePicker(
+                                        context: context,
+                                        initialFirstDate: DateTime.now(),
+                                        initialLastDate: (DateTime.now())
+                                            .add(Duration(days: 7)),
+                                        firstDate: DateTime(2019),
+                                        lastDate: DateTime(2020));
+                                if (originPicked != null &&
+                                    originPicked.length == 2) {
+                                  print(originPicked);
+                                  _originDate = originPicked.toList();
+                                }
+                              },
+                              child: Icon(Icons.date_range),
+                              /*child: Text(
+                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                      '$_originDate'
+                                      'yyyy-mm-dd <---> yyyy-mm-dd'
+                                  ),*/
+                              //'Departure Date Picker'),
+                            ),
+                          ),
+                        ),
+
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Card(
+                            margin:
+                                EdgeInsets.only(top: 8, left: 16, right: 16),
+                            elevation: 8,
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            child: FlatButton(
+                              color: Colors.white,
+                              onPressed: () async {
+                                final List<DateTime> returnDatePicked =
+                                    await DateRangePicker.showDatePicker(
+                                        context: context,
+                                        initialFirstDate: DateTime.now()
+                                            .add(Duration(days: 7)),
+                                        initialLastDate: (DateTime.now())
+                                            .add(Duration(days: 14)),
+                                        firstDate: DateTime(2019),
+                                        lastDate: DateTime(2020));
+                                if (returnDatePicked != null &&
+                                    returnDatePicked.length == 2) {
+                                  print(returnDatePicked);
+                                  _destinationDate = returnDatePicked.toList();
+                                }
+                              },
+                              child: Icon(Icons.date_range),
+                              /*child: Text(
+                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                      '$_originDate'
+                                      'yyyy-mm-dd <---> yyyy-mm-dd'
+                                  ),*/
+                              //'Departure Date Picker'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _getLowerLayer(BuildContext context) {
+    return Container(
+      child: PageView(
+        onPageChanged: (i) {
+          if (i == 0) {
+            setState(() {
+              fabIcon = Icons.search;
+            });
+          } else if (i == 1) {
+            _collapse();
+            setState(() {
+              fabIcon = Icons.payment;
+            });
+          }
+        },
+        controller: _pageviewcontroller,
+        physics: BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          //Container(child: LoginPage(),),
+          SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            //controller: _inputPage,
+            child: Container(
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+
+                    //margin: EdgeInsets.all(8),
+                    //color: Color(0xc25737373),
+                    child: Center(
+                      child: Container(
+                        child: GoogleMap(
+                          mapType: MapType.normal,
+                          myLocationEnabled: true,
+                          compassEnabled: true,
+                          onMapCreated: _onMapCreated,
+                          zoomGesturesEnabled: true,
+                          markers: Set<Marker>.of(markers.values),
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(40.5436, -101.9734347),
+                            zoom: 1.0,
+                            tilt: 45,
+                          ),
+                        ), //Text('Put Map here'), // CustomGoogleMap(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            child: Container(
+              height: MediaQuery.of(context).size.height * .85,
+              child: Container(
+                child: TicketListViewBuilder(
+                  data: responseTicketData,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
