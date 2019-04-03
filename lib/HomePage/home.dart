@@ -31,9 +31,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  //AnimationController _controller;
 
   RubberAnimationController _rubberController;
+  ScrollController _scrollController = ScrollController();
 
   Completer<GoogleMapController> _customGoogleMapController = Completer();
 
@@ -91,9 +92,7 @@ class _HomePageState extends State<HomePage>
 
     _rubberController = RubberAnimationController(
         vsync: this,
-        dismissable: true,
         halfBoundValue: AnimationControllerValue(percentage: 0.66),
-        lowerBoundValue: AnimationControllerValue(pixel: 50),
         duration: Duration(milliseconds: 200));
     _rubberController.addStatusListener(_statusListener);
 
@@ -123,7 +122,7 @@ class _HomePageState extends State<HomePage>
     super.dispose();
     _rubberController.removeStatusListener(_statusListener);
     _rubberController.dispose();
-    _controller.dispose();
+    // _controller.dispose();
   }
 
   void _statusListener(AnimationStatus status) {
@@ -176,6 +175,8 @@ class _HomePageState extends State<HomePage>
         itemBuilder: (context, i) {
           final fromItem = originData[i];
           return ListTile(
+            enabled: true,
+            selected: true,
             title: Text('$fromItem'),
             onTap: () {
               print('$fromItem selected');
@@ -302,14 +303,13 @@ class _HomePageState extends State<HomePage>
     _from.addListener(() {
       if (_from.text.isEmpty) {
         setState(() {
-          _isSearching = true;
           _searchFromField = "";
           _isFromOpen = false;
           _searchFromList = List();
         });
-      } else {
+      }
+      if (_from.text.length > 0) {
         setState(() {
-          _isSearching = false;
           _isFromOpen = true;
           _searchFromField = _from.text;
           _onTap = _onTapTextLength == _searchFromField.length;
@@ -319,14 +319,13 @@ class _HomePageState extends State<HomePage>
     _to.addListener(() {
       if (_to.text.isEmpty) {
         setState(() {
-          _isSearching = true;
           _searchToField = "";
           _isToOpen = false;
           _searchToList = List();
         });
-      } else {
+      }
+      if (_to.text.length > 0) {
         setState(() {
-          _isSearching = false;
           _isToOpen = true;
           _searchToField = _to.text;
           _onTap = _onTapTextLength == _searchToField.length;
@@ -446,8 +445,16 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Color.fromARGB(255, 247, 247, 247),
         body: Container(
           child: RubberBottomSheet(
+            header: Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ModalDrawerHandle(),
+              ),
+            ),
             lowerLayer: _getLowerLayer(context),
             animationController: _rubberController,
+            scrollController: _scrollController,
             upperLayer: _getUpperLayer(),
           ),
         ), //_getLowerLayer(context),
@@ -514,13 +521,6 @@ class _HomePageState extends State<HomePage>
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ModalDrawerHandle(),
-            ),
-          ),
-          Container(
             child: Form(
               key: _formKey,
               child: Column(
@@ -542,6 +542,7 @@ class _HomePageState extends State<HomePage>
                           child: Text(''),
                           color: Colors.transparent,
                           onPressed: () {},
+                          disabledColor: Colors.transparent,
                         ),
                         FlatButton(
                           child: Text('ROUND TRIP'),
@@ -560,7 +561,7 @@ class _HomePageState extends State<HomePage>
                           padding: EdgeInsets.only(
                               left: MediaQuery.of(context).size.width * .1),
                           child: Container(
-                              child: _isFromOpen //(_isSearching && (!_onTap))
+                              child: _isFromOpen && _from.text.isNotEmpty //(_isSearching && (!_onTap))
                                   ? getFromWidget()
                                   : null),
                         ),
@@ -578,10 +579,12 @@ class _HomePageState extends State<HomePage>
                                     return 'Field cannot be empty';
                                   }
                                 },
+                               
                                 onFieldSubmitted: (String value) {
                                   print("$value submitted");
                                   setState(() {
                                     _from.text = value;
+                                    _isFromOpen = false;
                                     _onTap = true;
                                   });
                                 },
@@ -610,6 +613,7 @@ class _HomePageState extends State<HomePage>
                         InkWell(
                           onTap: () {
                             _addOriginAirportMarkers();
+                            _isFromOpen = false;
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width * .6,
@@ -630,6 +634,7 @@ class _HomePageState extends State<HomePage>
                                         _addOriginAirportMarkers();
                                         setState(
                                           () {
+                                            _isFromOpen = false;
                                             _fromSlider = Value.floor();
                                           },
                                         );
@@ -666,6 +671,7 @@ class _HomePageState extends State<HomePage>
                                   print("$value submitted");
                                   setState(() {
                                     _to.text = value;
+                                    _isToOpen = false;
                                     _onTap = true;
                                   });
                                 },
@@ -689,6 +695,7 @@ class _HomePageState extends State<HomePage>
                         // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
                         InkWell(
                           onTap: () {
+                            _isToOpen = false;
                             _addDestinationAirportMarkers();
                           },
                           child: Container(
@@ -710,6 +717,7 @@ class _HomePageState extends State<HomePage>
                                       onChanged: (double Value) {
                                         _addDestinationAirportMarkers();
                                         setState(() {
+                                          _isToOpen = false;
                                           _toSlider = Value.round();
                                         });
                                       },
@@ -826,37 +834,22 @@ class _HomePageState extends State<HomePage>
         scrollDirection: Axis.horizontal,
         children: <Widget>[
           //Container(child: LoginPage(),),
-          SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            //controller: _inputPage,
-            child: Container(
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: <Widget>[
-                  Container(
-                    height: MediaQuery.of(context).size.height,
+          Container(
+            height: MediaQuery.of(context).size.height,
 
-                    //margin: EdgeInsets.all(8),
-                    //color: Color(0xc25737373),
-                    child: Center(
-                      child: Container(
-                        child: GoogleMap(
-                          mapType: MapType.normal,
-                          myLocationEnabled: true,
-                          compassEnabled: true,
-                          onMapCreated: _onMapCreated,
-                          zoomGesturesEnabled: true,
-                          markers: Set<Marker>.of(markers.values),
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(40.5436, -101.9734347),
-                            zoom: 1.0,
-                            tilt: 45,
-                          ),
-                        ), //Text('Put Map here'), // CustomGoogleMap(),
-                      ),
-                    ),
-                  ),
-                ],
+            //margin: EdgeInsets.all(8),
+            //color: Color(0xc25737373),
+            child: GoogleMap(
+              mapType: MapType.normal,
+              myLocationEnabled: true,
+              compassEnabled: true,
+              onMapCreated: _onMapCreated,
+              zoomGesturesEnabled: true,
+              markers: Set<Marker>.of(markers.values),
+              initialCameraPosition: CameraPosition(
+                target: LatLng(40.5436, -101.9734347),
+                zoom: 1.0,
+                tilt: 45,
               ),
             ),
           ),
