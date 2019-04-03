@@ -92,7 +92,8 @@ class _HomePageState extends State<HomePage>
 
     _rubberController = RubberAnimationController(
         vsync: this,
-        halfBoundValue: AnimationControllerValue(percentage: 0.66),
+        halfBoundValue: AnimationControllerValue(percentage: 0.8),
+        lowerBoundValue: AnimationControllerValue(percentage: 0.1),
         duration: Duration(milliseconds: 200));
     _rubberController.addStatusListener(_statusListener);
 
@@ -561,7 +562,9 @@ class _HomePageState extends State<HomePage>
                           padding: EdgeInsets.only(
                               left: MediaQuery.of(context).size.width * .1),
                           child: Container(
-                              child: _isFromOpen && _from.text.isNotEmpty //(_isSearching && (!_onTap))
+                              child: _isFromOpen &&
+                                      _from.text
+                                          .isNotEmpty //(_isSearching && (!_onTap))
                                   ? getFromWidget()
                                   : null),
                         ),
@@ -579,7 +582,7 @@ class _HomePageState extends State<HomePage>
                                     return 'Field cannot be empty';
                                   }
                                 },
-                               
+
                                 onFieldSubmitted: (String value) {
                                   print("$value submitted");
                                   setState(() {
@@ -802,6 +805,28 @@ class _HomePageState extends State<HomePage>
                             ),
                           ),
                         ),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          width: MediaQuery.of(context).size.width,
+                          child: Card(
+                            elevation: 0,
+                            child: FlatButton(
+                              color: Colors.white,
+                              child: Text('Find Tickets'),
+                              onPressed: () {
+                                postToGlitchServer();
+                                TicketListViewBuilder(
+                                  data: responseTicketData,
+                                );
+                                _pageviewcontroller.animateToPage(
+                                  2,
+                                  duration: Duration(milliseconds: 1000),
+                                  curve: Curves.easeInOutExpo.flipped,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -823,7 +848,8 @@ class _HomePageState extends State<HomePage>
               fabIcon = Icons.search;
             });
           } else if (i == 1) {
-            _collapse();
+            _rubberController
+                        .setVisibility(!_rubberController.visibility.value);
             setState(() {
               fabIcon = Icons.payment;
             });
