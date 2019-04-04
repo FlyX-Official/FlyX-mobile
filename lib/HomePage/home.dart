@@ -659,8 +659,10 @@ class _HomePageState extends State<HomePage>
                                   : null),
                         ),
                         Container(
+                          
                           margin: EdgeInsets.only(right: 8, left: 8),
                           child: Card(
+                            
                             elevation: 8,
                             child: Padding(
                               child: TextFormField(
@@ -672,9 +674,11 @@ class _HomePageState extends State<HomePage>
                                 },
                                 onFieldSubmitted: (String value) {
                                   print("$value submitted");
+                                  
                                   setState(() {
                                     _to.text = value;
                                     _isToOpen = false;
+                                    //_isFromOpen = false;
                                     _onTap = true;
                                   });
                                 },
