@@ -1,3 +1,6 @@
+
+
+
 //import 'package:flyx/FloatingActionButton/fab_with_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +37,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'OpenSans'
       ),
       home: LoginPage(),
       routes: routes,

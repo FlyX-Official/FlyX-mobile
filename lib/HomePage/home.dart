@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 //import 'package:rounded_modal/rounded_modal.dart';
 import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:rubber/rubber.dart';
+import 'package:search_widget/search_widget.dart';
 
 import 'package:geohash/geohash.dart';
 import 'package:rounded_modal/rounded_modal.dart';
@@ -92,8 +93,10 @@ class _HomePageState extends State<HomePage>
 
     _rubberController = RubberAnimationController(
         vsync: this,
-        halfBoundValue: AnimationControllerValue(percentage: 0.8),
-        lowerBoundValue: AnimationControllerValue(percentage: 0.1),
+        dismissable: true,
+        upperBoundValue: AnimationControllerValue(percentage: .9),
+        halfBoundValue: AnimationControllerValue(pixel: 550),
+        lowerBoundValue: AnimationControllerValue(pixel: 21),
         duration: Duration(milliseconds: 200));
     _rubberController.addStatusListener(_statusListener);
 
@@ -416,29 +419,29 @@ class _HomePageState extends State<HomePage>
     return Container(
       child: Scaffold(
         //body:,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(fabIcon),
-          elevation: 16,
-          highlightElevation: 4,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: Colors.black, width: 2)),
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.lightGreenAccent,
-          onPressed: () {
-            postToGlitchServer();
-            TicketListViewBuilder(
-              data: responseTicketData,
-            );
-            _pageviewcontroller.animateToPage(
-              2,
-              duration: Duration(milliseconds: 1000),
-              curve: Curves.easeInOutExpo.flipped,
-            );
-          },
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation
-            .centerDocked, //floatingActionButtonAnimator,
+        // floatingActionButton: FloatingActionButton(
+        //   child: Icon(fabIcon),
+        //   elevation: 16,
+        //   highlightElevation: 4,
+        //   shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(20),
+        //       side: BorderSide(color: Colors.black, width: 2)),
+        //   foregroundColor: Colors.black,
+        //   backgroundColor: Colors.lightGreenAccent,
+        //   onPressed: () {
+        //     postToGlitchServer();
+        //     TicketListViewBuilder(
+        //       data: responseTicketData,
+        //     );
+        //     _pageviewcontroller.animateToPage(
+        //       2,
+        //       duration: Duration(milliseconds: 1000),
+        //       curve: Curves.easeInOutExpo.flipped,
+        //     );
+        //   },
+        // ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation
+        //     .centerDocked, //floatingActionButtonAnimator,
         //persistentFooterButtons,
         //drawer,
         //endDrawer,
@@ -446,10 +449,11 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Color.fromARGB(255, 247, 247, 247),
         body: Container(
           child: RubberBottomSheet(
-            header: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+            header: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * .9,
+                color: Colors.white,
+                padding: EdgeInsets.all(8),
                 child: ModalDrawerHandle(),
               ),
             ),
@@ -460,12 +464,13 @@ class _HomePageState extends State<HomePage>
           ),
         ), //_getLowerLayer(context),
         resizeToAvoidBottomInset: false,
+
         bottomNavigationBar: BottomAppBar(
           notchMargin: 8,
           elevation: 0,
-          //shape: CircularNotchedRectangle(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
                 child: IconButton(
@@ -487,9 +492,26 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
               Container(
-                child: Icon(
-                  FontAwesomeIcons.envira,
-                  color: Color.fromARGB(0, 0, 0, 0),
+                color: Colors.lightGreenAccent,
+                child: Card(
+                  elevation: 0,
+                  color: Colors.lightGreenAccent,
+                  child: IconButton(
+                    icon: Icon(Icons.search),
+                    color: Colors.black,
+                    highlightColor: Colors.redAccent,
+                    onPressed: () {
+                      postToGlitchServer();
+                      TicketListViewBuilder(
+                        data: responseTicketData,
+                      );
+                      _pageviewcontroller.animateToPage(
+                        2,
+                        duration: Duration(milliseconds: 1000),
+                        curve: Curves.easeInOutExpo.flipped,
+                      );
+                    }, //showMenu,
+                  ),
                 ),
               ),
               Container(
@@ -497,9 +519,7 @@ class _HomePageState extends State<HomePage>
                   icon: Icon(Icons.notifications),
                   color: Colors.black,
                   highlightColor: Colors.blue,
-                  onPressed: () {
-                    // _scaffoldKey.currentState.openDrawer();
-                  }, //showMenu,
+                  onPressed: _collapse, //showMenu,
                 ),
               ),
               IconButton(
@@ -517,328 +537,323 @@ class _HomePageState extends State<HomePage>
 
   Widget _getUpperLayer() {
     return Container(
-      color: Colors.black54,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        FlatButton(
-                          child: Text('ONE WAY'),
-                          color: Colors.white,
-                          onPressed: () {},
-                        ),
-                        FlatButton(
-                          child: Text(''),
-                          color: Colors.transparent,
-                          onPressed: () {},
-                          disabledColor: Colors.transparent,
-                        ),
-                        FlatButton(
-                          child: Text('ROUND TRIP'),
-                          color: Colors.white,
-                          onPressed: () {},
-                        ),
-                      ],
+      width: MediaQuery.of(context).size.width * .9,
+      decoration: BoxDecoration(
+        color: Colors.black54,
+      ),
+      //color: Colors.black54,
+      child: Container(
+        child: Form(
+          autovalidate: false,
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Text('ONE WAY'),
+                      color: Colors.white,
+                      onPressed: () {},
                     ),
-                  ),
-                  Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width * .1),
-                          child: Container(
-                              child: _isFromOpen &&
-                                      _from.text
-                                          .isNotEmpty //(_isSearching && (!_onTap))
-                                  ? getFromWidget()
-                                  : null),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 8, right: 8),
-                          child: Card(
-                            elevation: 8,
-                            color: Colors.white,
-                            child: Padding(
-                              child: TextFormField(
-                                controller: _from,
-                                //focusNode: _flyingFromFocusNode,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Field cannot be empty';
-                                  }
-                                },
-
-                                onFieldSubmitted: (String value) {
-                                  print("$value submitted");
-                                  setState(() {
-                                    _from.text = value;
-                                    _isFromOpen = false;
-                                    _onTap = true;
-                                  });
-                                },
-
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  icon: Icon(
-                                    FontAwesomeIcons.planeDeparture,
-                                    color: Colors.blue,
-                                    //size: 22.0,
-                                  ),
-                                  hintText: 'Flying From',
-                                  hintStyle: TextStyle(
-                                      fontFamily: "Nunito", fontSize: 17.0),
-                                ),
-                              ),
-                              padding: EdgeInsets.only(
-                                left: 16,
-                                bottom: 8,
-                                top: 8,
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                        InkWell(
-                          onTap: () {
-                            _addOriginAirportMarkers();
-                            _isFromOpen = false;
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * .6,
-                            child: Card(
-                              elevation: 4,
-                              color: Colors.white,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    child: Slider(
-                                      value: _fromSlider.toDouble(),
-                                      min: 1.0,
-                                      max: 100.0,
-                                      divisions: 5,
-                                      label: '$_fromSlider',
-                                      onChanged: (double Value) {
-                                        _addOriginAirportMarkers();
-                                        setState(
-                                          () {
-                                            _isFromOpen = false;
-                                            _fromSlider = Value.floor();
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Text("$_fromSlider Mi"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width * .1),
-                          child: Container(
-                              child: _isToOpen //(_isSearching && (!_onTap))
-                                  ? getToWidget()
-                                  : null),
-                        ),
-                        Container(
-                          
-                          margin: EdgeInsets.only(right: 8, left: 8),
-                          child: Card(
-                            
-                            elevation: 8,
-                            child: Padding(
-                              child: TextFormField(
-                                controller: _to,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Field cannot be empty';
-                                  }
-                                },
-                                onFieldSubmitted: (String value) {
-                                  print("$value submitted");
-                                  
-                                  setState(() {
-                                    _to.text = value;
-                                    _isToOpen = false;
-                                    //_isFromOpen = false;
-                                    _onTap = true;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  icon: Icon(
-                                    FontAwesomeIcons.planeDeparture,
-                                    color: Colors.blue,
-                                    //size: 22.0,
-                                  ),
-                                  hintText: 'Flying To',
-                                  hintStyle: TextStyle(
-                                      fontFamily: "Nunito", fontSize: 17.0),
-                                ),
-                              ),
-                              padding:
-                                  EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                            ),
-                          ),
-                        ),
-                        // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                        InkWell(
-                          onTap: () {
-                            _isToOpen = false;
-                            _addDestinationAirportMarkers();
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * .6,
-                            child: Card(
-                              elevation: 8,
-                              color: Colors.white,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    child: Slider(
-                                      value: _toSlider.ceilToDouble(),
-                                      min: 1.0,
-                                      max: 100.0,
-                                      divisions: 5,
-                                      label: '$_toSlider', //var _toSlider = 1;,
-                                      onChanged: (double Value) {
-                                        _addDestinationAirportMarkers();
-                                        setState(() {
-                                          _isToOpen = false;
-                                          _toSlider = Value.round();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  Text("$_toSlider Mi"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: Card(
-                            margin:
-                                EdgeInsets.only(top: 8, left: 16, right: 16),
-                            elevation: 8,
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            child: FlatButton(
-                              color: Colors.white,
-                              onPressed: () async {
-                                final List<DateTime> originPicked =
-                                    await DateRangePicker.showDatePicker(
-                                        context: context,
-                                        initialFirstDate: DateTime.now(),
-                                        initialLastDate: (DateTime.now())
-                                            .add(Duration(days: 7)),
-                                        firstDate: DateTime(2019),
-                                        lastDate: DateTime(2020));
-                                if (originPicked != null &&
-                                    originPicked.length == 2) {
-                                  print(originPicked);
-                                  _originDate = originPicked.toList();
-                                }
-                              },
-                              child: Icon(Icons.date_range),
-                              /*child: Text(
-                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                      '$_originDate'
-                                      'yyyy-mm-dd <---> yyyy-mm-dd'
-                                  ),*/
-                              //'Departure Date Picker'),
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: Card(
-                            margin:
-                                EdgeInsets.only(top: 8, left: 16, right: 16),
-                            elevation: 8,
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            child: FlatButton(
-                              color: Colors.white,
-                              onPressed: () async {
-                                final List<DateTime> returnDatePicked =
-                                    await DateRangePicker.showDatePicker(
-                                        context: context,
-                                        initialFirstDate: DateTime.now()
-                                            .add(Duration(days: 7)),
-                                        initialLastDate: (DateTime.now())
-                                            .add(Duration(days: 14)),
-                                        firstDate: DateTime(2019),
-                                        lastDate: DateTime(2020));
-                                if (returnDatePicked != null &&
-                                    returnDatePicked.length == 2) {
-                                  print(returnDatePicked);
-                                  _destinationDate = returnDatePicked.toList();
-                                }
-                              },
-                              child: Icon(Icons.date_range),
-                              /*child: Text(
-                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                      '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                      '$_originDate'
-                                      'yyyy-mm-dd <---> yyyy-mm-dd'
-                                  ),*/
-                              //'Departure Date Picker'),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(8),
-                          width: MediaQuery.of(context).size.width,
-                          child: Card(
-                            elevation: 0,
-                            child: FlatButton(
-                              color: Colors.white,
-                              child: Text('Find Tickets'),
-                              onPressed: () {
-                                postToGlitchServer();
-                                TicketListViewBuilder(
-                                  data: responseTicketData,
-                                );
-                                _pageviewcontroller.animateToPage(
-                                  2,
-                                  duration: Duration(milliseconds: 1000),
-                                  curve: Curves.easeInOutExpo.flipped,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+                    FlatButton(
+                      child: Text(''),
+                      color: Colors.transparent,
+                      onPressed: () {},
+                      disabledColor: Colors.transparent,
                     ),
-                  ),
-                ],
+                    FlatButton(
+                      child: Text('ROUND TRIP'),
+                      color: Colors.white,
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
               ),
-            ),
+              Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * .1),
+                      child: Container(
+                          child: _isFromOpen &&
+                                  _from.text
+                                      .isNotEmpty //(_isSearching && (!_onTap))
+                              ? getFromWidget()
+                              : null),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 8, right: 8),
+                      child: Card(
+                        elevation: 8,
+                        color: Colors.white,
+                        child: Padding(
+                          child: TextFormField(
+                            controller: _from,
+                            //focusNode: _flyingFromFocusNode,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Field cannot be empty';
+                              }
+                            },
+
+                            onFieldSubmitted: (String value) {
+                              print("$value submitted");
+                              setState(() {
+                                _from.text = value;
+                                _isFromOpen = false;
+                                _onTap = true;
+                              });
+                            },
+
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: Icon(
+                                FontAwesomeIcons.planeDeparture,
+                                color: Colors.blue,
+                                //size: 22.0,
+                              ),
+                              hintText: 'Flying From',
+                              hintStyle: TextStyle(
+                                  fontFamily: "Nunito", fontSize: 17.0),
+                            ),
+                          ),
+                          padding: EdgeInsets.only(
+                            left: 16,
+                            bottom: 8,
+                            top: 8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                    InkWell(
+                      onTap: () {
+                        _addOriginAirportMarkers();
+                        _isFromOpen = false;
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * .6,
+                        child: Card(
+                          elevation: 4,
+                          color: Colors.white,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                child: Slider(
+                                  value: _fromSlider.toDouble(),
+                                  min: 1.0,
+                                  max: 100.0,
+                                  divisions: 5,
+                                  label: '$_fromSlider',
+                                  onChanged: (double Value) {
+                                    _addOriginAirportMarkers();
+                                    setState(
+                                      () {
+                                        _isFromOpen = false;
+                                        _fromSlider = Value.floor();
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                              Text("$_fromSlider Mi"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * .1),
+                      child: Container(
+                          child: _isToOpen //(_isSearching && (!_onTap))
+                              ? getToWidget()
+                              : null),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(right: 8, left: 8),
+                      child: Card(
+                        elevation: 8,
+                        child: Padding(
+                          child: TextFormField(
+                            controller: _to,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Field cannot be empty';
+                              }
+                            },
+                            onFieldSubmitted: (String value) {
+                              print("$value submitted");
+
+                              setState(() {
+                                _to.text = value;
+                                _isToOpen = false;
+                                //_isFromOpen = false;
+                                _onTap = true;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: Icon(
+                                FontAwesomeIcons.planeDeparture,
+                                color: Colors.blue,
+                                //size: 22.0,
+                              ),
+                              hintText: 'Flying To',
+                              hintStyle: TextStyle(
+                                  fontFamily: "Nunito", fontSize: 17.0),
+                            ),
+                          ),
+                          padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                        ),
+                      ),
+                    ),
+                    // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                    InkWell(
+                      onTap: () {
+                        _isToOpen = false;
+                        _addDestinationAirportMarkers();
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * .6,
+                        child: Card(
+                          elevation: 8,
+                          color: Colors.white,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                child: Slider(
+                                  value: _toSlider.ceilToDouble(),
+                                  min: 1.0,
+                                  max: 100.0,
+                                  divisions: 5,
+                                  label: '$_toSlider', //var _toSlider = 1;,
+                                  onChanged: (double Value) {
+                                    _addDestinationAirportMarkers();
+                                    setState(() {
+                                      _isToOpen = false;
+                                      _toSlider = Value.round();
+                                    });
+                                  },
+                                ),
+                              ),
+                              Text("$_toSlider Mi"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Card(
+                        margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                        elevation: 8,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        child: FlatButton(
+                          color: Colors.white,
+                          onPressed: () async {
+                            final List<DateTime> originPicked =
+                                await DateRangePicker.showDatePicker(
+                                    context: context,
+                                    initialFirstDate: DateTime.now(),
+                                    initialLastDate:
+                                        (DateTime.now()).add(Duration(days: 7)),
+                                    firstDate: DateTime(2019),
+                                    lastDate: DateTime(2020));
+                            if (originPicked != null &&
+                                originPicked.length == 2) {
+                              print(originPicked);
+                              _originDate = originPicked.toList();
+                            }
+                          },
+                          child: Icon(Icons.date_range),
+                          /*child: Text(
+                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                  '$_originDate'
+                                  'yyyy-mm-dd <---> yyyy-mm-dd'
+                              ),*/
+                          //'Departure Date Picker'),
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Card(
+                        margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                        elevation: 8,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        child: FlatButton(
+                          color: Colors.white,
+                          onPressed: () async {
+                            final List<DateTime> returnDatePicked =
+                                await DateRangePicker.showDatePicker(
+                                    context: context,
+                                    initialFirstDate:
+                                        DateTime.now().add(Duration(days: 7)),
+                                    initialLastDate: (DateTime.now())
+                                        .add(Duration(days: 14)),
+                                    firstDate: DateTime(2019),
+                                    lastDate: DateTime(2020));
+                            if (returnDatePicked != null &&
+                                returnDatePicked.length == 2) {
+                              print(returnDatePicked);
+                              _destinationDate = returnDatePicked.toList();
+                            }
+                          },
+                          child: Icon(Icons.date_range),
+                          /*child: Text(
+                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                  '$_originDate'
+                                  'yyyy-mm-dd <---> yyyy-mm-dd'
+                              ),*/
+                          //'Departure Date Picker'),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      width: MediaQuery.of(context).size.width,
+                      child: Card(
+                        elevation: 0,
+                        child: FlatButton(
+                          color: Colors.white,
+                          child: Text('Find Tickets'),
+                          onPressed: () {
+                            postToGlitchServer();
+                            TicketListViewBuilder(
+                              data: responseTicketData,
+                            );
+                            _pageviewcontroller.animateToPage(
+                              2,
+                              duration: Duration(milliseconds: 1000),
+                              curve: Curves.easeInOutExpo.flipped,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -853,7 +868,7 @@ class _HomePageState extends State<HomePage>
             });
           } else if (i == 1) {
             _rubberController
-                        .setVisibility(!_rubberController.visibility.value);
+                .setVisibility(!_rubberController.visibility.value);
             setState(() {
               fabIcon = Icons.payment;
             });
