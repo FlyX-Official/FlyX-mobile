@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flyx/style/theme.dart' as Theme;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +17,7 @@ import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 //import '../TicketDisplayer/ticketCard.dart';
 
@@ -141,10 +145,16 @@ class _HomePageState extends State<HomePage>
         ticketresponses = TicketListViewBuilder(
           data: responseTicketData,
         );
+        PageItem(
+          data: responseTicketData,
+        );
       });
     });
     _googleSignIn.signInSilently();
     TicketListViewBuilder(
+      data: responseTicketData,
+    );
+    PageItem(
       data: responseTicketData,
     );
     //_controller = AnimationController(vsync: this);
@@ -702,6 +712,9 @@ class _HomePageState extends State<HomePage>
                           child: Text('Find Tickets'),
                           onPressed: () {
                             postToGlitchServer();
+                            PageItem(
+                              data: responseTicketData,
+                            );
                             TicketListViewBuilder(
                               data: responseTicketData,
                             );
@@ -884,6 +897,9 @@ class _HomePageState extends State<HomePage>
       TicketListViewBuilder(
         data: responseTicketData,
       );
+      PageItem(
+        data: responseTicketData,
+      );
       setState(() {
         var responseData = json.decode(response.body);
         //search_par = responseData["tickets"]["search_params"];
@@ -899,34 +915,6 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
-        //body:,
-        // floatingActionButton: FloatingActionButton(
-        //   child: Icon(fabIcon),
-        //   elevation: 16,
-        //   highlightElevation: 4,
-        //   shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(20),
-        //       side: BorderSide(color: Colors.black, width: 2)),
-        //   foregroundColor: Colors.black,
-        //   backgroundColor: Colors.lightGreenAccent,
-        //   onPressed: () {
-        //     postToGlitchServer();
-        //     TicketListViewBuilder(
-        //       data: responseTicketData,
-        //     );
-        //     _pageviewcontroller.animateToPage(
-        //       2,
-        //       duration: Duration(milliseconds: 1000),
-        //       curve: Curves.easeInOutExpo.flipped,
-        //     );
-        //   },
-        // ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation
-        //     .centerDocked, //floatingActionButtonAnimator,
-        //persistentFooterButtons,
-        //drawer,
-        //endDrawer,
-        //bottomSheet: ,
         backgroundColor: Color.fromARGB(255, 247, 247, 247),
         body: Container(
           child: RubberBottomSheet(
@@ -988,6 +976,9 @@ class _HomePageState extends State<HomePage>
                     highlightColor: Colors.redAccent,
                     onPressed: () {
                       postToGlitchServer();
+                      PageItem(
+                        data: responseTicketData,
+                      );
                       TicketListViewBuilder(
                         data: responseTicketData,
                       );
@@ -1042,367 +1033,653 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
   bool _isOpen = false;
   double _thisItem = 0.0;
 
-  Widget added(BuildContext contex) {
-    if (_isOpen) {
-      _isOpen = false;
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 120),
-        child: Container(
-          child: Text("data"),
-          height: 200.0,
-          color: Colors.red,
-        ),
-        height: _thisItem,
-      );
-    }
-    _isOpen = true;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
-      child: Container(
-        child: Text("data"),
-        height: 0.0,
-      ),
-      height: _thisItem,
-    );
-  }
+  // Widget added(BuildContext contex) {
+  //   if (_isOpen) {
+  //     _isOpen = false;
+  //     return AnimatedContainer(
+  //       duration: const Duration(milliseconds: 120),
+  //       child: Container(
+  //         child: Text("data"),
+  //         height: 200.0,
+  //         color: Colors.red,
+  //       ),
+  //       height: _thisItem,
+  //     );
+  //   }
+  //   _isOpen = true;
+  //   return AnimatedContainer(
+  //     duration: const Duration(milliseconds: 120),
+  //     child: Container(
+  //       child: Text("data"),
+  //       height: 0.0,
+  //     ),
+  //     height: _thisItem,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     //return await buildSafeArea();
+    dynamic responsePageItemTicketData = widget.data;
     return SafeArea(
-      child: ListView.builder(
-        itemCount: widget.data == null ? 0 : widget.data.length,
-        itemBuilder: (context, i) {
-          return Hero(
-            tag: "card$i",
-            child: Container(
-              padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+      child: Container(
+        child: ListView.builder(
+          itemCount: widget.data == null ? 0 : widget.data.length,
+          itemBuilder: (context, i) {
+            return Hero(
+              tag: "card$i",
+              child: Container(
+                padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Stack(
+                    children: <Widget>[
+                      buildTicketCardContainer(i, context),
+                      Positioned(
+                        left: 0.0,
+                        top: 0.0,
+                        bottom: 0.0,
+                        right: 0.0,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () async {
+                              await Future.delayed(Duration(milliseconds: 500));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return PageItem(
+                                        num: i,
+                                        data: responsePageItemTicketData);
+                                  },
+                                  fullscreenDialog: true,
+                                  maintainState: true,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            color: Color.fromARGB(255, 100, 135, 165),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: <Widget>[
-                                      Container(
-                                        child: Text(
-                                          "${widget.data[i]['flyFrom'].toString()}",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
-                                      ),
-                                      Container(
-                                        padding:
-                                            EdgeInsets.only(left: 8, right: 8),
-                                        child: Icon(
-                                          FontAwesomeIcons.exchangeAlt,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Text(
-                                          "${widget.data[i]['flyTo'].toString()}",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
-                                      ),
-                                    ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Container buildTicketCardContainer(int i, BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            color: Color.fromARGB(255, 100, 135, 165),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          "${widget.data[i]['flyFrom'].toString()}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                        child: Icon(
+                          FontAwesomeIcons.exchangeAlt,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        child: Text(
+                          "${widget.data[i]['flyTo'].toString()}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Text(
+                    "\$${widget.data[i]['price'].toString()}.00",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+
+                      fontWeight: FontWeight.bold,
+                      //fontWeight: FontWeight.w700,
+                    ),
+                  ), // ${widget.data[i]['aTimeUTC'].toString()} UTC"),
+                ),
+              ],
+            ),
+          ),
+          //BlueBar
+          Container(
+            child: Column(
+              children: <Widget>[
+                //Divider(color: Colors.transparent,),
+                Container(
+                  margin: EdgeInsets.only(top: 16),
+                  color: Colors.white,
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityFrom'].toString()}",
+                            //       style: TextStyle(
+                            //           //fontFamily: "OpenSans",
+                            //           //fontSize: 14,
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyFrom'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                    //fontFamily: "OpenSans",
                                   ),
                                 ),
-                                Container(
-                                  child: Text(
-                                    "\$${widget.data[i]['price'].toString()}.00",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 32,
-
-                                      fontWeight: FontWeight.bold,
-                                      //fontWeight: FontWeight.w700,
-                                    ),
-                                  ), // ${widget.data[i]['aTimeUTC'].toString()} UTC"),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Origin Data
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            child: Card(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Color(0XFFE4E4E4),
                                 ),
-                              ],
+                                width: MediaQuery.of(context).size.width * .30,
+                                //color: Color(0XFFE4E4E4),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '7 Stops',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          //TopBar
                           Container(
-                            child: Column(
-                              children: <Widget>[
-                                //Divider(color: Colors.transparent,),
-                                Container(
-                                  margin: EdgeInsets.only(top: 16),
-                                  color: Colors.white,
-                                  padding: EdgeInsets.only(left: 8, right: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            // Container(
-                                            //   width: MediaQuery.of(context)
-                                            //           .size
-                                            //           .width *
-                                            //       .15,
-                                            //   child: Center(
-                                            //     child: Text(
-                                            //       "${widget.data[i]['cityFrom'].toString()}",
-                                            //       style: TextStyle(
-                                            //           //fontFamily: "OpenSans",
-                                            //           //fontSize: 14,
-                                            //           color: Colors
-                                            //               .lightBlueAccent),
-                                            //     ),
-                                            //   ),
-                                            // ),
+                            width: MediaQuery.of(context).size.width * .30,
+                            //padding: EdgeInsets.only(bottom: 8),
+                            child: Center(
+                              child: Text(
+                                "${widget.data[i]['fly_duration'].toString()}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityTo'].toString()}",
+                            //       style: TextStyle(
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyTo'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Destination Data
+                    ],
+                  ),
+                ),
+                // if Roundtip
+                Container(
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Divider(
+                    height: 25,
+                    color: Colors.black,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    bottom: 16,
+                  ),
+                  color: Colors.white,
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityFrom'].toString()}",
+                            //       style: TextStyle(
+                            //           //fontFamily: "OpenSans",
+                            //           //fontSize: 14,
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
 
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .15,
-                                              child: Center(
-                                                child: Text(
-                                                  "${widget.data[i]['flyFrom'].toString()}",
-                                                  style: TextStyle(
-                                                    fontSize: 28,
-                                                    color: Color(0XFF4a4a4a),
-                                                    fontWeight: FontWeight.w600,
-                                                    //fontFamily: "OpenSans",
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Text('4/23'),
-                                            ),
-                                          ],
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyTo'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                    //fontFamily: "OpenSans",
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Origin Data
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Card(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Color(0XFFE4E4E4),
+                              ),
+                              width: MediaQuery.of(context).size.width * .30,
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Center(
+                                child: Text(
+                                  '3 Stops',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * .30,
+                            //padding: EdgeInsets.only(bottom: 8),
+                            child: Center(
+                              child: Text(
+                                "${widget.data[i]['return_duration'].toString()}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityTo'].toString()}",
+                            //       style: TextStyle(
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyFrom'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Destination Data
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          //Everything under
+        ],
+      ),
+    );
+  }
+}
+
+class PageItem extends StatelessWidget {
+  const PageItem({Key key, this.num, this.data}) : super(key: key);
+
+  final int num;
+  final List data;
+  @override
+  Widget build(BuildContext context) {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+
+    return Stack(children: <Widget>[
+      Material(
+        child: Column(
+          children: <Widget>[
+            Material(
+              child: Container(
+                height: MediaQuery.of(context).size.height * .33,
+                //margin: EdgeInsets.all(8),
+                //color: Color(0xc25737373),
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  myLocationEnabled: true,
+                  compassEnabled: true,
+                  //onMapCreated: _onMapCreated,
+                  zoomGesturesEnabled: true,
+                  //markers: Set<Marker>.of(markers.values),
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(40.5436, -101.9734347),
+                    zoom: 1.0,
+                    tilt: 45,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(16))),
+              //margin: EdgeInsets.symmetric(horizontal: 8),
+              //height: mediaQuery.size.height * .33,
+              child: Hero(
+                tag: "card$num",
+                child: Material(
+                  type: MaterialType.card,
+                  elevation: 0,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                    //color: Colors.red,
+                    //child:Text("Card $num pressed\n${data[num]['flyFrom']}"),
+                    elevation: 8,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                            color: Color.fromARGB(255, 100, 135, 165),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Text(
+                                        "${data[num]['flyFrom'].toString()}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700,
                                         ),
-                                      ), // Origin Data
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 24),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                .12,
-                                        child: Center(
-                                          child: Icon(
-                                            FontAwesomeIcons.arrowCircleRight,
-                                            color: Color.fromARGB(
-                                                255, 34, 180, 222),
-                                          ),
-                                        ),
-                                        padding:
-                                            EdgeInsets.only(left: 8, right: 8),
+                                      ), //${data[num]['dTimeUTC'].toString()} UTC"),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                      child: Icon(
+                                        FontAwesomeIcons.exchangeAlt,
+                                        color: Colors.white,
                                       ),
-                                      Column(
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        "${data[num]['flyTo'].toString()}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ), //${data[num]['dTimeUTC'].toString()} UTC"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                child: Text(
+                                  "\$${data[num]['price'].toString()}.00",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 32,
+
+                                    fontWeight: FontWeight.bold,
+                                    //fontWeight: FontWeight.w700,
+                                  ),
+                                ), // ${data[num]['aTimeUTC'].toString()} UTC"),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //BlueBar
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              //Divider(color: Colors.transparent,),
+                              Container(
+                                margin: EdgeInsets.only(top: 16),
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Column(
                                         children: <Widget>[
-                                          Container(
-                                            child: Card(
-                                              elevation: 0,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8)),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  color: Color(0XFFE4E4E4),
-                                                ),
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    .30,
-                                                //color: Color(0XFFE4E4E4),
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    '7 Stops',
-                                                    style: TextStyle(
-                                                        color: Colors.black),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${data[num]['cityFrom'].toString()}",
+                                          //       style: TextStyle(
+                                          //           //fontFamily: "OpenSans",
+                                          //           //fontSize: 14,
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
+
                                           Container(
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                .30,
-                                            //padding: EdgeInsets.only(bottom: 8),
+                                                .15,
                                             child: Center(
                                               child: Text(
-                                                "${widget.data[i]['fly_duration'].toString()}",
-                                                style: TextStyle(fontSize: 14),
+                                                "${data[num]['flyFrom'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                  //fontFamily: "OpenSans",
+                                                ),
                                               ),
                                             ),
-                                          )
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
                                         ],
                                       ),
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 24),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                .12,
-                                        child: Center(
-                                          child: Icon(
-                                            FontAwesomeIcons.arrowCircleRight,
-                                            color: Color.fromARGB(
-                                                255, 34, 180, 222),
-                                          ),
+                                    ), // Origin Data
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
                                         ),
-                                        padding:
-                                            EdgeInsets.only(left: 8, right: 8),
                                       ),
-                                      Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            // Container(
-                                            //   width: MediaQuery.of(context)
-                                            //           .size
-                                            //           .width *
-                                            //       .15,
-                                            //   child: Center(
-                                            //     child: Text(
-                                            //       "${widget.data[i]['cityTo'].toString()}",
-                                            //       style: TextStyle(
-                                            //           color: Colors
-                                            //               .lightBlueAccent),
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .15,
-                                              child: Center(
-                                                child: Text(
-                                                  "${widget.data[i]['flyTo'].toString()}",
-                                                  style: TextStyle(
-                                                    fontSize: 28,
-                                                    color: Color(0XFF4a4a4a),
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Text('4/23'),
-                                            ),
-                                          ],
-                                        ),
-                                      ), // Destination Data
-                                    ],
-                                  ),
-                                ),
-                                // if Roundtip
-                                Container(
-                                  padding: EdgeInsets.only(left: 8, right: 8),
-                                  child: Divider(
-                                    height: 25,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(
-                                    bottom: 16,
-                                  ),
-                                  color: Colors.white,
-                                  padding: EdgeInsets.only(left: 8, right: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            // Container(
-                                            //   width: MediaQuery.of(context)
-                                            //           .size
-                                            //           .width *
-                                            //       .15,
-                                            //   child: Center(
-                                            //     child: Text(
-                                            //       "${widget.data[i]['cityFrom'].toString()}",
-                                            //       style: TextStyle(
-                                            //           //fontFamily: "OpenSans",
-                                            //           //fontSize: 14,
-                                            //           color: Colors
-                                            //               .lightBlueAccent),
-                                            //     ),
-                                            //   ),
-                                            // ),
-
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .15,
-                                              child: Center(
-                                                child: Text(
-                                                  "${widget.data[i]['flyTo'].toString()}",
-                                                  style: TextStyle(
-                                                    fontSize: 28,
-                                                    color: Color(0XFF4a4a4a),
-                                                    fontWeight: FontWeight.w600,
-                                                    //fontFamily: "OpenSans",
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Text('4/23'),
-                                            ),
-                                          ],
-                                        ),
-                                      ), // Origin Data
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 24),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                .12,
-                                        child: Center(
-                                          child: Icon(
-                                            FontAwesomeIcons.arrowCircleRight,
-                                            color: Color.fromARGB(
-                                                255, 34, 180, 222),
-                                          ),
-                                        ),
-                                        padding:
-                                            EdgeInsets.only(left: 8, right: 8),
-                                      ),
-                                      Column(
-                                        children: <Widget>[
-                                          Card(
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        Container(
+                                          child: Card(
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -1417,191 +1694,997 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
                                                       .size
                                                       .width *
                                                   .30,
+                                              //color: Color(0XFFE4E4E4),
                                               padding: EdgeInsets.symmetric(
-                                                  vertical: 8),
+                                                vertical: 8,
+                                              ),
                                               child: Center(
                                                 child: Text(
-                                                  '3 Stops',
+                                                  '7 Stops',
                                                   style: TextStyle(
                                                       color: Colors.black),
                                                 ),
                                               ),
                                             ),
                                           ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .30,
+                                          //padding: EdgeInsets.only(bottom: 8),
+                                          child: Center(
+                                            child: Text(
+                                              "${data[num]['fly_duration'].toString()}",
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${data[num]['cityTo'].toString()}",
+                                          //       style: TextStyle(
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                           Container(
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                .30,
-                                            //padding: EdgeInsets.only(bottom: 8),
+                                                .15,
                                             child: Center(
                                               child: Text(
-                                                "${widget.data[i]['return_duration'].toString()}",
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 24),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                .12,
-                                        child: Center(
-                                          child: Icon(
-                                            FontAwesomeIcons.arrowCircleRight,
-                                            color: Color.fromARGB(
-                                                255, 34, 180, 222),
-                                          ),
-                                        ),
-                                        padding:
-                                            EdgeInsets.only(left: 8, right: 8),
-                                      ),
-                                      Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            // Container(
-                                            //   width: MediaQuery.of(context)
-                                            //           .size
-                                            //           .width *
-                                            //       .15,
-                                            //   child: Center(
-                                            //     child: Text(
-                                            //       "${widget.data[i]['cityTo'].toString()}",
-                                            //       style: TextStyle(
-                                            //           color: Colors
-                                            //               .lightBlueAccent),
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .15,
-                                              child: Center(
-                                                child: Text(
-                                                  "${widget.data[i]['flyFrom'].toString()}",
-                                                  style: TextStyle(
-                                                    fontSize: 28,
-                                                    color: Color(0XFF4a4a4a),
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
+                                                "${data[num]['flyTo'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              child: Text('4/23'),
-                                            ),
-                                          ],
-                                        ),
-                                      ), // Destination Data
-                                    ],
-                                  ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Destination Data
+                                  ],
                                 ),
-                              ],
+                              ),
+                              // if Roundtip
+                              Container(
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Divider(
+                                  height: 25,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                  bottom: 16,
+                                ),
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${data[num]['flyTo'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                  //fontFamily: "OpenSans",
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Origin Data
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        Card(
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: Color(0XFFE4E4E4),
+                                            ),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .30,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: Center(
+                                              child: Text(
+                                                '3 Stops',
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .30,
+                                          //padding: EdgeInsets.only(bottom: 8),
+                                          child: Center(
+                                            child: Text(
+                                              "${data[num]['return_duration'].toString()}",
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${data[num]['cityTo'].toString()}",
+                                          //       style: TextStyle(
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${data[num]['flyFrom'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Destination Data
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //Everything under
+                      ],
+                    ),
+                  ),
+                  // child: ListTile(
+                  //   title: Text("Item $num"),
+                  //   subtitle: Text("This is item #$num"),
+                  // ),
+                  // itemCount: data.length,//data == null ? 0 : data.length,
+                  //     itemBuilder: (context, num) {
+                  //     return Card(
+                  //       child:
+                  //           Text("Card $num pressed\n${data[num]['flyFrom']}"),
+                  //     );
+                  //     },
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(child: Text("Some more content goes here!")),
+            )
+          ],
+        ),
+      ),
+    ]);
+  }
+}
+
+// Login Page Code
+class LoginPage extends StatefulWidget {
+  static String tag = 'login-page';
+  final Widget child;
+
+  LoginPage({Key key, this.child}) : super(key: key);
+
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _pageController = PageController();
+  final _loginPageController = PageController();
+  final _signUpPageController = PageController();
+  //SignIn Controllers
+  final TextEditingController _signInEmailController = TextEditingController();
+  final TextEditingController _signInPasswordController =
+      TextEditingController();
+
+  final TextEditingController _signUpNameController = TextEditingController();
+  final TextEditingController _signUpEmailController = TextEditingController();
+  final TextEditingController _signUpPasswordController =
+      TextEditingController();
+  final TextEditingController _signUpPasswordConfirmController =
+      TextEditingController();
+
+  final GlobalKey<FormState> _signInFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _signupFormKey = GlobalKey<FormState>();
+
+  String userEmailStore = "";
+  bool _successSignUp;
+  bool _successLogin;
+  String _userEmail = "";
+  String _errorMessage = "";
+  GoogleSignInAccount _currentUser;
+  bool _success;
+  String _userID;
+  String _uName;
+  String _uEmail;
+  bool _uVerfied;
+  String _uPhoto;
+  Type _uRunTimeType;
+  String _uPhone;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+        if (_googleSignIn.isSignedIn == true) {
+          Navigator.of(context).pushNamed(HomePage.tag);
+        }
+      });
+    });
+    _googleSignIn.signInSilently();
+  }
+
+  Widget build(BuildContext context) {
+    dynamic _height = MediaQuery.of(context).size.height;
+    dynamic _width = MediaQuery.of(context).size.width;
+    dynamic _fourFifthsWidth = _width * .85;
+
+    return Scaffold(
+      body: Center(
+        child: Container(
+          color: Color.fromARGB(255, 247, 247, 247),
+          child: PageView(
+            physics: BouncingScrollPhysics(),
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            children: <Widget>[
+              Container(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      child: buildSignIn(_height, _width, _fourFifthsWidth)),
+                  Container(
+                    child: FlatButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('Need an Account?'),
+                          Text(
+                            ' Sign up',
+                            style: TextStyle(
+                              color: Colors.blue,
                             ),
                           ),
                         ],
                       ),
+                      onPressed: () {
+                        _pageController.animateToPage(
+                          1,
+                          curve: Curves.easeInOutExpo,
+                          duration: Duration(milliseconds: 1000),
+                        );
+                      },
                     ),
-                    Positioned(
-                      left: 0.0,
-                      top: 0.0,
-                      bottom: 0.0,
-                      right: 0.0,
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: InkWell(
-                          onTap: () async {
-                            await Future.delayed(Duration(milliseconds: 200));
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return new PageItem(num: i);
-                                },
-                                fullscreenDialog: true,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                  ),
+                ],
+              )),
+              Center(
+                  child: Container(
+                      child: buildSignUp(_height, _width, _fourFifthsWidth))),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+//Login Code Begin
+  SingleChildScrollView buildSignIn(_height, _width, _fourFifthsWidth) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      controller: _loginPageController,
+      child: Form(
+        key: _signInFormKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Container(
+              height: _height * .3,
+              width: _width,
+              //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
+              child: FadeInImage.memoryNetwork(
+                image:
+                    'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4',
+                //height: _height * .33,
+                fadeOutDuration: const Duration(milliseconds: 500),
+                placeholder: kTransparentImage,
+                // filterQuality: FilterQuality.high,
+              ),
+            ),
+            //Logo PlaceHolder
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: _fourFifthsWidth,
+                  child: signInEmail("Email", Icons.mail_outline),
+                ),
+                Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Container(
+                      width: _fourFifthsWidth,
+                      child: signInPassword("Password", Icons.lock_outline),
+                      margin: EdgeInsets.only(bottom: 25),
+                    ),
+                    Container(
+                      //rmargin: EdgeInsets.only(top:125),
+                      child: buildLoginCard(),
                     ),
                   ],
                 ),
-              ),
+                Container(
+                  child:
+                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
+                ),
+              ],
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
-}
 
-class PageItem extends StatelessWidget {
-  const PageItem({Key key, this.num}) : super(key: key);
-
-  final int num;
-
-  @override
-  Widget build(BuildContext context) {
-    AppBar appBar = new AppBar(
-      primary: false,
-      leading: IconTheme(
-          data: IconThemeData(color: Colors.white), child: CloseButton()),
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black.withOpacity(0.4),
-              Colors.black.withOpacity(0.1),
-            ],
+  Container signInEmail(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signInEmailController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
-      backgroundColor: Colors.transparent,
     );
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
+  }
 
-    return Stack(children: <Widget>[
-      Hero(
-        tag: "card$num",
-        child: Material(
-          child: Column(
-            children: <Widget>[
-              Material(
-                child: Text('data'),
+  Container signInPassword(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            obscureText: true,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signInPasswordController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
               ),
-              Material(
-                type: MaterialType.card,
-                elevation: 8,
-                child: ListTile(
-                  title: Text("Item $num"),
-                  subtitle: Text("This is item #$num"),
-                ),
-              ),
-              Expanded(
-                child: Center(child: Text("Some more content goes here!")),
-              )
-            ],
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+            },
           ),
         ),
       ),
-      Column(
+    );
+  }
+
+  Card buildLoginCard() {
+    return Card(
+      elevation: 8,
+      color: Colors.lightGreenAccent,
+      child: FlatButton.icon(
+        highlightColor: Colors.transparent,
+        splashColor: Theme.Colors.loginGradientEnd,
+        color: Colors.lightGreenAccent,
+        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        icon: Icon(Icons.security),
+        label: Text(
+          "Sign In",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22.0,
+            fontFamily: "Nunito",
+          ),
+        ),
+        onPressed: _emailPasswordSignIn,
+      ),
+    );
+  }
+
+  Padding buildSeparator() {
+    return Padding(
+      padding: EdgeInsets.all(15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Container(
-            height: mediaQuery.padding.top,
+            decoration: BoxDecoration(
+              gradient: new LinearGradient(
+                  colors: [
+                    Colors.white10,
+                    Colors.white,
+                  ],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(1.0, 1.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp),
+            ),
+            width: MediaQuery.of(context).size.width * .33,
+            height: 1.0,
           ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: appBar.preferredSize.height),
-            child: appBar,
-          )
+          Container(
+            decoration: BoxDecoration(
+              gradient: new LinearGradient(
+                  colors: [
+                    Colors.white,
+                    Colors.white10,
+                  ],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(1.0, 1.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp),
+            ),
+            width: MediaQuery.of(context).size.width * .33,
+            height: 1.0,
+          ),
         ],
       ),
-    ]);
+    );
   }
+
+  Future<void> _emailPasswordSignIn() async {
+    final formState = _signInFormKey.currentState;
+    bool alertError = false;
+    if (_signInFormKey.currentState.validate()) {
+      formState.save();
+      try {
+        FirebaseUser userLoginEmailPassword;
+        userLoginEmailPassword = await _auth.signInWithEmailAndPassword(
+          email: _signInEmailController.text,
+          password: _signInPasswordController.text,
+        );
+        print("UserName: ${userLoginEmailPassword.displayName}");
+        userEmailStore = userLoginEmailPassword.displayName;
+        Navigator.of(context).pushNamed(HomePage.tag);
+      } catch (e) {
+        print(e.message);
+        alertError = true;
+      }
+    }
+    if (alertError == true) {
+      return AlertDialog(
+        title: Text('Error loggin in'),
+        content: Text('Re-enter ID/Passowrd'),
+      );
+    }
+  }
+
+  ButtonBar buildThirdPartySignIn() {
+    return ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: <Widget>[
+        RaisedButton.icon(
+          color: Colors.white,
+          icon: Icon(FontAwesomeIcons.google),
+          label: Text("Google"),
+          onPressed: () async {
+            _signIn();
+          },
+        ),
+        RaisedButton.icon(
+          color: Colors.white,
+          icon: Icon(FontAwesomeIcons.mailchimp),
+          label: Text("Guest Login"),
+          onPressed: () {
+            //_signInAnonymously();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),
+        /*RaisedButton.icon(
+          color: Colors.white,
+          icon: Icon(FontAwesomeIcons.acquisitionsIncorporated),
+          label: Text("Anonymous Login"),
+          onPressed: () {
+            _signInAnonymously();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),*/
+      ],
+    );
+  }
+
+  void _signInAnonymously() async {
+    final FirebaseUser user = await _auth.signInAnonymously();
+    assert(user != null);
+    assert(user.isAnonymous);
+    assert(!user.isEmailVerified);
+    assert(await user.getIdToken() != null);
+    if (Platform.isIOS) {
+      // Anonymous auth doesn't show up as a provider on iOS
+      assert(user.providerData.isEmpty);
+    } else if (Platform.isAndroid) {
+      // Anonymous auth does show up as a provider on Android
+      assert(user.providerData.length == 1);
+      assert(user.providerData[0].providerId == 'firebase');
+      assert(user.providerData[0].uid != null);
+      assert(user.providerData[0].displayName == null);
+      assert(user.providerData[0].photoUrl == null);
+      assert(user.providerData[0].email == null);
+    }
+
+    final FirebaseUser fireCurrentUser = await _auth.currentUser();
+    assert(user.uid == fireCurrentUser.uid);
+    setState(() {
+      if (user != null) {
+        _success = true;
+        _userID = user.uid;
+      } else {
+        _success = false;
+      }
+    });
+  }
+
+  Future<void> _signIn() async {
+    try {
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final FirebaseUser user = await _auth.signInWithCredential(credential);
+      print("signed in " + user.displayName);
+    } catch (error) {
+      print(error);
+    }
+  }
+//Login Code End
+
+//SignUp Code Begin
+
+  SingleChildScrollView buildSignUp(_height, _width, _fourFifthsWidth) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      controller: _signUpPageController,
+      //height: _height * .5,
+      //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
+      child: Form(
+        key: _signupFormKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          //mainAxisSize: MainAxisSize.min,
+          /* alignment: AlignmentDirectional.center,
+          overflow: Overflow.clip,
+          fit: StackFit.loose,*/
+          children: <Widget>[
+            /*Container(
+              height: _height * .33,
+              width: _width,
+              color: Color.fromARGB(255, 73, 144, 226),//Colors.black,
+              child: Image.network(
+                  'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4'),
+            ),*/
+            //Logo PlaceHolder
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              //mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  child: _showErrorMessage(),
+                ),
+                Container(
+                  width: _fourFifthsWidth,
+                  child: signUpName("Name", Icons.mail_outline),
+                ),
+                Container(
+                  width: _fourFifthsWidth,
+                  child: signUpEmail("Email", Icons.mail_outline),
+                ),
+                Container(
+                  width: _fourFifthsWidth,
+                  child: signUpPassword("Password", Icons.lock_outline),
+                ),
+                Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Container(
+                      width: _fourFifthsWidth,
+                      margin: EdgeInsets.only(bottom: 25),
+                      child: signUpPasswordConfirmation(
+                          "Confirmation", Icons.lock_outline),
+                    ),
+                    Container(
+                      child: buildSignUpCard(),
+                    ),
+                  ],
+                ),
+                Container(
+                  child: buildSeparator(),
+                ),
+                Container(
+                  child:
+                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Card buildSignUpCard() {
+    return Card(
+      elevation: 8,
+      color: Colors.lightGreenAccent,
+      child: FlatButton.icon(
+        color: Colors.lightGreenAccent,
+        highlightColor: Colors.transparent,
+        splashColor: Theme.Colors.loginGradientEnd,
+        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        icon: Icon(Icons.security),
+        label: Text(
+          "SIGN UP",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25.0,
+            fontFamily: "Nunito",
+          ),
+        ),
+        onPressed: () async {
+          if (_signupFormKey.currentState.validate()) {
+            _register();
+            //_authenticate;
+          }
+          Navigator.of(context).pushNamed(HomePage.tag);
+        },
+        /*() {
+                     //Navigator.of(context).pushNamed(FloatActBttn.tag);
+                      Navigator.of(context).pushNamed(InputForm.tag);
+                    }*/
+      ),
+    );
+  }
+
+  void _register() async {
+    final FirebaseUser user = await _auth.createUserWithEmailAndPassword(
+      email: _signUpEmailController.text,
+      password: _signUpPasswordController.text,
+    );
+
+    if (user != null) {
+      //Navigator.of(context).pushNamed(InputForm.tag);
+      setState(() {
+        _successSignUp = true;
+        _userEmail = user.email;
+      });
+    } else {
+      _successSignUp = false;
+    }
+  }
+
+  Widget _showErrorMessage() {
+    if (_errorMessage.length > 0 && _errorMessage != null) {
+      return new Text(
+        _errorMessage,
+        style: TextStyle(
+            fontSize: 13.0,
+            color: Colors.red,
+            height: 1.0,
+            fontWeight: FontWeight.w300),
+      );
+    } else {
+      return new Container(
+        height: 0.0,
+      );
+    }
+  }
+
+  Container signUpName(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpNameController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Name cannot be Empty';
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container signUpEmail(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpEmailController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Email field cannot be empty';
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container signUpPassword(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            obscureText: true,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpPasswordController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Password Field cannot be empty';
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container signUpPasswordConfirmation(String text, dynamic fieldIcon) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: EdgeInsets.all(25.0),
+          child: TextFormField(
+            autofocus: false,
+            obscureText: true,
+            //focusNode: myFocusNodeEmailLogin,
+            controller: _signUpPasswordConfirmController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              icon: Icon(
+                fieldIcon,
+                color: Colors.redAccent,
+                size: 22.0,
+              ),
+              hintText: text,
+              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Confirmation Field cannot be empty.';
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+//SignUp Code End
 }

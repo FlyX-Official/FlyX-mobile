@@ -1,7 +1,7 @@
 //import 'package:flyx/FloatingActionButton/fab_with_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flyx/LoginPage/login_page.dart';
+import 'package:flyx/HomePage/home.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
