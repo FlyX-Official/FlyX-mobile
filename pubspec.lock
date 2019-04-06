@@ -21,7 +21,7 @@ packages:
       name: auto_size_text
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -77,14 +77,14 @@ packages:
       name: firebase_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.3"
+    version: "0.8.4"
   firebase_core:
     dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.1+1"
+    version: "0.3.2"
   firebase_database:
     dependency: "direct main"
     description:
@@ -136,7 +136,7 @@ packages:
       name: google_maps_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0+2"
+    version: "0.5.2"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -231,9 +231,11 @@ packages:
   rubber:
     dependency: "direct main"
     description:
-      name: rubber
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: d8a8602b84fc89bcdf4889cc20cddd4a8fbf3d85
+      url: "https://github.com/mcrovero/rubber.git"
+    source: git
     version: "0.2.7"
   scoped_model:
     dependency: transitive

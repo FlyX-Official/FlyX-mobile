@@ -11,7 +11,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../HomePage/home.dart';
-import '../InputPage/inputForm.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -341,7 +340,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         print("UserName: ${userLoginEmailPassword.displayName}");
         userEmailStore = userLoginEmailPassword.displayName;
-        Navigator.of(context).pushNamed(InputForm.tag);
+        Navigator.of(context).pushNamed(HomePage.tag);
       } catch (e) {
         print(e.message);
         alertError = true;
@@ -544,7 +543,7 @@ class _LoginPageState extends State<LoginPage> {
             _register();
             //_authenticate;
           }
-          Navigator.of(context).pushNamed(InputForm.tag);
+          Navigator.of(context).pushNamed(HomePage.tag);
         },
         /*() {
                      //Navigator.of(context).pushNamed(FloatActBttn.tag);
