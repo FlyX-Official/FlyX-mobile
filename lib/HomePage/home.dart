@@ -126,11 +126,11 @@ class _HomePageState extends State<HomePage>
 
     _rubberController = RubberAnimationController(
         vsync: this,
-        dismissable: true,
+        dismissable: false,
         upperBoundValue: AnimationControllerValue(percentage: .9),
-        halfBoundValue: AnimationControllerValue(pixel: 550),
-        lowerBoundValue: AnimationControllerValue(pixel: 21),
-        duration: Duration(milliseconds: 200));
+        halfBoundValue: AnimationControllerValue(pixel: 500),
+        lowerBoundValue: AnimationControllerValue(pixel: 94),
+        duration: Duration(milliseconds: 500));
     _rubberController.addStatusListener(_statusListener);
 
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
@@ -166,6 +166,10 @@ class _HomePageState extends State<HomePage>
 
   void _halfExpand() {
     _rubberController.halfExpand();
+  }
+
+  void _searchPageCollapseed() {
+    _rubberController.lowerBound;
   }
 
   void _collapse() {
@@ -413,12 +417,13 @@ class _HomePageState extends State<HomePage>
 
   Widget _getUpperLayer() {
     return Container(
-      width: MediaQuery.of(context).size.width * .9,
+      width: MediaQuery.of(context).size.width * .95,
       decoration: BoxDecoration(
-        color: Colors.black54,
+        color: Color.fromARGB(255, 247, 247, 247),
       ),
       //color: Colors.black54,
-      child: Container(
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Form(
           autovalidate: false,
           key: _formKey,
@@ -429,8 +434,8 @@ class _HomePageState extends State<HomePage>
               Container(
                 padding: EdgeInsets.only(top: 10, bottom: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     FlatButton(
                       child: Text('ONE WAY'),
@@ -440,7 +445,7 @@ class _HomePageState extends State<HomePage>
                     FlatButton(
                       child: Text(''),
                       color: Colors.transparent,
-                      onPressed: () {},
+                      onPressed: null,
                       disabledColor: Colors.transparent,
                     ),
                     FlatButton(
@@ -706,7 +711,7 @@ class _HomePageState extends State<HomePage>
                       padding: EdgeInsets.all(8),
                       width: MediaQuery.of(context).size.width,
                       child: Card(
-                        elevation: 0,
+                        elevation: 8,
                         child: FlatButton(
                           color: Colors.white,
                           child: Text('Find Tickets'),
@@ -746,8 +751,9 @@ class _HomePageState extends State<HomePage>
               fabIcon = Icons.search;
             });
           } else if (i == 1) {
-            _rubberController
-                .setVisibility(!_rubberController.visibility.value);
+            // _rubberController
+            //     .setVisibility(!_rubberController.visibility.value);
+            //_searchPageCollapseed();
             setState(() {
               fabIcon = Icons.payment;
             });
@@ -763,8 +769,8 @@ class _HomePageState extends State<HomePage>
             //color: Color(0xc25737373),
             child: GoogleMap(
               mapType: MapType.normal,
-              myLocationEnabled: true,
-              compassEnabled: true,
+              //myLocationEnabled: true,
+              //compassEnabled: true,
               onMapCreated: _onMapCreated,
               zoomGesturesEnabled: true,
               markers: Set<Marker>.of(markers.values),
@@ -913,28 +919,59 @@ class _HomePageState extends State<HomePage>
 //end autocomplete
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SafeArea(
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 247, 247, 247),
-        body: Container(
-          child: RubberBottomSheet(
-            header: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * .9,
-                color: Colors.white,
-                padding: EdgeInsets.all(8),
-                child: ModalDrawerHandle(),
+        body: Stack(
+          children: <Widget>[
+            Container(
+              child: RubberBottomSheet(
+                header: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(16),
+                          topLeft: Radius.circular(16)),
+                      color: Colors.white,
+                    ),
+                    width: MediaQuery.of(context).size.width * .95,
+                    padding: EdgeInsets.all(8),
+                    child: ModalDrawerHandle(),
+                  ),
+                ),
+                lowerLayer: _getLowerLayer(context),
+                animationController: _rubberController,
+                scrollController: _scrollController,
+                upperLayer: _getUpperLayer(),
               ),
             ),
-            lowerLayer: _getLowerLayer(context),
-            animationController: _rubberController,
-            scrollController: _scrollController,
-            upperLayer: _getUpperLayer(),
-          ),
+            Container(
+              child: Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Color.fromARGB(0, 247, 247, 247),
+                  elevation: 0,
+                  actions: <Widget>[
+                    IconButton(
+                      onPressed: () => showModalMenu(),
+
+                      icon: Icon(
+                        Icons.account_box,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ), //_getLowerLayer(context),
         resizeToAvoidBottomInset: false,
 
-        bottomNavigationBar: BottomAppBar(
+        /*bottomNavigationBar: BottomAppBar(
           notchMargin: 8,
           elevation: 0,
           child: Row(
@@ -1008,6 +1045,7 @@ class _HomePageState extends State<HomePage>
             ],
           ),
         ),
+      */
       ),
     );
   }
@@ -1511,8 +1549,8 @@ class PageItem extends StatelessWidget {
                 //color: Color(0xc25737373),
                 child: GoogleMap(
                   mapType: MapType.normal,
-                  myLocationEnabled: true,
-                  compassEnabled: true,
+                  //myLocationEnabled: true,
+                  //compassEnabled: true,
                   //onMapCreated: _onMapCreated,
                   zoomGesturesEnabled: true,
                   //markers: Set<Marker>.of(markers.values),
