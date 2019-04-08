@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage>
         upperBoundValue: AnimationControllerValue(percentage: .9),
         halfBoundValue: AnimationControllerValue(pixel: 500),
         lowerBoundValue: AnimationControllerValue(pixel: 94),
-        duration: Duration(milliseconds: 500));
+        duration: Duration(milliseconds: 200));
     _rubberController.addStatusListener(_statusListener);
 
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
@@ -418,304 +418,319 @@ class _HomePageState extends State<HomePage>
   Widget _getUpperLayer() {
     return Container(
       width: MediaQuery.of(context).size.width * .95,
-      decoration: BoxDecoration(
+      child: Material(
+        type: MaterialType.card,
         color: Color.fromARGB(255, 247, 247, 247),
-      ),
-      //color: Colors.black54,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Form(
-          autovalidate: false,
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    FlatButton(
-                      child: Text('ONE WAY'),
-                      color: Colors.white,
-                      onPressed: () {},
-                    ),
-                    FlatButton(
-                      child: Text(''),
-                      color: Colors.transparent,
-                      onPressed: null,
-                      disabledColor: Colors.transparent,
-                    ),
-                    FlatButton(
-                      child: Text('ROUND TRIP'),
-                      color: Colors.white,
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * .1),
-                      child: Container(
-                          child: _isFromOpen &&
-                                  _from.text
-                                      .isNotEmpty //(_isSearching && (!_onTap))
-                              ? getFromWidget()
-                              : null),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 8, right: 8),
-                      child: Card(
-                        elevation: 8,
+        elevation: 8,
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Form(
+            autovalidate: false,
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text('ONE WAY'),
                         color: Colors.white,
-                        child: Padding(
-                          child: TextFormField(
-                            controller: _from,
-                            //focusNode: _flyingFromFocusNode,
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                            },
-
-                            onFieldSubmitted: (String value) {
-                              print("$value submitted");
-                              setState(() {
-                                _from.text = value;
-                                _isFromOpen = false;
-                                _onTap = true;
-                              });
-                            },
-
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(
-                                FontAwesomeIcons.planeDeparture,
-                                color: Colors.blue,
-                                //size: 22.0,
-                              ),
-                              hintText: 'Flying From',
-                              hintStyle: TextStyle(
-                                  fontFamily: "Nunito", fontSize: 17.0),
-                            ),
-                          ),
-                          padding: EdgeInsets.only(
-                            left: 16,
-                            bottom: 8,
-                            top: 8,
-                          ),
-                        ),
+                        onPressed: _halfExpand,
                       ),
-                    ),
-                    // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                    InkWell(
-                      onTap: () {
-                        _addOriginAirportMarkers();
-                        _isFromOpen = false;
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * .6,
+                      FlatButton(
+                        child: Text(''),
+                        color: Colors.transparent,
+                        onPressed: null,
+                        disabledColor: Colors.transparent,
+                      ),
+                      FlatButton(
+                        child: Text('ROUND TRIP'),
+                        color: Colors.white,
+                        onPressed: _collapse,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * .1),
+                        child: Container(
+                            child: _isFromOpen &&
+                                    _from.text
+                                        .isNotEmpty //(_isSearching && (!_onTap))
+                                ? getFromWidget()
+                                : null),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 8, right: 8),
                         child: Card(
                           elevation: 4,
                           color: Colors.white,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                child: Slider(
-                                  value: _fromSlider.toDouble(),
-                                  min: 1.0,
-                                  max: 100.0,
-                                  divisions: 5,
-                                  label: '$_fromSlider',
-                                  onChanged: (double Value) {
-                                    _addOriginAirportMarkers();
-                                    setState(
-                                      () {
-                                        _isFromOpen = false;
-                                        _fromSlider = Value.floor();
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                              Text("$_fromSlider Mi"),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * .1),
-                      child: Container(
-                          child: _isToOpen //(_isSearching && (!_onTap))
-                              ? getToWidget()
-                              : null),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(right: 8, left: 8),
-                      child: Card(
-                        elevation: 8,
-                        child: Padding(
-                          child: TextFormField(
-                            controller: _to,
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                            },
-                            onFieldSubmitted: (String value) {
-                              print("$value submitted");
+                          child: Padding(
+                            child: TextFormField(
+                              controller: _from,
+                              //focusNode: _flyingFromFocusNode,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Field cannot be empty';
+                                }
+                              },
 
-                              setState(() {
-                                _to.text = value;
-                                _isToOpen = false;
-                                //_isFromOpen = false;
-                                _onTap = true;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(
-                                FontAwesomeIcons.planeDeparture,
-                                color: Colors.blue,
-                                //size: 22.0,
+                              onFieldSubmitted: (String value) {
+                                print("$value submitted");
+                                setState(() {
+                                  _from.text = value;
+                                  _isFromOpen = false;
+                                  _onTap = true;
+                                });
+                              },
+
+                              decoration: InputDecoration(
+                                //border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.planeDeparture,
+                                  color: Colors.blue,
+                                  //size: 22.0,
+                                ),
+                                hintText: 'Flying From',
+                                hintStyle: TextStyle(
+                                    fontFamily: "Nunito", fontSize: 17.0),
                               ),
-                              hintText: 'Flying To',
-                              hintStyle: TextStyle(
-                                  fontFamily: "Nunito", fontSize: 17.0),
+                            ),
+                            padding: EdgeInsets.only(
+                              left: 16,
+                              bottom: 8,
+                              top: 8,
                             ),
                           ),
-                          padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
                         ),
                       ),
-                    ),
-                    // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                    InkWell(
-                      onTap: () {
-                        _isToOpen = false;
-                        _addDestinationAirportMarkers();
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * .6,
-                        child: Card(
-                          elevation: 8,
-                          color: Colors.white,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                child: Slider(
-                                  value: _toSlider.ceilToDouble(),
-                                  min: 1.0,
-                                  max: 100.0,
-                                  divisions: 5,
-                                  label: '$_toSlider', //var _toSlider = 1;,
-                                  onChanged: (double Value) {
-                                    _addDestinationAirportMarkers();
-                                    setState(() {
-                                      _isToOpen = false;
-                                      _toSlider = Value.round();
-                                    });
-                                  },
+                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                      InkWell(
+                        onTap: () {
+                          _addOriginAirportMarkers();
+                          _isFromOpen = false;
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * .6,
+                          child: Card(
+                            elevation: 4,
+                            color: Colors.white,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Slider(
+                                    value: _fromSlider.toDouble(),
+                                    min: 1.0,
+                                    max: 100.0,
+                                    divisions: 5,
+                                    label: '$_fromSlider',
+                                    onChanged: (double Value) {
+                                      _addOriginAirportMarkers();
+                                      setState(
+                                        () {
+                                          _isFromOpen = false;
+                                          _fromSlider = Value.floor();
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                              Text("$_toSlider Mi"),
-                            ],
+                                Text("$_fromSlider Mi"),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      Container(
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * .1),
+                        child: Container(
+                            child: _isToOpen //(_isSearching && (!_onTap))
+                                ? getToWidget()
+                                : null),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(right: 8, left: 8),
+                        child: Card(
+                          elevation: 4,
+                          child: Padding(
+                            child: TextFormField(
+                              controller: _to,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Field cannot be empty';
+                                }
+                              },
+                              onFieldSubmitted: (String value) {
+                                print("$value submitted");
 
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Card(
-                        margin: EdgeInsets.only(top: 8, left: 16, right: 16),
-                        elevation: 8,
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        child: FlatButton(
-                          color: Colors.white,
-                          onPressed: () async {
-                            final List<DateTime> originPicked =
-                                await DateRangePicker.showDatePicker(
-                                    context: context,
-                                    initialFirstDate: DateTime.now(),
-                                    initialLastDate:
-                                        (DateTime.now()).add(Duration(days: 7)),
-                                    firstDate: DateTime(2019),
-                                    lastDate: DateTime(2020));
-                            if (originPicked != null &&
-                                originPicked.length == 2) {
-                              print(originPicked);
-                              _originDate = originPicked.toList();
-                            }
-                          },
-                          child: Icon(Icons.date_range),
-                          /*child: Text(
-                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                  '$_originDate'
-                                  'yyyy-mm-dd <---> yyyy-mm-dd'
-                              ),*/
-                          //'Departure Date Picker'),
+                                setState(() {
+                                  _to.text = value;
+                                  _isToOpen = false;
+                                  //_isFromOpen = false;
+                                  _onTap = true;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                //border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.planeDeparture,
+                                  color: Colors.blue,
+                                  //size: 22.0,
+                                ),
+                                hintText: 'Flying To',
+                                hintStyle: TextStyle(
+                                    fontFamily: "Nunito", fontSize: 17.0),
+                              ),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                          ),
                         ),
                       ),
-                    ),
-
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Card(
-                        margin: EdgeInsets.only(top: 8, left: 16, right: 16),
-                        elevation: 8,
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        child: FlatButton(
-                          color: Colors.white,
-                          onPressed: () async {
-                            final List<DateTime> returnDatePicked =
-                                await DateRangePicker.showDatePicker(
-                                    context: context,
-                                    initialFirstDate:
-                                        DateTime.now().add(Duration(days: 7)),
-                                    initialLastDate: (DateTime.now())
-                                        .add(Duration(days: 14)),
-                                    firstDate: DateTime(2019),
-                                    lastDate: DateTime(2020));
-                            if (returnDatePicked != null &&
-                                returnDatePicked.length == 2) {
-                              print(returnDatePicked);
-                              _destinationDate = returnDatePicked.toList();
-                            }
-                          },
-                          child: Icon(Icons.date_range),
-                          /*child: Text(
-                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                  '$_originDate'
-                                  'yyyy-mm-dd <---> yyyy-mm-dd'
-                              ),*/
-                          //'Departure Date Picker'),
+                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                      InkWell(
+                        onTap: () {
+                          _isToOpen = false;
+                          _addDestinationAirportMarkers();
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * .6,
+                          child: Card(
+                            elevation: 4,
+                            color: Colors.white,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Slider(
+                                    value: _toSlider.ceilToDouble(),
+                                    min: 1.0,
+                                    max: 100.0,
+                                    divisions: 5,
+                                    label: '$_toSlider', //var _toSlider = 1;,
+                                    onChanged: (double Value) {
+                                      _addDestinationAirportMarkers();
+                                      setState(() {
+                                        _isToOpen = false;
+                                        _toSlider = Value.round();
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Text("$_toSlider Mi"),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      width: MediaQuery.of(context).size.width,
-                      child: Card(
-                        elevation: 8,
+
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: Card(
+                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                          elevation: 4,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          child: FlatButton(
+                            color: Colors.white,
+                            onPressed: () async {
+                              final List<DateTime> originPicked =
+                                  await DateRangePicker.showDatePicker(
+                                      context: context,
+                                      initialFirstDate: DateTime.now(),
+                                      initialLastDate: (DateTime.now())
+                                          .add(Duration(days: 7)),
+                                      firstDate: DateTime(2019),
+                                      lastDate: DateTime(2020));
+                              if (originPicked != null &&
+                                  originPicked.length == 2) {
+                                print(originPicked);
+                                _originDate = originPicked.toList();
+                              }
+                            },
+                            child: Icon(Icons.date_range),
+                            /*child: Text(
+                                '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                    '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                    '$_originDate'
+                                    'yyyy-mm-dd <---> yyyy-mm-dd'
+                                ),*/
+                            //'Departure Date Picker'),
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: Card(
+                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                          elevation: 4,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          child: FlatButton(
+                            color: Colors.white,
+                            onPressed: () async {
+                              final List<DateTime> returnDatePicked =
+                                  await DateRangePicker.showDatePicker(
+                                      context: context,
+                                      initialFirstDate:
+                                          DateTime.now().add(Duration(days: 7)),
+                                      initialLastDate: (DateTime.now())
+                                          .add(Duration(days: 14)),
+                                      firstDate: DateTime(2019),
+                                      lastDate: DateTime(2020));
+                              if (returnDatePicked != null &&
+                                  returnDatePicked.length == 2) {
+                                print(returnDatePicked);
+                                _destinationDate = returnDatePicked.toList();
+                              }
+                            },
+                            child: Icon(Icons.date_range),
+                            /*child: Text(
+                                '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                    '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                    '$_originDate'
+                                    'yyyy-mm-dd <---> yyyy-mm-dd'
+                                ),*/
+                            //'Departure Date Picker'),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(16),
+                          ),
+                        ),
+                        width: 300,
                         child: FlatButton(
-                          color: Colors.white,
-                          child: Text('Find Tickets'),
+                          //padding: EdgeInsets.all(16),
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black, width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(16))),
+                          color: Colors.lightGreenAccent,
+                          child: Text(
+                            'FIND TICKETS',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                          ),
                           onPressed: () {
+                            _searchPageCollapseed();
                             postToGlitchServer();
                             PageItem(
                               data: responseTicketData,
@@ -731,11 +746,11 @@ class _HomePageState extends State<HomePage>
                           },
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -936,7 +951,9 @@ class _HomePageState extends State<HomePage>
                     ),
                     width: MediaQuery.of(context).size.width * .95,
                     padding: EdgeInsets.all(8),
-                    child: ModalDrawerHandle(),
+                    child: ModalDrawerHandle(
+                      handleColor: Colors.lightGreenAccent,
+                    ),
                   ),
                 ),
                 lowerLayer: _getLowerLayer(context),
@@ -957,7 +974,6 @@ class _HomePageState extends State<HomePage>
                   actions: <Widget>[
                     IconButton(
                       onPressed: () => showModalMenu(),
-
                       icon: Icon(
                         Icons.account_box,
                         color: Colors.black,
@@ -1552,7 +1568,7 @@ class PageItem extends StatelessWidget {
                   //myLocationEnabled: true,
                   //compassEnabled: true,
                   //onMapCreated: _onMapCreated,
-                  zoomGesturesEnabled: true,
+                  //zoomGesturesEnabled: true,
                   //markers: Set<Marker>.of(markers.values),
                   initialCameraPosition: CameraPosition(
                     target: LatLng(40.5436, -101.9734347),
@@ -2077,38 +2093,108 @@ class _LoginPageState extends State<LoginPage> {
           child: PageView(
             physics: BouncingScrollPhysics(),
             controller: _pageController,
-            scrollDirection: Axis.vertical,
+            scrollDirection: Axis.horizontal,
             children: <Widget>[
-              Container(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                      child: buildSignIn(_height, _width, _fourFifthsWidth)),
-                  Container(
-                    child: FlatButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text('Need an Account?'),
-                          Text(
-                            ' Sign up',
-                            style: TextStyle(
-                              color: Colors.blue,
+              Center(
+                  child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Container(
+                      child: Card(
+                        elevation: 8,
+                        shape: CircleBorder(
+                          side: BorderSide(
+                              style: BorderStyle.solid, color: Colors.blue),
+                        ),
+                        color: Colors.blue,
+                        child: Container(
+                          height: 150,
+                          width: 150,
+                          //color: Colors.blue,
+                          // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
+                          // color: Colors.blue),
+                          child: Center(
+                            child: Text(
+                              'FlyX',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w700),
                             ),
                           ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(25),
+                      child: Column(
+                        children: <Widget>[
+                          Card(
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(16),
+                              ),
+                            ),
+                            child:
+                                buildSignIn(_height, _width, _fourFifthsWidth),
+                          ),
+                          Card(
+                            margin: EdgeInsets.all(8),
+                            elevation: 8,
+                            color: Colors.lightGreenAccent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8))),
+                            child: buildLoginCard(),
+                          )
+                          // RaisedButton.icon(
+                          //   color: Colors.white,
+                          //   icon: Icon(FontAwesomeIcons.mailchimp),
+                          //   label: Text("Guest"),
+                          //   shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(8),
+                          //   ),
+                          //   elevation: 8,
+                          //   onPressed: () {
+                          //     //_signInAnonymously();
+                          //     Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (context) => HomePage()),
+                          //     );
+                          //   },
+                          // ),
                         ],
                       ),
-                      onPressed: () {
-                        _pageController.animateToPage(
-                          1,
-                          curve: Curves.easeInOutExpo,
-                          duration: Duration(milliseconds: 1000),
-                        );
-                      },
                     ),
-                  ),
-                ],
+                    Container(
+                      child: FlatButton(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text('Need an Account?'),
+                            Text(
+                              ' Sign up',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _pageController.animateToPage(
+                            1,
+                            curve: Curves.easeInOutExpo,
+                            duration: Duration(milliseconds: 1000),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               )),
               Center(
                   child: Container(
@@ -2128,53 +2214,26 @@ class _LoginPageState extends State<LoginPage> {
       child: Form(
         key: _signInFormKey,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
+          // mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Container(
-              height: _height * .3,
-              width: _width,
-              //color: Color.fromARGB(0, 73, 144, 226),//Colors.white,
-              child: FadeInImage.memoryNetwork(
-                image:
-                    'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4',
-                //height: _height * .33,
-                fadeOutDuration: const Duration(milliseconds: 500),
-                placeholder: kTransparentImage,
-                // filterQuality: FilterQuality.high,
-              ),
+              width: _fourFifthsWidth,
+              child: signInEmail("Email", Icons.mail_outline),
             ),
-            //Logo PlaceHolder
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  width: _fourFifthsWidth,
-                  child: signInEmail("Email", Icons.mail_outline),
-                ),
-                Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  overflow: Overflow.visible,
-                  children: <Widget>[
-                    Container(
-                      width: _fourFifthsWidth,
-                      child: signInPassword("Password", Icons.lock_outline),
-                      margin: EdgeInsets.only(bottom: 25),
-                    ),
-                    Container(
-                      //rmargin: EdgeInsets.only(top:125),
-                      child: buildLoginCard(),
-                    ),
-                  ],
-                ),
-                Container(
-                  child:
-                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
-                ),
-              ],
+            Container(
+              width: _fourFifthsWidth,
+              child: signInPassword("Password", Icons.lock_outline),
+              //margin: EdgeInsets.only(bottom: 35),
+            ),
+            // Container(
+            //   //rmargin: EdgeInsets.only(top:125),
+            //   child: buildLoginCard(),
+            // ),
+            Container(
+              child:
+                  buildThirdPartySignIn(), //google,facebook,twitter signin buttons
             ),
           ],
         ),
@@ -2186,9 +2245,16 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Card(
-        elevation: 8,
+        //color: Colors.red,
+        // shape: RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.only(
+        //     topLeft: Radius.circular(16),
+        //     topRight: Radius.circular(16),
+        //   ),
+        // ),
+        elevation: 0,
         child: Padding(
-          padding: EdgeInsets.all(25.0),
+          padding: EdgeInsets.all(25),
           child: TextFormField(
             autofocus: false,
             //focusNode: myFocusNodeEmailLogin,
@@ -2198,7 +2264,7 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(
                 fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
             decoration: InputDecoration(
-              border: InputBorder.none,
+              //border: InputBorder.none,
               icon: Icon(
                 fieldIcon,
                 color: Colors.redAccent,
@@ -2222,9 +2288,15 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Card(
-        elevation: 8,
+        // shape: RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.only(
+        //     bottomLeft: Radius.circular(16),
+        //     bottomRight: Radius.circular(16),
+        //   ),
+        // ),
+        elevation: 0,
         child: Padding(
-          padding: EdgeInsets.all(25.0),
+          padding: EdgeInsets.all(25),
           child: TextFormField(
             autofocus: false,
             obscureText: true,
@@ -2235,7 +2307,7 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(
                 fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
             decoration: InputDecoration(
-              border: InputBorder.none,
+              //border: InputBorder.none,
               icon: Icon(
                 fieldIcon,
                 color: Colors.redAccent,
@@ -2255,26 +2327,24 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Card buildLoginCard() {
-    return Card(
-      elevation: 8,
+  dynamic buildLoginCard() {
+    return FlatButton.icon(
+      highlightColor: Colors.transparent,
+      splashColor: Theme.Colors.loginGradientEnd,
       color: Colors.lightGreenAccent,
-      child: FlatButton.icon(
-        highlightColor: Colors.transparent,
-        splashColor: Theme.Colors.loginGradientEnd,
-        color: Colors.lightGreenAccent,
-        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        icon: Icon(Icons.security),
-        label: Text(
-          "Sign In",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22.0,
-            fontFamily: "Nunito",
-          ),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8.0))),
+      icon: Icon(Icons.security),
+      padding: EdgeInsets.all(8),
+      label: Text(
+        "Sign In",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 22.0,
+          fontWeight: FontWeight.w700,
         ),
-        onPressed: _emailPasswordSignIn,
       ),
+      onPressed: _emailPasswordSignIn,
     );
   }
 
@@ -2348,25 +2418,55 @@ class _LoginPageState extends State<LoginPage> {
 
   ButtonBar buildThirdPartySignIn() {
     return ButtonBar(
-      alignment: MainAxisAlignment.center,
+      alignment: MainAxisAlignment.spaceAround,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        RaisedButton.icon(
-          color: Colors.white,
+        IconButton(
+          color: Colors.black,
           icon: Icon(FontAwesomeIcons.google),
-          label: Text("Google"),
+          //label: Text("Google"),
+          onPressed: () async {
+            _signIn();
+           Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          },
+        ),
+        IconButton(
+          color: Colors.black,
+          icon: Icon(FontAwesomeIcons.facebook),
+          //label: Text("Google"),
+          onPressed: () async {
+            _signIn();
+          },
+        ),
+        IconButton(
+          color: Colors.black,
+          icon: Icon(FontAwesomeIcons.twitter),
+          //label: Text("Google"),
           onPressed: () async {
             _signIn();
           },
         ),
         RaisedButton.icon(
-          color: Colors.white,
+          color: Colors.lightGreenAccent,
           icon: Icon(FontAwesomeIcons.mailchimp),
-          label: Text("Guest Login"),
+          label: Text("Guest"),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          elevation: 8,
+          highlightElevation: 2,
           onPressed: () {
             //_signInAnonymously();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
             );
           },
         ),
