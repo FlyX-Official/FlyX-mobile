@@ -1,109 +1,29 @@
-// import 'package:flutter/material.dart';
-// import 'auth.dart';
-
-// class MyApp1 extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'FlutterBase',
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text('Flutterbase'),
-//           backgroundColor: Colors.amber,
-//         ),
-//         body: Center(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: <Widget>[LoginButton(), UserProfile()],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class UserProfile extends StatefulWidget {
-//   @override
-//   UserProfileState createState() => UserProfileState();
-// }
-
-// class UserProfileState extends State<UserProfile> {
-//   Map<String, dynamic> _profile;
-//   bool _loading = false;
-
-//   @override
-//   initState() {
-//     super.initState();
-//     authService.profile.listen((state) => setState(() => _profile = state));
-
-//     authService.loading.listen((state) => setState(() => _loading = state));
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(children: <Widget>[
-//       Container(padding: EdgeInsets.all(20), child: Text(_profile.toString())),
-//       Container(padding: EdgeInsets.all(20), child: Text(_profile.values.first)),
-//       Container(padding:EdgeInsets.all(20), child: Text('Loading: ${_loading.toString()}')),
-//     ]);
-//   }
-// }
-
-// class LoginButton extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder(
-//         stream: authService.user,
-//         builder: (context, snapshot) {
-//           if (snapshot.hasData) {
-//             return MaterialButton(
-//               onPressed: () => authService.signOut(),
-//               color: Colors.red,
-//               textColor: Colors.white,
-//               child: Text('Signout'),
-//             );
-//           } else {
-//             return MaterialButton(
-//               onPressed: () => authService.googleSignIn(),
-//               color: Colors.white,
-//               textColor: Colors.black,
-//               child: Text('Login with Google'),
-//             );
-//           }
-//         });
-//   }
-// }
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flyx/HomePage/auth.dart';
+import 'package:flyx/Auth/auth.dart';
+import 'package:flyx/HomePage/oldhome.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:groovin_widgets/groovin_widgets.dart';
-import 'package:http/http.dart' as http;
-import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
-
-//import '../TicketDisplayer/ticketCard.dart';
+import 'package:http/http.dart' as http;
+import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 class HomePage extends StatefulWidget {
-  static String tag = 'Home-page';
+  HomePage({Key key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  GlobalKey _rubberBotSheetKey = GlobalKey();
+
   _HomePageState() {
     authService.profile.listen((state) => setState(() => _profile = state));
 
@@ -120,7 +40,7 @@ class _HomePageState extends State<HomePage>
         setState(() {
           _isFromOpen = true;
           _searchFromField = _from.text;
-          _onTap = _onTapTextLength == _searchFromField.length;
+          //_onTap = _onTapTextLength == _searchFromField.length;
         });
       }
     });
@@ -136,114 +56,143 @@ class _HomePageState extends State<HomePage>
         setState(() {
           _isToOpen = true;
           _searchToField = _to.text;
-          _onTap = _onTapTextLength == _searchToField.length;
+          // _onTap = _onTapTextLength == _searchToField.length;
         });
       }
     });
   }
 
+  Map<String, dynamic> _profile;
+  bool _loading = false;
+
+  RubberAnimationController _controller;
+  ScrollController _scrollController = ScrollController();
+
+  final GlobalKey<FormState> _tickerSearchFormKey = GlobalKey<FormState>();
+  Completer<GoogleMapController> _customGoogleMapController = Completer();
+
+  int _markerIdCounter = 1;
+
+  double _lowerValue = 1, _upperValue = 100;
+
+  double _fromSlider = 1, _toSlider = 1;
+
+  bool _isFromOpen, _isToOpen;
+
+  TextEditingController _from = TextEditingController();
+  TextEditingController _to = TextEditingController();
+
+  String _searchFromField = "", _searchToField = "";
+  List<String> _searchFromList = List(), _searchToList = List();
+
   var center;
   LatLng decodedGeoHash;
-  List<String> destData;
+  List<String> destData, originData;
   IconData fabIcon = Icons.search;
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  Map<MarkerId, Marker> markers1 = <MarkerId, Marker>{};
-  List<String> originData;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{},
+      markers1 = <MarkerId, Marker>{};
   List responseTicketData;
   MarkerId selectedMarker;
   var ticketresponses;
 
-  Completer<GoogleMapController> _customGoogleMapController = Completer();
-  List<DateTime> _destinationDate;
-  final _formKey = GlobalKey<FormState>();
-
-  var _fromSlider = 1;
-  PageController _inputPage;
-  bool _isFromOpen;
-  bool _isSearching = true;
-  bool _isToOpen;
-  int _markerIdCounter = 1;
-  bool _onTap = false;
-  int _onTapTextLength = 0;
-  List<DateTime> _originDate;
-  final _pageviewcontroller = PageController();
-  //AnimationController _controller;
-
-  RubberAnimationController _rubberController;
-
-  ScrollController _scrollController = ScrollController();
-  String _searchFromField = "";
-  List<String> _searchFromList = List();
-  String _searchToField = "";
-  List<String> _searchToList = List();
-  List<String> _tmpList = List();
-  TextEditingController _from = TextEditingController();
-  TextEditingController _to = TextEditingController();
-
-  var _toSlider = 1;
+  List<DateTime> _originDate, _destinationDate;
 
   @override
-  void dispose() {
-    super.dispose();
-    _rubberController.removeStatusListener(_statusListener);
-    _rubberController.dispose();
-    // _controller.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    authService.profile.listen((state) => setState(() => _profile = state));
-
-    authService.loading.listen((state) => setState(() => _loading = state));
-
-    _isSearching = false;
-    _isFromOpen = false;
-    _isToOpen = false;
-
-    _rubberController = RubberAnimationController(
-        vsync: this,
-        dismissable: false,
-        upperBoundValue: AnimationControllerValue(percentage: .97),
-        halfBoundValue: AnimationControllerValue(pixel: 500),
-        lowerBoundValue: AnimationControllerValue(pixel: 94),
-        duration: Duration(milliseconds: 200));
-    _rubberController.addStatusListener(_statusListener);
-    TicketListViewBuilder(
-      data: responseTicketData,
+  Widget build(BuildContext context) {
+    final MediaQueryData _mediaQuery = MediaQuery.of(context);
+    final dynamic _upperLayerWidth = _mediaQuery.size.width * .95;
+    final dynamic _backGroundColor = Color.fromARGB(255, 247, 247, 247);
+    var _color2 = Color.fromARGB(255, 46, 209, 153);
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: _color2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(24),
+              bottomRight: Radius.circular(24),
+            ),
+          ),
+          actionsIconTheme: IconThemeData(color: Colors.white),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                icon: Icon(Icons.account_box),
+                onPressed: () {},
+              ),
+            )
+          ],
+        ),
+        backgroundColor: _backGroundColor,
+        body: _buildBody(
+            _mediaQuery, _backGroundColor, _upperLayerWidth, _color2),
+        drawer: Drawer(
+          elevation: 8,
+          child: Container(
+            height: 300,
+            child: UserAccountsDrawerHeader(
+              currentAccountPicture: null,
+              accountEmail: Text('Maheshwar.ravuri@gmail.com'),
+              accountName: Text('Maheshwar Ravuri'),
+            ),
+          ),
+        ),
+        resizeToAvoidBottomInset: true,
+      ),
     );
-    PageItem(
-      data: responseTicketData,
+  }
+
+  Material _buildBody(
+      _mediaQuery, _backGroundColor, _upperLayerWidth, _color2) {
+    return Material(
+      type: MaterialType.card,
+      color: _color2,
+      child: RubberBottomSheet(
+        //scrollController: _scrollController,
+        key: _rubberBotSheetKey,
+        animationController: _controller,
+        lowerLayer: _lowerLayer(_backGroundColor),
+        upperLayer: _upperLayer(_mediaQuery, _upperLayerWidth, _color2),
+        menuLayer: _menuLayer(_color2),
+        header: _headerLayer(_upperLayerWidth, _color2),
+      ),
     );
-    //_controller = AnimationController(vsync: this);
   }
 
-  void _statusListener(AnimationStatus status) {
-    print("changed State ${_rubberController.animationState}");
+  Center _headerLayer(_upperLayerWidth, _color2) {
+    return Center(
+      child: Container(
+        width: _upperLayerWidth,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+            color: _color2),
+        padding: EdgeInsets.all(8),
+        child: ModalDrawerHandle(
+          handleColor: Colors.white,
+          handleBorderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+        ),
+      ),
+    );
   }
 
-  void _halfExpand() {
-    _rubberController.halfExpand();
+  Scaffold _lowerLayer(_backGroundColor) {
+    return Scaffold(
+      backgroundColor: _backGroundColor,
+      body: Container(
+        child: TicketListViewBuilder(
+          data: responseTicketData,
+        ),
+      ),
+    );
   }
 
-  void _searchPageCollapseed() {
-    _rubberController.lowerBound;
-  }
-
-  void _collapse() {
-    _rubberController.collapse();
-  }
-
-  //GOogle map
-  void _onMapCreated(GoogleMapController controller) {
-    _customGoogleMapController.complete(controller);
-  }
-
-  //
-
-//autocomplete
-
+//NEED TO BE MOVED TO OTHER FILE
   dynamic _getFromData() async {
     while (_searchFromField.isNotEmpty) {
       _searchFromList = await _getFromSuggestions(_searchFromField) ?? null;
@@ -474,403 +423,6 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Widget _getUpperLayer() {
-    return Container(
-      width: MediaQuery.of(context).size.width * .95,
-      child: Material(
-        type: MaterialType.card,
-        color: Color.fromARGB(255, 247, 247, 247),
-        elevation: 8,
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Form(
-            autovalidate: false,
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      FlatButton(
-                        child: Text('ONE WAY'),
-                        color: Colors.white,
-                        onPressed: _halfExpand,
-                      ),
-                      FlatButton(
-                        child: Text(''),
-                        color: Colors.transparent,
-                        onPressed: null,
-                        disabledColor: Colors.transparent,
-                      ),
-                      FlatButton(
-                        child: Text('ROUND TRIP'),
-                        color: Colors.white,
-                        onPressed: _collapse,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.width * .1),
-                        child: Container(
-                            child: _isFromOpen &&
-                                    _from.text
-                                        .isNotEmpty //(_isSearching && (!_onTap))
-                                ? getFromWidget()
-                                : null),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 8, right: 8),
-                        child: Card(
-                          elevation: 4,
-                          color: Colors.white,
-                          child: Padding(
-                            child: TextFormField(
-                              controller: _from,
-                              //focusNode: _flyingFromFocusNode,
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Field cannot be empty';
-                                }
-                              },
-
-                              onFieldSubmitted: (String value) {
-                                print("$value submitted");
-
-                                setState(() {
-                                  _from.text = value;
-                                  _isFromOpen = false;
-                                  _onTap = true;
-                                });
-                              },
-
-                              decoration: InputDecoration(
-                                //border: InputBorder.none,
-                                icon: Icon(
-                                  FontAwesomeIcons.planeDeparture,
-                                  color: Colors.blue,
-                                  //size: 22.0,
-                                ),
-                                hintText: 'Flying From',
-                                hintStyle: TextStyle(
-                                    fontFamily: "Nunito", fontSize: 17.0),
-                              ),
-                            ),
-                            padding: EdgeInsets.only(
-                              left: 16,
-                              bottom: 8,
-                              top: 8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                      InkWell(
-                        onTap: () {
-                          _addOriginAirportMarkers();
-                          _isFromOpen = false;
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: Card(
-                            elevation: 4,
-                            color: Colors.white,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Slider(
-                                    value: _fromSlider.toDouble(),
-                                    min: 1.0,
-                                    max: 100.0,
-                                    divisions: 5,
-                                    label: '$_fromSlider',
-                                    onChanged: (double Value) {
-                                      _addOriginAirportMarkers();
-                                      setState(
-                                        () {
-                                          _isFromOpen = false;
-                                          _fromSlider = Value.floor();
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                                Text("$_fromSlider Mi"),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.width * .1),
-                        child: Container(
-                            child: _isToOpen //(_isSearching && (!_onTap))
-                                ? getToWidget()
-                                : null),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(right: 8, left: 8),
-                        child: Card(
-                          elevation: 4,
-                          child: Padding(
-                            child: TextFormField(
-                              controller: _to,
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Field cannot be empty';
-                                }
-                              },
-                              onFieldSubmitted: (String value) {
-                                print("$value submitted");
-
-                                setState(() {
-                                  _to.text = value;
-                                  _isToOpen = false;
-                                  //_isFromOpen = false;
-                                  _onTap = true;
-                                });
-                              },
-                              decoration: InputDecoration(
-                                //border: InputBorder.none,
-                                icon: Icon(
-                                  FontAwesomeIcons.planeDeparture,
-                                  color: Colors.blue,
-                                  //size: 22.0,
-                                ),
-                                hintText: 'Flying To',
-                                hintStyle: TextStyle(
-                                    fontFamily: "Nunito", fontSize: 17.0),
-                              ),
-                            ),
-                            padding:
-                                EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                          ),
-                        ),
-                      ),
-                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
-                      InkWell(
-                        onTap: () {
-                          _isToOpen = false;
-                          _addDestinationAirportMarkers();
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: Card(
-                            elevation: 4,
-                            color: Colors.white,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Slider(
-                                    value: _toSlider.ceilToDouble(),
-                                    min: 1.0,
-                                    max: 100.0,
-                                    divisions: 5,
-                                    label: '$_toSlider', //var _toSlider = 1;,
-                                    onChanged: (double Value) {
-                                      _addDestinationAirportMarkers();
-                                      setState(() {
-                                        _isToOpen = false;
-                                        _toSlider = Value.round();
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Text("$_toSlider Mi"),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Card(
-                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
-                          elevation: 4,
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          child: FlatButton(
-                            color: Colors.white,
-                            onPressed: () async {
-                              final List<DateTime> originPicked =
-                                  await DateRangePicker.showDatePicker(
-                                      context: context,
-                                      initialFirstDate: DateTime.now(),
-                                      initialLastDate: (DateTime.now())
-                                          .add(Duration(days: 7)),
-                                      firstDate: DateTime(2019),
-                                      lastDate: DateTime(2020));
-                              if (originPicked != null &&
-                                  originPicked.length == 2) {
-                                print(originPicked);
-                                _originDate = originPicked.toList();
-                              }
-                            },
-                            child: Icon(Icons.date_range),
-                            /*child: Text(
-                                '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                    '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                    '$_originDate'
-                                    'yyyy-mm-dd <---> yyyy-mm-dd'
-                                ),*/
-                            //'Departure Date Picker'),
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Card(
-                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
-                          elevation: 4,
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          child: FlatButton(
-                            color: Colors.white,
-                            onPressed: () async {
-                              final List<DateTime> returnDatePicked =
-                                  await DateRangePicker.showDatePicker(
-                                      context: context,
-                                      initialFirstDate:
-                                          DateTime.now().add(Duration(days: 7)),
-                                      initialLastDate: (DateTime.now())
-                                          .add(Duration(days: 14)),
-                                      firstDate: DateTime(2019),
-                                      lastDate: DateTime(2020));
-                              if (returnDatePicked != null &&
-                                  returnDatePicked.length == 2) {
-                                print(returnDatePicked);
-                                _destinationDate = returnDatePicked.toList();
-                              }
-                            },
-                            child: Icon(Icons.date_range),
-                            /*child: Text(
-                                '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
-                                    '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
-                                    '$_originDate'
-                                    'yyyy-mm-dd <---> yyyy-mm-dd'
-                                ),*/
-                            //'Departure Date Picker'),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(16),
-                          ),
-                        ),
-                        width: 300,
-                        child: FlatButton(
-                          //padding: EdgeInsets.all(16),
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Colors.black, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(16))),
-                          color: Colors.lightGreenAccent,
-                          child: Text(
-                            'FIND TICKETS',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          onPressed: () {
-                            _searchPageCollapseed();
-                            postToGlitchServer();
-                            PageItem(
-                              data: responseTicketData,
-                            );
-                            TicketListViewBuilder(
-                              data: responseTicketData,
-                            );
-                            _pageviewcontroller.animateToPage(
-                              2,
-                              duration: Duration(milliseconds: 1000),
-                              curve: Curves.easeInOutExpo.flipped,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container _getLowerLayer(BuildContext context) {
-    return Container(
-      child: PageView(
-        onPageChanged: (i) {
-          if (i == 0) {
-            setState(() {
-              fabIcon = Icons.search;
-            });
-          } else if (i == 1) {
-            // _rubberController
-            //     .setVisibility(!_rubberController.visibility.value);
-            //_searchPageCollapseed();
-            setState(() {
-              fabIcon = Icons.payment;
-            });
-          }
-        },
-        controller: _pageviewcontroller,
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          //Container(child: Center(child: Text('Empty Page')),),
-          Container(
-            height: MediaQuery.of(context).size.height,
-            //margin: EdgeInsets.all(8),
-            //color: Color(0xc25737373),
-            child: GoogleMap(
-              mapType: MapType.normal,
-              //myLocationEnabled: true,
-              //compassEnabled: true,
-              onMapCreated: _onMapCreated,
-              zoomGesturesEnabled: true,
-              markers: Set<Marker>.of(markers.values),
-              initialCameraPosition: CameraPosition(
-                target: LatLng(40.5436, -101.9734347),
-                zoom: 1.0,
-                tilt: 45,
-              ),
-            ),
-          ),
-          Container(
-            child: Container(
-              height: MediaQuery.of(context).size.height * .85,
-              child: Container(
-                child: TicketListViewBuilder(
-                  data: responseTicketData,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Map<String, Object> postToGlitchServerData() {
     return {
       'oneWay': false,
@@ -923,1642 +475,377 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Map<String, dynamic> _profile;
-  bool _loading = false;
-
-//end autocomplete
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 247, 247, 247),
-        body: Stack(
-          children: <Widget>[
-            Container(
-              child: RubberBottomSheet(
-                header: Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(16),
-                          topLeft: Radius.circular(16)),
-                      color: Colors.white,
-                    ),
-                    width: MediaQuery.of(context).size.width * .95,
-                    padding: EdgeInsets.all(8),
-                    child: ModalDrawerHandle(
-                      handleColor: Colors.lightGreenAccent,
-                    ),
-                  ),
-                ),
-                lowerLayer: _getLowerLayer(context),
-                animationController: _rubberController,
-                scrollController: _scrollController,
-                upperLayer: _getUpperLayer(),
-              ),
-            ),
-            Container(
-              child: Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: Color.fromARGB(0, 247, 247, 247),
-                  elevation: 0,
-                  actions: <Widget>[
-                    IconButton(
-                      onPressed: () async {
-                        return showRoundedModalBottomSheet(
-                          context: context,
-                          radius: 16,
-                          color: Color.fromARGB(255, 247, 247, 247),
-                          builder: (BuildContext context) {
-                            return SingleChildScrollView(
-                              physics: BouncingScrollPhysics(),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(8),
-                                    child: StreamBuilder(
-                                      stream: authService.user,
-                                      builder: (context, snapshot) {
-                                        return UserAccountsDrawerHeader(
-                                          accountName:
-                                              Text(_profile.toString()),
-                                          accountEmail:
-                                              Text(_profile.toString()),
-                                          // currentAccountPicture:
-                                          //     Image.network(_profile.toString()),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              .50,
-                                      child: ListView(
-                                        physics: BouncingScrollPhysics(),
-                                        children: <Widget>[
-                                          Container(
-                                            margin: EdgeInsets.all(10),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: <Widget>[
-                                                Card(
-                                                  elevation: 8,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: ListTile(
-                                                    leading: Icon(
-                                                        Icons.monetization_on),
-                                                    title: Text(
-                                                        "Preferred Airport"),
-                                                  ),
-                                                ),
-                                                Card(
-                                                  color: Colors.white,
-                                                  child: MaterialButton(
-                                                    child: Text('Sign OUT'),
-                                                    onPressed: () async {
-                                                      authService.signOut();
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      icon: Icon(
-                        Icons.account_box,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ), //_getLowerLayer(context),
-        resizeToAvoidBottomInset: false,
-      ),
-    );
-  }
-
-//Ticket Card
-
-}
-
-class TicketListViewBuilder extends StatefulWidget {
-  const TicketListViewBuilder({
-    Key key,
-    @required this.data,
-  }) : super(key: key);
-
-  final List data;
-
-  @override
-  _TicketListViewBuilder createState() => _TicketListViewBuilder();
-}
-
-class _TicketListViewBuilder extends State<TicketListViewBuilder> {
-  int _currentIndexCounter;
-  bool _isOpen = false;
-  double _thisItem = 0.0;
-
-  // Widget added(BuildContext contex) {
-  //   if (_isOpen) {
-  //     _isOpen = false;
-  //     return AnimatedContainer(
-  //       duration: const Duration(milliseconds: 120),
-  //       child: Container(
-  //         child: Text("data"),
-  //         height: 200.0,
-  //         color: Colors.red,
-  //       ),
-  //       height: _thisItem,
-  //     );
-  //   }
-  //   _isOpen = true;
-  //   return AnimatedContainer(
-  //     duration: const Duration(milliseconds: 120),
-  //     child: Container(
-  //       child: Text("data"),
-  //       height: 0.0,
-  //     ),
-  //     height: _thisItem,
-  //   );
-  // }
-
-  @override
-  Widget build(BuildContext context) {
-    //return await buildSafeArea();
-    dynamic responsePageItemTicketData = widget.data;
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.only(top: 56, bottom: 94),
-        child: ListView.builder(
-          itemCount: widget.data == null ? 0 : widget.data.length,
-          itemBuilder: (context, i) {
-            return Hero(
-              tag: "card$i",
-              child: Container(
-                padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
-                child: Card(
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: Stack(
-                    children: <Widget>[
-                      buildTicketCardContainer(i, context),
-                      Positioned(
-                        left: 0.0,
-                        top: 0.0,
-                        bottom: 0.0,
-                        right: 0.0,
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: InkWell(
-                            splashColor: Colors.amber,
-                            onTap: () async {
-                              await Future.delayed(Duration(milliseconds: 500));
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return PageItem(
-                                        num: i,
-                                        data: responsePageItemTicketData);
-                                  },
-                                  fullscreenDialog: true,
-                                  maintainState: true,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Container buildTicketCardContainer(int i, BuildContext context) {
+//
+  Container _upperLayer(_mediaQuery, _upperLayerWidth, _color2) {
+    var _upperLayerColor2 = Color.fromARGB(75, 46, 209, 153);
     return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            color: Color.fromARGB(255, 100, 135, 165),
-            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      width: _upperLayerWidth,
+      color: _upperLayerColor2,
+      child: SingleChildScrollView(
+        child: Form(
+          key: _tickerSearchFormKey,
+          child: Container(
+            height: 550,
+            color: _upperLayerColor2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Container(
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       Container(
-                        child: Text(
-                          "${widget.data[i]['flyFrom'].toString()}",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * .1),
+                        child: Container(
+                            child: _isFromOpen &&
+                                    _from.text
+                                        .isNotEmpty //(_isSearching && (!_onTap))
+                                ? getFromWidget()
+                                : null),
                       ),
                       Container(
-                        padding: EdgeInsets.only(left: 8, right: 8),
-                        child: Icon(
-                          FontAwesomeIcons.exchangeAlt,
+                        margin: EdgeInsets.only(left: 8, right: 8),
+                        child: Card(
+                          
+                          elevation: 4,
                           color: Colors.white,
+                          child: Padding(
+                            child: TextFormField(
+                              controller: _from,
+                              //focusNode: _flyingFromFocusNode,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Field cannot be empty';
+                                }
+                              },
+
+                              onFieldSubmitted: (String value) {
+                                print("$value submitted");
+
+                                setState(() {
+                                  _from.text = value;
+                                  _isFromOpen = false;
+                                });
+                              },
+
+                              decoration: InputDecoration(
+                                //border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.planeDeparture,
+                                  color: Colors.blue,
+                                  //size: 22.0,
+                                ),
+                                hintText: 'Flying From',
+                                hintStyle: TextStyle(
+                                    fontFamily: "Nunito", fontSize: 17.0),
+                              ),
+                            ),
+                            padding: EdgeInsets.only(
+                              left: 16,
+                              bottom: 8,
+                              top: 8,
+                            ),
+                          ),
                         ),
                       ),
-                      Container(
-                        child: Text(
-                          "${widget.data[i]['flyTo'].toString()}",
-                          style: TextStyle(
+                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                      InkWell(
+                        onTap: () {
+                          _addOriginAirportMarkers();
+                          _isFromOpen = false;
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * .6,
+                          child: Card(
+                            elevation: 4,
                             color: Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.w700,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Slider(
+                                    value: _fromSlider.toDouble(),
+                                    min: 1.0,
+                                    max: 100.0,
+                                    divisions: 5,
+                                    label: '$_fromSlider',
+                                    onChanged: (double value) {
+                                      _addOriginAirportMarkers();
+                                      setState(
+                                        () {
+                                          _isFromOpen = false;
+                                          _fromSlider = value;
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Text("$_fromSlider Mi"),
+                              ],
+                            ),
                           ),
-                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Text(
-                    "\$${widget.data[i]['price'].toString()}.00",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
+                      Container(
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * .1),
+                        child: Container(
+                            child: _isToOpen //(_isSearching && (!_onTap))
+                                ? getToWidget()
+                                : null),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(right: 8, left: 8),
+                        child: Card(
+                          elevation: 4,
+                          child: Padding(
+                            child: TextFormField(
+                              controller: _to,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Field cannot be empty';
+                                }
+                              },
+                              onFieldSubmitted: (String value) {
+                                print("$value submitted");
 
-                      fontWeight: FontWeight.bold,
-                      //fontWeight: FontWeight.w700,
-                    ),
-                  ), // ${widget.data[i]['aTimeUTC'].toString()} UTC"),
-                ),
-              ],
-            ),
-          ),
-          //BlueBar
-          Container(
-            child: Column(
-              children: <Widget>[
-                //Divider(color: Colors.transparent,),
-                Container(
-                  margin: EdgeInsets.only(top: 16),
-                  color: Colors.white,
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            // Container(
-                            //   width: MediaQuery.of(context)
-                            //           .size
-                            //           .width *
-                            //       .15,
-                            //   child: Center(
-                            //     child: Text(
-                            //       "${widget.data[i]['cityFrom'].toString()}",
-                            //       style: TextStyle(
-                            //           //fontFamily: "OpenSans",
-                            //           //fontSize: 14,
-                            //           color: Colors
-                            //               .lightBlueAccent),
-                            //     ),
-                            //   ),
-                            // ),
+                                setState(() {
+                                  _to.text = value;
+                                  _isToOpen = false;
+                                  //_isFromOpen = false;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                //border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.planeDeparture,
+                                  color: Colors.blue,
+                                  //size: 22.0,
+                                ),
+                                hintText: 'Flying To',
+                                hintStyle: TextStyle(
+                                    fontFamily: "Nunito", fontSize: 17.0),
+                              ),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                          ),
+                        ),
+                      ),
+                      // Container(margin: EdgeInsets.only(top: 160),color: Colors.white,child: ExpansionTile(title: Text('this'),),),
+                      InkWell(
+                        onTap: () {
+                          _isToOpen = false;
+                          _addDestinationAirportMarkers();
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * .6,
+                          child: Card(
+                            elevation: 4,
+                            color: Colors.white,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Slider(
+                                    value: _toSlider.ceilToDouble(),
+                                    min: 1.0,
+                                    max: 100.0,
+                                    divisions: 5,
+                                    label: '$_toSlider', //var _toSlider = 1;,
+                                    onChanged: (double value) {
+                                      _addDestinationAirportMarkers();
+                                      setState(() {
+                                        _isToOpen = false;
+                                        _toSlider = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Text("$_toSlider Mi"),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
-                            Container(
-                              width: MediaQuery.of(context).size.width * .15,
-                              child: Center(
-                                child: Text(
-                                  "${widget.data[i]['flyFrom'].toString()}",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Color(0XFF4a4a4a),
-                                    fontWeight: FontWeight.w600,
-                                    //fontFamily: "OpenSans",
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).day.toString()}" +
-                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).month.toString()}" +
-                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).year.toString()}"),
-                            ),
-                          ],
-                        ),
-                      ), // Origin Data
                       Container(
-                        margin: EdgeInsets.only(bottom: 24),
-                        width: MediaQuery.of(context).size.width * .12,
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.arrowCircleRight,
-                            color: Color.fromARGB(255, 34, 180, 222),
+                        width: MediaQuery.of(context).size.width,
+                        child: Card(
+                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                          elevation: 4,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          child: FlatButton(
+                            color: Colors.white,
+                            onPressed: () async {
+                              final List<DateTime> originPicked =
+                                  await DateRangePicker.showDatePicker(
+                                      context: context,
+                                      initialFirstDate: DateTime.now(),
+                                      initialLastDate: (DateTime.now())
+                                          .add(Duration(days: 7)),
+                                      firstDate: DateTime(2019),
+                                      lastDate: DateTime(2020));
+                              if (originPicked != null &&
+                                  originPicked.length == 2) {
+                                print(originPicked);
+                                _originDate = originPicked.toList();
+                              }
+                            },
+                            child: Icon(Icons.date_range),
+                            /*child: Text(
+                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                  '$_originDate'
+                                  'yyyy-mm-dd <---> yyyy-mm-dd'
+                              ),*/
+                            //'Departure Date Picker'),
                           ),
                         ),
-                        padding: EdgeInsets.only(left: 8, right: 8),
                       ),
-                      Column(
-                        children: <Widget>[
-                          Container(
-                            child: Card(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Color(0XFFE4E4E4),
-                                ),
-                                width: MediaQuery.of(context).size.width * .30,
-                                //color: Color(0XFFE4E4E4),
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '7 Stops',
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * .30,
-                            //padding: EdgeInsets.only(bottom: 8),
-                            child: Center(
-                              child: Text(
-                                "${widget.data[i]['fly_duration'].toString()}",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(bottom: 24),
-                        width: MediaQuery.of(context).size.width * .12,
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.arrowCircleRight,
-                            color: Color.fromARGB(255, 34, 180, 222),
-                          ),
-                        ),
-                        padding: EdgeInsets.only(left: 8, right: 8),
-                      ),
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            // Container(
-                            //   width: MediaQuery.of(context)
-                            //           .size
-                            //           .width *
-                            //       .15,
-                            //   child: Center(
-                            //     child: Text(
-                            //       "${widget.data[i]['cityTo'].toString()}",
-                            //       style: TextStyle(
-                            //           color: Colors
-                            //               .lightBlueAccent),
-                            //     ),
-                            //   ),
-                            // ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * .15,
-                              child: Center(
-                                child: Text(
-                                  "${widget.data[i]['flyTo'].toString()}",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Color(0XFF4a4a4a),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).day.toString()}" +
-                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).month.toString()}" +
-                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).year.toString()}"),
-                            ),
-                          ],
-                        ),
-                      ), // Destination Data
-                    ],
-                  ),
-                ),
-                // if Roundtip
-                Container(
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  child: Divider(
-                    height: 25,
-                    color: Colors.black,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                    bottom: 16,
-                  ),
-                  color: Colors.white,
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            // Container(
-                            //   width: MediaQuery.of(context)
-                            //           .size
-                            //           .width *
-                            //       .15,
-                            //   child: Center(
-                            //     child: Text(
-                            //       "${widget.data[i]['cityFrom'].toString()}",
-                            //       style: TextStyle(
-                            //           //fontFamily: "OpenSans",
-                            //           //fontSize: 14,
-                            //           color: Colors
-                            //               .lightBlueAccent),
-                            //     ),
-                            //   ),
-                            // ),
 
-                            Container(
-                              width: MediaQuery.of(context).size.width * .15,
-                              child: Center(
-                                child: Text(
-                                  "${widget.data[i]['flyTo'].toString()}",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Color(0XFF4a4a4a),
-                                    fontWeight: FontWeight.w600,
-                                    //fontFamily: "OpenSans",
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              child: Text('4/23'),
-                            ),
-                          ],
-                        ),
-                      ), // Origin Data
                       Container(
-                        margin: EdgeInsets.only(bottom: 24),
-                        width: MediaQuery.of(context).size.width * .12,
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.arrowCircleRight,
-                            color: Color.fromARGB(255, 34, 180, 222),
+                        width: MediaQuery.of(context).size.width,
+                        child: Card(
+                          margin: EdgeInsets.only(top: 8, left: 16, right: 16),
+                          elevation: 4,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          child: FlatButton(
+                            color: Colors.white,
+                            onPressed: () async {
+                              final List<DateTime> returnDatePicked =
+                                  await DateRangePicker.showDatePicker(
+                                      context: context,
+                                      initialFirstDate:
+                                          DateTime.now().add(Duration(days: 7)),
+                                      initialLastDate: (DateTime.now())
+                                          .add(Duration(days: 14)),
+                                      firstDate: DateTime(2019),
+                                      lastDate: DateTime(2020));
+                              if (returnDatePicked != null &&
+                                  returnDatePicked.length == 2) {
+                                print(returnDatePicked);
+                                _destinationDate = returnDatePicked.toList();
+                              }
+                            },
+                            child: Icon(Icons.date_range),
+                            /*child: Text(
+                              '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year} <-> ' +
+                                  '${DateTime.now().month}-${DateTime.now().day + 7}-${DateTime.now().year}' +
+                                  '$_originDate'
+                                  'yyyy-mm-dd <---> yyyy-mm-dd'
+                              ),*/
+                            //'Departure Date Picker'),
                           ),
                         ),
-                        padding: EdgeInsets.only(left: 8, right: 8),
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Card(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Color(0XFFE4E4E4),
-                              ),
-                              width: MediaQuery.of(context).size.width * .30,
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Center(
-                                child: Text(
-                                  '3 Stops',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * .30,
-                            //padding: EdgeInsets.only(bottom: 8),
-                            child: Center(
-                              child: Text(
-                                "${widget.data[i]['return_duration'].toString()}",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          )
-                        ],
                       ),
                       Container(
-                        margin: EdgeInsets.only(bottom: 24),
-                        width: MediaQuery.of(context).size.width * .12,
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.arrowCircleRight,
-                            color: Color.fromARGB(255, 34, 180, 222),
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(16),
                           ),
                         ),
-                        padding: EdgeInsets.only(left: 8, right: 8),
-                      ),
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            // Container(
-                            //   width: MediaQuery.of(context)
-                            //           .size
-                            //           .width *
-                            //       .15,
-                            //   child: Center(
-                            //     child: Text(
-                            //       "${widget.data[i]['cityTo'].toString()}",
-                            //       style: TextStyle(
-                            //           color: Colors
-                            //               .lightBlueAccent),
-                            //     ),
-                            //   ),
-                            // ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * .15,
-                              child: Center(
-                                child: Text(
-                                  "${widget.data[i]['flyFrom'].toString()}",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Color(0XFF4a4a4a),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              child: Text('4/23'),
-                            ),
-                          ],
+                        width: 300,
+                        child: FlatButton(
+                          //padding: EdgeInsets.all(16),
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black, width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(16))),
+                          color: Colors.lightGreenAccent,
+                          child: Text(
+                            'FIND TICKETS',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          onPressed: () {
+                            // _searchPageCollapseed();
+                            postToGlitchServer();
+                            PageItem(
+                              data: responseTicketData,
+                            );
+                            TicketListViewBuilder(
+                              data: responseTicketData,
+                            );
+                            // _pageviewcontroller.animateToPage(
+                            //   2,
+                            //   duration: Duration(milliseconds: 1000),
+                            //   curve: Curves.easeInOutExpo.flipped,
+                            // );
+                          },
                         ),
-                      ), // Destination Data
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          //Everything under
-        ],
+        ),
       ),
     );
   }
-}
 
-class PageItem extends StatelessWidget {
-  const PageItem({Key key, this.num, this.data}) : super(key: key);
-
-  final int num;
-  final List data;
-  @override
-  Widget build(BuildContext context) {
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
-
-    return Stack(children: <Widget>[
-      Material(
-        child: Column(
-          children: <Widget>[
-            Material(
-              child: Container(
-                height: MediaQuery.of(context).size.height * .33,
-                //margin: EdgeInsets.all(8),
-                //color: Color(0xc25737373),
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  //myLocationEnabled: true,
-                  //compassEnabled: true,
-                  //onMapCreated: _onMapCreated,
-                  //zoomGesturesEnabled: true,
-                  //markers: Set<Marker>.of(markers.values),
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(40.5436, -101.9734347),
-                    zoom: 1.0,
-                    tilt: 45,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(16))),
-              //margin: EdgeInsets.symmetric(horizontal: 8),
-              //height: mediaQuery.size.height * .33,
-              child: Hero(
-                tag: "card$num",
-                child: Material(
-                  type: MaterialType.card,
-                  elevation: 0,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                    //color: Colors.red,
-                    //child:Text("Card $num pressed\n${data[num]['flyFrom']}"),
-                    elevation: 8,
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(16)),
-                            color: Color.fromARGB(255, 100, 135, 165),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text(
-                                        "${data[num]['flyFrom'].toString()}",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ), //${data[num]['dTimeUTC'].toString()} UTC"),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(left: 8, right: 8),
-                                      child: Icon(
-                                        FontAwesomeIcons.exchangeAlt,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Container(
-                                      child: Text(
-                                        "${data[num]['flyTo'].toString()}",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ), //${data[num]['dTimeUTC'].toString()} UTC"),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                child: Text(
-                                  "\$${data[num]['price'].toString()}.00",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 32,
-
-                                    fontWeight: FontWeight.bold,
-                                    //fontWeight: FontWeight.w700,
-                                  ),
-                                ), // ${data[num]['aTimeUTC'].toString()} UTC"),
-                              ),
-                            ],
-                          ),
-                        ),
-                        //BlueBar
-                        Container(
-                          child: Column(
-                            children: <Widget>[
-                              //Divider(color: Colors.transparent,),
-                              Container(
-                                margin: EdgeInsets.only(top: 16),
-                                color: Colors.white,
-                                padding: EdgeInsets.only(left: 8, right: 8),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          // Container(
-                                          //   width: MediaQuery.of(context)
-                                          //           .size
-                                          //           .width *
-                                          //       .15,
-                                          //   child: Center(
-                                          //     child: Text(
-                                          //       "${data[num]['cityFrom'].toString()}",
-                                          //       style: TextStyle(
-                                          //           //fontFamily: "OpenSans",
-                                          //           //fontSize: 14,
-                                          //           color: Colors
-                                          //               .lightBlueAccent),
-                                          //     ),
-                                          //   ),
-                                          // ),
-
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .15,
-                                            child: Center(
-                                              child: Text(
-                                                "${data[num]['flyFrom'].toString()}",
-                                                style: TextStyle(
-                                                  fontSize: 28,
-                                                  color: Color(0XFF4a4a4a),
-                                                  fontWeight: FontWeight.w600,
-                                                  //fontFamily: "OpenSans",
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            child: Text('4/23'),
-                                          ),
-                                        ],
-                                      ),
-                                    ), // Origin Data
-                                    Container(
-                                      margin: EdgeInsets.only(bottom: 24),
-                                      width: MediaQuery.of(context).size.width *
-                                          .12,
-                                      child: Center(
-                                        child: Icon(
-                                          FontAwesomeIcons.arrowCircleRight,
-                                          color:
-                                              Color.fromARGB(255, 34, 180, 222),
-                                        ),
-                                      ),
-                                      padding:
-                                          EdgeInsets.only(left: 8, right: 8),
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        Container(
-                                          child: Card(
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: Color(0XFFE4E4E4),
-                                              ),
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .30,
-                                              //color: Color(0XFFE4E4E4),
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 8,
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '7 Stops',
-                                                  style: TextStyle(
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              .30,
-                                          //padding: EdgeInsets.only(bottom: 8),
-                                          child: Center(
-                                            child: Text(
-                                              "${data[num]['fly_duration'].toString()}",
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(bottom: 24),
-                                      width: MediaQuery.of(context).size.width *
-                                          .12,
-                                      child: Center(
-                                        child: Icon(
-                                          FontAwesomeIcons.arrowCircleRight,
-                                          color:
-                                              Color.fromARGB(255, 34, 180, 222),
-                                        ),
-                                      ),
-                                      padding:
-                                          EdgeInsets.only(left: 8, right: 8),
-                                    ),
-                                    Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          // Container(
-                                          //   width: MediaQuery.of(context)
-                                          //           .size
-                                          //           .width *
-                                          //       .15,
-                                          //   child: Center(
-                                          //     child: Text(
-                                          //       "${data[num]['cityTo'].toString()}",
-                                          //       style: TextStyle(
-                                          //           color: Colors
-                                          //               .lightBlueAccent),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .15,
-                                            child: Center(
-                                              child: Text(
-                                                "${data[num]['flyTo'].toString()}",
-                                                style: TextStyle(
-                                                  fontSize: 28,
-                                                  color: Color(0XFF4a4a4a),
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            child: Text('4/23'),
-                                          ),
-                                        ],
-                                      ),
-                                    ), // Destination Data
-                                  ],
-                                ),
-                              ),
-                              // if Roundtip
-                              Container(
-                                padding: EdgeInsets.only(left: 8, right: 8),
-                                child: Divider(
-                                  height: 25,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                  bottom: 16,
-                                ),
-                                color: Colors.white,
-                                padding: EdgeInsets.only(left: 8, right: 8),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .15,
-                                            child: Center(
-                                              child: Text(
-                                                "${data[num]['flyTo'].toString()}",
-                                                style: TextStyle(
-                                                  fontSize: 28,
-                                                  color: Color(0XFF4a4a4a),
-                                                  fontWeight: FontWeight.w600,
-                                                  //fontFamily: "OpenSans",
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            child: Text('4/23'),
-                                          ),
-                                        ],
-                                      ),
-                                    ), // Origin Data
-                                    Container(
-                                      margin: EdgeInsets.only(bottom: 24),
-                                      width: MediaQuery.of(context).size.width *
-                                          .12,
-                                      child: Center(
-                                        child: Icon(
-                                          FontAwesomeIcons.arrowCircleRight,
-                                          color:
-                                              Color.fromARGB(255, 34, 180, 222),
-                                        ),
-                                      ),
-                                      padding:
-                                          EdgeInsets.only(left: 8, right: 8),
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        Card(
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              color: Color(0XFFE4E4E4),
-                                            ),
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .30,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 8),
-                                            child: Center(
-                                              child: Text(
-                                                '3 Stops',
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              .30,
-                                          //padding: EdgeInsets.only(bottom: 8),
-                                          child: Center(
-                                            child: Text(
-                                              "${data[num]['return_duration'].toString()}",
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(bottom: 24),
-                                      width: MediaQuery.of(context).size.width *
-                                          .12,
-                                      child: Center(
-                                        child: Icon(
-                                          FontAwesomeIcons.arrowCircleRight,
-                                          color:
-                                              Color.fromARGB(255, 34, 180, 222),
-                                        ),
-                                      ),
-                                      padding:
-                                          EdgeInsets.only(left: 8, right: 8),
-                                    ),
-                                    Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          // Container(
-                                          //   width: MediaQuery.of(context)
-                                          //           .size
-                                          //           .width *
-                                          //       .15,
-                                          //   child: Center(
-                                          //     child: Text(
-                                          //       "${data[num]['cityTo'].toString()}",
-                                          //       style: TextStyle(
-                                          //           color: Colors
-                                          //               .lightBlueAccent),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .15,
-                                            child: Center(
-                                              child: Text(
-                                                "${data[num]['flyFrom'].toString()}",
-                                                style: TextStyle(
-                                                  fontSize: 28,
-                                                  color: Color(0XFF4a4a4a),
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            child: Text('4/23'),
-                                          ),
-                                        ],
-                                      ),
-                                    ), // Destination Data
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        //Everything under
-                      ],
-                    ),
-                  ),
-                  // child: ListTile(
-                  //   title: Text("Item $num"),
-                  //   subtitle: Text("This is item #$num"),
-                  // ),
-                  // itemCount: data.length,//data == null ? 0 : data.length,
-                  //     itemBuilder: (context, num) {
-                  //     return Card(
-                  //       child:
-                  //           Text("Card $num pressed\n${data[num]['flyFrom']}"),
-                  //     );
-                  //     },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(child: Text("Some more content goes here!")),
-            )
-          ],
-        ),
-      ),
-    ]);
-  }
-}
-
-// Login Page Code
-class LoginPage extends StatefulWidget {
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
-  final PageController _loginPageController = PageController();
-  final GlobalKey<FormState> _loginPageFormKey = GlobalKey<FormState>();
-
-  final TextEditingController _loginPageEmailController =
-      TextEditingController();
-  final TextEditingController _loginPagePasswordController =
-      TextEditingController();
-
-  //final GlobalKey<FormState> _signUpPageFormKey = GlobalKey<FormState>();
-
-  final TextEditingController _signUpPageUserNameController =
-      TextEditingController();
-
-  final TextEditingController _signUpPageEmailController =
-      TextEditingController();
-  final TextEditingController _signUpPagePasswordController =
-      TextEditingController();
-  final TextEditingController _signUpPagePasswordConfirmController =
-      TextEditingController();
-
-  String _userEmail, _userName, _userPhoto, _googleUserId;
-  String _githubAccessToken = 'd7b96d4da97bbfbb0a58068507d82a9bc9ef42b3';
-  bool _successSignInWithEmailPasswordLogin,
-      _successSignUpWithEmailPassword,
-      _successGoogleSignIn;
-
-  //double _pageViewContainerHeight ;
-
-//States
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Form(
-            key: _loginPageFormKey,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(8),
-                  child: Card(
-                    elevation: 4,
-                    shape: CircleBorder(
-                      side: BorderSide(
-                          style: BorderStyle.solid, color: Colors.blue),
-                    ),
-                    color: Colors.blue,
-                    child: Container(
-                      height: 150,
-                      width: 150,
-                      //color: Colors.blue,
-                      // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
-                      // color: Colors.blue),
-                      child: Center(
-                        child: Text(
-                          'FlyX',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 480,
-                  child: Center(
-                    child: PageView(
-                      controller: _loginPageController,
-                      // onPageChanged: (pageLocation) {
-                      //   if (pageLocation == 0) {
-                      //    setState(() {
-                      //      _pageViewContainerHeight = 300;
-                      //    });
-                      //   }else if(pageLocation == 1){
-                      //       setState(() {
-                      //      _pageViewContainerHeight = 400;
-                      //    });
-                      //   }
-                      // },
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 100, horizontal: 0),
-                          child: Card(
-                            elevation: 8,
-                            margin: EdgeInsets.all(16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                              side: BorderSide(color: Colors.black),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: 'Email',
-                                        icon: Icon(
-                                          Icons.mail_outline,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      style: TextStyle(color: Colors.black),
-                                      validator: (enteredEmail) =>
-                                          !(enteredEmail.contains('@'))
-                                              ? "Invalid Email"
-                                              : null,
-                                      controller: _loginPageEmailController,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                      obscureText: true,
-                                      validator: (enteredPassword) =>
-                                          enteredPassword.length < 6
-                                              ? 'Password too short.'
-                                              : null,
-                                      controller: _loginPagePasswordController,
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            Icons.lock_outline,
-                                            color: Colors.black,
-                                          ),
-                                          hintText: "Password"),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.google),
-                                          //label: Text("Google"),
-                                          onPressed: () async =>
-                                              authService.googleSignIn(),
-                                        ),
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.facebook),
-                                          //label: Text("Google"),
-                                          onPressed: () async {
-                                            //_signIn();
-                                          },
-                                        ),
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.twitter),
-                                          //label: Text("Google"),
-                                          onPressed: () async {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HomePage(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.github),
-                                          //label: Text("Google"),
-                                          onPressed: () async =>
-                                              authService.googleSignIn(),
-                                        ),
-                                        MaterialButton(
-                                          elevation: 8,
-                                          highlightElevation: 0,
-                                          padding: EdgeInsets.all(8),
-                                          color: Colors.lightGreenAccent,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                  color: Colors.black)),
-                                          child: Icon(
-                                            FontAwesomeIcons.signInAlt,
-                                            color: Colors.black,
-                                            size: 23,
-                                          ),
-                                          // Text(
-                                          //   'Login',
-                                          //   style: TextStyle(
-                                          //       fontWeight: FontWeight.w700,
-                                          //       fontSize: 22),
-                                          // ),
-                                          onPressed: () async {
-                                            if (_loginPageFormKey.currentState
-                                                .validate()) {
-                                              authService
-                                                  .signInWithEmailAndPassword(
-                                                      _loginPageEmailController,
-                                                      _loginPagePasswordController);
-                                              if (_successSignInWithEmailPasswordLogin) {
-                                                print(
-                                                  'Welcome ' + _userEmail,
-                                                );
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomePage(),
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 25, horizontal: 0),
-                          child: Card(
-                            elevation: 8,
-                            margin: EdgeInsets.all(16),
-                            //color: Color.fromARGB(255, 247, 247, 247),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                              side: BorderSide(color: Colors.black),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: 'Username',
-                                        icon: Icon(
-                                          FontAwesomeIcons.user,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      style: TextStyle(color: Colors.black),
-                                      validator: (enteredEmail) =>
-                                          (enteredEmail.length > 0)
-                                              ? null
-                                              : "Invalid Email",
-                                      controller: _signUpPageUserNameController,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: 'Email',
-                                        icon: Icon(
-                                          Icons.mail_outline,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      style: TextStyle(color: Colors.black),
-                                      validator: (enteredEmail) =>
-                                          !(enteredEmail.contains('@'))
-                                              ? "Invalid Email"
-                                              : null,
-                                      controller: _signUpPageEmailController,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                      obscureText: true,
-                                      validator: (enteredPassword) =>
-                                          enteredPassword.length < 6
-                                              ? 'Password too short.'
-                                              : null,
-                                      controller: _signUpPagePasswordController,
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            Icons.lock_outline,
-                                            color: Colors.black,
-                                          ),
-                                          hintText: "Password"),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                      obscureText: true,
-                                      validator: (enteredPassword) =>
-                                          enteredPassword.length < 6
-                                              ? 'Password too short.'
-                                              : null,
-                                      controller:
-                                          _signUpPagePasswordConfirmController,
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          icon: Icon(
-                                            Icons.lock_outline,
-                                            color: Colors.black,
-                                          ),
-                                          hintText: "Confirm Password"),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.google),
-                                          //label: Text("Google"),
-                                          onPressed: () async {},
-                                        ),
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(
-                                              FontAwesomeIcons.facebookSquare),
-                                          //label: Text("Google"),
-                                          onPressed: () async {
-                                            //_signIn();
-                                          },
-                                        ),
-                                        IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(FontAwesomeIcons.twitter),
-                                          //label: Text("Google"),
-                                          onPressed: () async {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HomePage(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        MaterialButton(
-                                          elevation: 8,
-                                          highlightElevation: 0,
-                                          padding: EdgeInsets.all(8),
-                                          color: Colors.lightGreenAccent,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                  color: Colors.black)),
-                                          child: Icon(
-                                            FontAwesomeIcons.signInAlt,
-                                            color: Colors.black,
-                                            size: 23,
-                                          ),
-                                          // Text(
-                                          //   'Login',
-                                          //   style: TextStyle(
-                                          //       fontWeight: FontWeight.w700,
-                                          //       fontSize: 22),
-                                          // ),
-                                          onPressed: () async {
-                                            if (_loginPageFormKey.currentState
-                                                .validate()) {
-                                              authService.signUpWithEmailAndPassword(
-                                                  context,
-                                                  _signUpPageUserNameController,
-                                                  _signUpPageEmailController,
-                                                  _signUpPagePasswordConfirmController);
-                                              if (_successSignInWithEmailPasswordLogin) {
-                                                print(
-                                                  'Welcome ' + _userEmail,
-                                                );
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomePage(),
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text('Need an Account?'),
-                        Text(
-                          ' Sign Up',
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      _loginPageController.animateToPage(
-                        1,
-                        curve: Curves.easeInOutExpo,
-                        duration: Duration(milliseconds: 1000),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+  Container _menuLayer(_color2) {
+    final MediaQueryData _mediaQuery = MediaQuery.of(context);
+    final dynamic _menuLayerWidth = _mediaQuery.size.width;
+    return Container(
+      color: _color2,
+      width: _menuLayerWidth * .95,
+      margin: EdgeInsets.only(left: _menuLayerWidth * .025),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          FlatButton(
+            child: Text('ONE WAY'),
+            color: Colors.white,
+            onPressed: () {},
           ),
-        ),
+          FlatButton(
+            child: Text(''),
+            color: Colors.transparent,
+            onPressed: null,
+            disabledColor: Colors.transparent,
+          ),
+          FlatButton(
+            child: Text('ROUND TRIP'),
+            color: Colors.white,
+            onPressed: () {},
+          ),
+        ],
       ),
     );
   }
 
   @override
   void dispose() {
-    _loginPageEmailController.dispose();
-    _loginPagePasswordController.dispose();
     super.dispose();
+    _controller.dispose();
   }
 
-  // Sign in/up with email and password hooked to FireBase.
-
-}
-
-class RootPage extends StatefulWidget {
-  @override
-  _RootPageState createState() => _RootPageState();
-}
-
-class _RootPageState extends State<RootPage> {
-  Map<String, dynamic> _profile;
-  bool _loading = false;
   @override
   void initState() {
     super.initState();
+
     authService.profile.listen((state) => setState(() => _profile = state));
 
     authService.loading.listen((state) => setState(() => _loading = state));
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: authService.user,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return HomePage();
-        } else {
-          return LoginPage();
-        }
-      },
-    );
+    _isFromOpen = false;
+    _isToOpen = false;
+
+    _controller = RubberAnimationController(
+        vsync: this,
+        dismissable: true,
+        halfBoundValue: AnimationControllerValue(percentage: 0.5),
+        duration: Duration(milliseconds: 200));
   }
 }

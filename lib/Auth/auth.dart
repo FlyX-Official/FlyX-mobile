@@ -8,13 +8,9 @@ import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'home.dart';
+import 'package:flyx/HomePage/home.dart';
 
-String userEmail, userName, userPhoto, _googleUserId;
-String _githubAccessToken = 'd7b96d4da97bbfbb0a58068507d82a9bc9ef42b3';
-bool _successSignInWithEmailPasswordLogin,
-    _successSignUpWithEmailPassword,
-    _successGoogleSignIn;
+String userEmail, userName, userPhoto;
 
 class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -30,6 +26,8 @@ class AuthService {
   Observable<FirebaseUser> user; // firebase user
   Observable<Map<String, dynamic>> profile; // custom user data in Firestore
   PublishSubject loading = PublishSubject();
+
+  bool _successSignInWithEmailPasswordLogin,_successSignUpWithEmailPassword;
 
   // constructor
   AuthService() {
@@ -76,7 +74,7 @@ class AuthService {
       Navigator.push(
         context,
         MaterialPageRoute(
-          maintainState: false,
+          maintainState: true,
           builder: (context) => HomePage(),
         ),
       );
@@ -125,8 +123,9 @@ class AuthService {
       'displayName': user.displayName,
       'methodSignedIn': 'Using Google Sign In',
       'lastSeen': DateTime.now()
-    },merge: true);
+    }, merge: true);
   }
+
   void updateUserDataEmailReSignIn(FirebaseUser user) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
 
@@ -137,11 +136,13 @@ class AuthService {
       //'displayName': user.displayName,
       'lastSeen': DateTime.now(),
       'methodSignedIn': 'Using Email Password Sign In'
-    },merge: true);
+    }, merge: true);
   }
 
-    void updateUserDataEmailPassword(FirebaseUser user, TextEditingController _signUpPageUserNameController,
-    ) async {
+  void updateUserDataEmailPassword(
+    FirebaseUser user,
+    TextEditingController _signUpPageUserNameController,
+  ) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
 
     return ref.setData({
@@ -165,5 +166,4 @@ class AuthService {
   }
 }
 
-// TODO refactor global to InheritedWidget
 final AuthService authService = AuthService();
