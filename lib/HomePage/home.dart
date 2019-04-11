@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 final GoogleSignIn _googleSignIn = GoogleSignIn();
+
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
 
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   GlobalKey _rubberBotSheetKey = GlobalKey();
 
+  PageController lowerLayerPageViewController;
 
   _HomePageState() {
     authService.profile.listen((state) => setState(() => _profile = state));
@@ -83,7 +85,6 @@ class _HomePageState extends State<HomePage>
 
   bool _isFromOpen, _isToOpen;
 
-
   GoogleSignInAccount _currentUser;
 
   TextEditingController _from = TextEditingController();
@@ -112,6 +113,7 @@ class _HomePageState extends State<HomePage>
     var _color2 = Color.fromARGB(255, 46, 209, 153);
     return SafeArea(
       child: Scaffold(
+        
         appBar: AppBar(
           backgroundColor: _color2,
           shape: RoundedRectangleBorder(
@@ -135,14 +137,64 @@ class _HomePageState extends State<HomePage>
                       return Container(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            Padding(
+                            Container(
+                             // color: Color.fromARGB(255, 46, 209, 153),
                               padding: const EdgeInsets.all(8.0),
-                              child: ModalDrawerHandle(),
+                              child: ModalDrawerHandle(
+                                handleColor: Color.fromARGB(255, 46, 209, 153),
+                              ),
                             ),
                             Container(
                               height: _mediaQuery.size.height * .50,
-                              child: authService.getProfile(),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                      height: 175,
+                                      child: authService.getProfile()),
+                                  Container(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        Card(
+                                          elevation: 8,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                          child: ListTile(
+                                            leading:
+                                                Icon(Icons.monetization_on),
+                                            title: Text("Preferred Currency"),
+                                          ),
+                                        ),
+                                        Card(
+                                          elevation: 8,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                          child: ListTile(
+                                            leading:
+                                                Icon(Icons.local_airport),
+                                            title: Text("Preferred Airport"),
+                                          ),
+                                        ),
+                                        Card(
+                                          color: Colors.white,
+                                          child: MaterialButton(
+                                            child: Text('Sign OUT'),
+                                            onPressed: () async {
+                                              authService.signOut();
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             )
                           ],
                         ),
@@ -154,7 +206,7 @@ class _HomePageState extends State<HomePage>
             )
           ],
         ),
-        backgroundColor: _backGroundColor,
+        backgroundColor: _color2,
         body: _buildBody(
             _mediaQuery, _backGroundColor, _upperLayerWidth, _color2),
         drawer: Drawer(
@@ -225,8 +277,37 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       backgroundColor: _backGroundColor,
       body: Container(
-        child: TicketListViewBuilder(
-          data: responseTicketData,
+        child: PageView(
+          controller: lowerLayerPageViewController,
+          scrollDirection: Axis.horizontal,
+          //onPageChanged: ,
+          children: <Widget>[
+            Container(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                //margin: EdgeInsets.all(8),
+                //color: Color(0xc25737373),
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  //myLocationEnabled: true,
+                  //compassEnabled: true,
+                  //onMapCreated: _onMapCreated,
+                  zoomGesturesEnabled: true,
+                  markers: Set<Marker>.of(markers.values),
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(40.5436, -101.9734347),
+                    zoom: 1.0,
+                    tilt: 45,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              child: TicketListViewBuilder(
+                data: responseTicketData,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -519,13 +600,14 @@ class _HomePageState extends State<HomePage>
   Container _upperLayer(_mediaQuery, _upperLayerWidth, _color2) {
     var _upperLayerColor2 = Color.fromARGB(75, 46, 209, 153);
     return Container(
+      height: 550,
       width: _upperLayerWidth,
       color: _upperLayerColor2,
       child: SingleChildScrollView(
         child: Form(
           key: _tickerSearchFormKey,
           child: Container(
-            height: 550,
+            height: 1000,
             color: _upperLayerColor2,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -805,6 +887,7 @@ class _HomePageState extends State<HomePage>
                           ),
                           onPressed: () {
                             // _searchPageCollapseed();
+                            _collapse();
                             postToGlitchServer();
                             PageItem(
                               data: responseTicketData,
@@ -812,11 +895,11 @@ class _HomePageState extends State<HomePage>
                             TicketListViewBuilder(
                               data: responseTicketData,
                             );
-                            // _pageviewcontroller.animateToPage(
-                            //   2,
-                            //   duration: Duration(milliseconds: 1000),
-                            //   curve: Curves.easeInOutExpo.flipped,
-                            // );
+                            lowerLayerPageViewController.animateToPage(
+                              1,
+                              duration: Duration(milliseconds: 1000),
+                              curve: Curves.easeInOutExpo,
+                            );
                           },
                         ),
                       ),
@@ -835,8 +918,9 @@ class _HomePageState extends State<HomePage>
     final MediaQueryData _mediaQuery = MediaQuery.of(context);
     final dynamic _menuLayerWidth = _mediaQuery.size.width;
     return Container(
-      color: _color2,
+      
       width: _menuLayerWidth * .95,
+      decoration: BoxDecoration(color: _color2, border: Border.all(color: Colors.black)),
       margin: EdgeInsets.only(left: _menuLayerWidth * .025),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -846,7 +930,7 @@ class _HomePageState extends State<HomePage>
           FlatButton(
             child: Text('ONE WAY'),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: null,
           ),
           FlatButton(
             child: Text(''),
@@ -857,7 +941,9 @@ class _HomePageState extends State<HomePage>
           FlatButton(
             child: Text('TWO WAY'),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              _expand();
+            },
           ),
         ],
       ),
@@ -896,15 +982,19 @@ class _HomePageState extends State<HomePage>
     _controller.animationState.addListener(_stateListener);
   }
 
+  void _collapse() {
+    _controller.collapse();
+  }
+
+  void _expand() {
+    _controller.expand();
+  }
+
   void _stateListener() {
     print("state changed ${_controller.animationState.value}");
   }
 
   void _statusListener(AnimationStatus status) {
     print("changed status ${_controller.status}");
-  }
-
-  void _expand() {
-    _controller.expand();
   }
 }

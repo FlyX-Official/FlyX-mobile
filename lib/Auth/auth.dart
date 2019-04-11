@@ -169,7 +169,7 @@ class AuthService {
   }
 
   Widget getProfile() {
-    //silentGoogleSignIn();
+    silentGoogleSignIn();
     return StreamBuilder<QuerySnapshot>(
       stream: authService._db.collection('UsersDetails').snapshots(),
       builder: (context, snapshot) {
@@ -182,6 +182,7 @@ class AuthService {
                 accountEmail: Text(document['displayName']),
                 currentAccountPicture:
                     Image.network(document['photoURL'].toString()),
+                    
               );
             },
           ).toList(),

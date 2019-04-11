@@ -91,6 +91,7 @@ import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //import '../TicketDisplayer/ticketCard.dart';
 
@@ -994,46 +995,46 @@ class _HomePageState extends State<HomePage>
                                     ),
                                   ),
                                   SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              .50,
-                                      child: ListView(
-                                        physics: BouncingScrollPhysics(),
-                                        children: <Widget>[
-                                          Container(
-                                            margin: EdgeInsets.all(10),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: <Widget>[
-                                                Card(
-                                                  elevation: 8,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: ListTile(
-                                                    leading: Icon(
-                                                        Icons.monetization_on),
-                                                    title: Text(
-                                                        "Preferred Airport"),
-                                                  ),
+                                    height: MediaQuery.of(context).size.height *
+                                        .50,
+                                    child: ListView(
+                                      physics: BouncingScrollPhysics(),
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: <Widget>[
+                                              Card(
+                                                elevation: 8,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16)),
+                                                child: ListTile(
+                                                  leading: Icon(
+                                                      Icons.monetization_on),
+                                                  title:
+                                                      Text("Preferred Airport"),
                                                 ),
-                                                Card(
-                                                  color: Colors.white,
-                                                  child: MaterialButton(
-                                                    child: Text('Sign OUT'),
-                                                    onPressed: () async {
-                                                      authService.signOut();
-                                                    },
-                                                  ),
+                                              ),
+                                              Card(
+                                                color: Colors.white,
+                                                child: MaterialButton(
+                                                  child: Text('Sign OUT'),
+                                                  onPressed: () async {
+                                                    authService.signOut();
+                                                  },
                                                 ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      )),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             );
@@ -1107,7 +1108,7 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
     dynamic responsePageItemTicketData = widget.data;
     return SafeArea(
       child: Container(
-       padding: EdgeInsets.only(bottom: 65),
+        padding: EdgeInsets.only(bottom: 65),
         child: ListView.builder(
           itemCount: widget.data == null ? 0 : widget.data.length,
           itemBuilder: (context, i) {
@@ -1594,8 +1595,9 @@ class PageItem extends StatelessWidget {
                       children: <Widget>[
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(topLeft:Radius.circular(16),
-                            topRight:Radius.circular(16)),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16)),
                             color: Color.fromARGB(255, 100, 135, 165),
                           ),
                           padding: EdgeInsets.symmetric(
@@ -2006,6 +2008,21 @@ class PageItem extends StatelessWidget {
                   //     );
                   //     },
                 ),
+              ),
+            ),
+            Container(
+              child: RaisedButton(
+                color: Colors.lightGreenAccent,
+                onPressed: () async {
+                  String url = data[1]['deep_link'];
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                    print(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: Text('Purchase ticket '),
               ),
             ),
             Expanded(
