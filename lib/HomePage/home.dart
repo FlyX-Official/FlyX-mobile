@@ -1,3 +1,79 @@
+// import 'package:flutter/material.dart';
+// import 'auth.dart';
+
+// class MyApp1 extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'FlutterBase',
+//       home: Scaffold(
+//         appBar: AppBar(
+//           title: Text('Flutterbase'),
+//           backgroundColor: Colors.amber,
+//         ),
+//         body: Center(
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: <Widget>[LoginButton(), UserProfile()],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class UserProfile extends StatefulWidget {
+//   @override
+//   UserProfileState createState() => UserProfileState();
+// }
+
+// class UserProfileState extends State<UserProfile> {
+//   Map<String, dynamic> _profile;
+//   bool _loading = false;
+
+//   @override
+//   initState() {
+//     super.initState();
+//     authService.profile.listen((state) => setState(() => _profile = state));
+
+//     authService.loading.listen((state) => setState(() => _loading = state));
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(children: <Widget>[
+//       Container(padding: EdgeInsets.all(20), child: Text(_profile.toString())),
+//       Container(padding: EdgeInsets.all(20), child: Text(_profile.values.first)),
+//       Container(padding:EdgeInsets.all(20), child: Text('Loading: ${_loading.toString()}')),
+//     ]);
+//   }
+// }
+
+// class LoginButton extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder(
+//         stream: authService.user,
+//         builder: (context, snapshot) {
+//           if (snapshot.hasData) {
+//             return MaterialButton(
+//               onPressed: () => authService.signOut(),
+//               color: Colors.red,
+//               textColor: Colors.white,
+//               child: Text('Signout'),
+//             );
+//           } else {
+//             return MaterialButton(
+//               onPressed: () => authService.googleSignIn(),
+//               color: Colors.white,
+//               textColor: Colors.black,
+//               child: Text('Login with Google'),
+//             );
+//           }
+//         });
+//   }
+// }
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -8,7 +84,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flyx/style/theme.dart' as Theme;
+import 'package:flyx/HomePage/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,16 +93,11 @@ import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 //import '../TicketDisplayer/ticketCard.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-final GoogleSignIn _googleSignIn = GoogleSignIn();
-
 class HomePage extends StatefulWidget {
   static String tag = 'Home-page';
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -34,6 +105,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   _HomePageState() {
+    authService.profile.listen((state) => setState(() => _profile = state));
+
+    authService.loading.listen((state) => setState(() => _loading = state));
     _from.addListener(() {
       if (_from.text.isEmpty) {
         setState(() {
@@ -79,11 +153,10 @@ class _HomePageState extends State<HomePage>
   MarkerId selectedMarker;
   var ticketresponses;
 
-  GoogleSignInAccount _currentUser;
   Completer<GoogleMapController> _customGoogleMapController = Completer();
   List<DateTime> _destinationDate;
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _from = TextEditingController();
+
   var _fromSlider = 1;
   PageController _inputPage;
   bool _isFromOpen;
@@ -104,7 +177,7 @@ class _HomePageState extends State<HomePage>
   String _searchToField = "";
   List<String> _searchToList = List();
   List<String> _tmpList = List();
-  //TextEditingController _from = TextEditingController();
+  TextEditingController _from = TextEditingController();
   TextEditingController _to = TextEditingController();
 
   var _toSlider = 1;
@@ -120,6 +193,11 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+
+    authService.profile.listen((state) => setState(() => _profile = state));
+
+    authService.loading.listen((state) => setState(() => _loading = state));
+
     _isSearching = false;
     _isFromOpen = false;
     _isToOpen = false;
@@ -127,30 +205,11 @@ class _HomePageState extends State<HomePage>
     _rubberController = RubberAnimationController(
         vsync: this,
         dismissable: false,
-        upperBoundValue: AnimationControllerValue(percentage: .9),
+        upperBoundValue: AnimationControllerValue(percentage: .97),
         halfBoundValue: AnimationControllerValue(pixel: 500),
         lowerBoundValue: AnimationControllerValue(pixel: 94),
         duration: Duration(milliseconds: 200));
     _rubberController.addStatusListener(_statusListener);
-
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      _currentUser = account;
-      ticketresponses = TicketListViewBuilder(
-        data: responseTicketData,
-      );
-
-      setState(() {
-        _currentUser = account;
-
-        ticketresponses = TicketListViewBuilder(
-          data: responseTicketData,
-        );
-        PageItem(
-          data: responseTicketData,
-        );
-      });
-    });
-    _googleSignIn.signInSilently();
     TicketListViewBuilder(
       data: responseTicketData,
     );
@@ -220,21 +279,21 @@ class _HomePageState extends State<HomePage>
             title: Text('$fromItem'),
             onTap: () {
               print('$fromItem selected');
-              setState(() {
-                _from.text = fromItem;
-                //_onTap = true;
-                //_isSearching = false;
+
+              _from.text = fromItem;
+              _searchFromField = fromItem;
+
+              print(_searchFromField);
+              if (_searchFromField.isEmpty) {
                 _isFromOpen = false;
-                _isToOpen = false;
-              });
-              /*if (form == 'to') {
                 setState(() {
-                form.text = item;
-                _onTap = true;
-                _isSearching = false;
-                _isToOpen = true;
-              });
-              }*/
+                  _from.text = fromItem;
+                  _searchFromField = fromItem;
+                  _isFromOpen = false;
+                  _isToOpen = false;
+                });
+              }
+              _isFromOpen = false;
             },
           );
         },
@@ -488,6 +547,7 @@ class _HomePageState extends State<HomePage>
 
                               onFieldSubmitted: (String value) {
                                 print("$value submitted");
+
                                 setState(() {
                                   _from.text = value;
                                   _isFromOpen = false;
@@ -811,75 +871,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  void showModalMenu() {
-    showRoundedModalBottomSheet(
-      context: context,
-      radius: 16,
-      color: Color.fromARGB(255, 247, 247, 247),
-      builder: (BuildContext context) {
-        return Container(
-          //color: Colors.black54,
-          child: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                SizedBox(
-                    height: MediaQuery.of(context).size.height * .50,
-                    child: ListView(
-                      physics: BouncingScrollPhysics(),
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Card(
-                            elevation: 8,
-                            child: UserAccountsDrawerHeader(
-                              accountName:
-                                  Text("Name: ${_currentUser.displayName}"),
-                              accountEmail:
-                                  Text("Email: ${_currentUser.email}"),
-                              currentAccountPicture:
-                                  Image.network(_currentUser.photoUrl),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Card(
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16)),
-                                child: ListTile(
-                                  leading: Icon(Icons.attach_money),
-                                  title: Text("Currency"),
-                                ),
-                              ),
-                              Card(
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16)),
-                                child: ListTile(
-                                  leading: Icon(Icons.monetization_on),
-                                  title: Text("Preferred Airport"),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    )),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Map<String, Object> postToGlitchServerData() {
     return {
       'oneWay': false,
@@ -901,7 +892,6 @@ class _HomePageState extends State<HomePage>
 
   postToGlitchServer() {
     var testData = postToGlitchServerData();
-
     var testDataEnc = json.encode(testData);
     print(testDataEnc);
     var url =
@@ -910,26 +900,31 @@ class _HomePageState extends State<HomePage>
       url,
       body: testDataEnc,
       headers: {"Content-Type": "application/json"},
-    ).then((response) {
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-      dynamic responseData = jsonDecode(response.body);
-      responseTicketData = responseData["data"];
-      TicketListViewBuilder(
-        data: responseTicketData,
-      );
-      PageItem(
-        data: responseTicketData,
-      );
-      setState(() {
-        var responseData = json.decode(response.body);
-        //search_par = responseData["tickets"]["search_params"];
+    ).then(
+      (response) {
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        dynamic responseData = jsonDecode(response.body);
         responseTicketData = responseData["data"];
-      });
-    });
-
-//http.read("https://olivine-pamphlet.glitch.me/").then(print);
+        TicketListViewBuilder(
+          data: responseTicketData,
+        );
+        PageItem(
+          data: responseTicketData,
+        );
+        setState(
+          () {
+            var responseData = json.decode(response.body);
+            //search_par = responseData["tickets"]["search_params"];
+            responseTicketData = responseData["data"];
+          },
+        );
+      },
+    );
   }
+
+  Map<String, dynamic> _profile;
+  bool _loading = false;
 
 //end autocomplete
   @override
@@ -973,7 +968,81 @@ class _HomePageState extends State<HomePage>
                   elevation: 0,
                   actions: <Widget>[
                     IconButton(
-                      onPressed: () => showModalMenu(),
+                      onPressed: () async {
+                        return showRoundedModalBottomSheet(
+                          context: context,
+                          radius: 16,
+                          color: Color.fromARGB(255, 247, 247, 247),
+                          builder: (BuildContext context) {
+                            return SingleChildScrollView(
+                              physics: BouncingScrollPhysics(),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: StreamBuilder(
+                                      stream: authService.user,
+                                      builder: (context, snapshot) {
+                                        return UserAccountsDrawerHeader(
+                                          accountName:
+                                              Text(_profile.toString()),
+                                          accountEmail:
+                                              Text(_profile.toString()),
+                                          // currentAccountPicture:
+                                          //     Image.network(_profile.toString()),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              .50,
+                                      child: ListView(
+                                        physics: BouncingScrollPhysics(),
+                                        children: <Widget>[
+                                          Container(
+                                            margin: EdgeInsets.all(10),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: <Widget>[
+                                                Card(
+                                                  elevation: 8,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16)),
+                                                  child: ListTile(
+                                                    leading: Icon(
+                                                        Icons.monetization_on),
+                                                    title: Text(
+                                                        "Preferred Airport"),
+                                                  ),
+                                                ),
+                                                Card(
+                                                  color: Colors.white,
+                                                  child: MaterialButton(
+                                                    child: Text('Sign OUT'),
+                                                    onPressed: () async {
+                                                      authService.signOut();
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      )),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                       icon: Icon(
                         Icons.account_box,
                         color: Colors.black,
@@ -986,82 +1055,6 @@ class _HomePageState extends State<HomePage>
           ],
         ), //_getLowerLayer(context),
         resizeToAvoidBottomInset: false,
-
-        /*bottomNavigationBar: BottomAppBar(
-          notchMargin: 8,
-          elevation: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.explore),
-                  color: Colors.black,
-                  highlightColor: Colors.redAccent,
-                  onPressed: () {
-                    _rubberController
-                        .setVisibility(!_rubberController.visibility.value);
-                  }, //() async => await _buildShowRoundedModalBottomSheet(context), //showMenu,
-                ),
-              ),
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.edit_location),
-                  color: Colors.black,
-                  highlightColor: Colors.redAccent,
-                  onPressed: _halfExpand, //showMenu,
-                ),
-              ),
-              Container(
-                //color: Colors.lightGreenAccent,
-
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(width: 2, color: Colors.black),
-                  ),
-                  color: Colors.lightGreenAccent,
-                  child: IconButton(
-                    icon: Icon(Icons.search),
-                    color: Colors.black,
-                    highlightColor: Colors.redAccent,
-                    onPressed: () {
-                      postToGlitchServer();
-                      PageItem(
-                        data: responseTicketData,
-                      );
-                      TicketListViewBuilder(
-                        data: responseTicketData,
-                      );
-                      _pageviewcontroller.animateToPage(
-                        2,
-                        duration: Duration(milliseconds: 1000),
-                        curve: Curves.easeInOutExpo.flipped,
-                      );
-                    }, //showMenu,
-                  ),
-                ),
-              ),
-              Container(
-                child: IconButton(
-                  icon: Icon(Icons.notifications),
-                  color: Colors.black,
-                  highlightColor: Colors.blue,
-                  onPressed: _collapse, //showMenu,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.account_box),
-                color: Colors.black,
-                highlightColor: Colors.orange,
-                onPressed: () => showModalMenu(),
-              ),
-            ],
-          ),
-        ),
-      */
       ),
     );
   }
@@ -1117,6 +1110,7 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
     dynamic responsePageItemTicketData = widget.data;
     return SafeArea(
       child: Container(
+        padding: EdgeInsets.only(top: 56, bottom: 94),
         child: ListView.builder(
           itemCount: widget.data == null ? 0 : widget.data.length,
           itemBuilder: (context, i) {
@@ -1279,7 +1273,9 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
                               ),
                             ),
                             Container(
-                              child: Text('4/23'),
+                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).day.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).month.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).year.toString()}"),
                             ),
                           ],
                         ),
@@ -1375,7 +1371,9 @@ class _TicketListViewBuilder extends State<TicketListViewBuilder> {
                               ),
                             ),
                             Container(
-                              child: Text('4/23'),
+                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).day.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).month.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).year.toString()}"),
                             ),
                           ],
                         ),
@@ -2024,805 +2022,543 @@ class PageItem extends StatelessWidget {
 
 // Login Page Code
 class LoginPage extends StatefulWidget {
-  static String tag = 'login-page';
-  final Widget child;
-
-  LoginPage({Key key, this.child}) : super(key: key);
-
+  @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _pageController = PageController();
-  final _loginPageController = PageController();
-  final _signUpPageController = PageController();
-  //SignIn Controllers
-  final TextEditingController _signInEmailController = TextEditingController();
-  final TextEditingController _signInPasswordController =
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
+  final PageController _loginPageController = PageController();
+  final GlobalKey<FormState> _loginPageFormKey = GlobalKey<FormState>();
+
+  final TextEditingController _loginPageEmailController =
+      TextEditingController();
+  final TextEditingController _loginPagePasswordController =
       TextEditingController();
 
-  final TextEditingController _signUpNameController = TextEditingController();
-  final TextEditingController _signUpEmailController = TextEditingController();
-  final TextEditingController _signUpPasswordController =
-      TextEditingController();
-  final TextEditingController _signUpPasswordConfirmController =
+  //final GlobalKey<FormState> _signUpPageFormKey = GlobalKey<FormState>();
+
+  final TextEditingController _signUpPageUserNameController =
       TextEditingController();
 
-  final GlobalKey<FormState> _signInFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> _signupFormKey = GlobalKey<FormState>();
+  final TextEditingController _signUpPageEmailController =
+      TextEditingController();
+  final TextEditingController _signUpPagePasswordController =
+      TextEditingController();
+  final TextEditingController _signUpPagePasswordConfirmController =
+      TextEditingController();
 
-  String userEmailStore = "";
-  bool _successSignUp;
-  bool _successLogin;
-  String _userEmail = "";
-  String _errorMessage = "";
-  GoogleSignInAccount _currentUser;
-  bool _success;
-  String _userID;
-  String _uName;
-  String _uEmail;
-  bool _uVerfied;
-  String _uPhoto;
-  Type _uRunTimeType;
-  String _uPhone;
+  String _userEmail, _userName, _userPhoto, _googleUserId;
+  String _githubAccessToken = 'd7b96d4da97bbfbb0a58068507d82a9bc9ef42b3';
+  bool _successSignInWithEmailPasswordLogin,
+      _successSignUpWithEmailPassword,
+      _successGoogleSignIn;
 
+  //double _pageViewContainerHeight ;
+
+//States
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      setState(() {
-        _currentUser = account;
-        if (_googleSignIn.isSignedIn == true) {
-          Navigator.of(context).pushNamed(HomePage.tag);
-        }
-      });
-    });
-    _googleSignIn.signInSilently();
   }
 
+  @override
   Widget build(BuildContext context) {
-    dynamic _height = MediaQuery.of(context).size.height;
-    dynamic _width = MediaQuery.of(context).size.width;
-    dynamic _fourFifthsWidth = _width * .85;
-
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: Center(
-        child: Container(
-          color: Color.fromARGB(255, 247, 247, 247),
-          child: PageView(
-            physics: BouncingScrollPhysics(),
-            controller: _pageController,
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              Center(
-                  child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Container(
-                      child: Card(
-                        elevation: 8,
-                        shape: CircleBorder(
-                          side: BorderSide(
-                              style: BorderStyle.solid, color: Colors.blue),
-                        ),
-                        color: Colors.blue,
-                        child: Container(
-                          height: 150,
-                          width: 150,
-                          //color: Colors.blue,
-                          // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
-                          // color: Colors.blue),
-                          child: Center(
-                            child: Text(
-                              'FlyX',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(25),
-                      child: Column(
-                        children: <Widget>[
-                          Card(
-                            elevation: 8,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(16),
-                              ),
-                            ),
-                            child:
-                                buildSignIn(_height, _width, _fourFifthsWidth),
-                          ),
-                          Card(
-                            margin: EdgeInsets.all(8),
-                            elevation: 8,
-                            color: Colors.lightGreenAccent,
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8))),
-                            child: buildLoginCard(),
-                          )
-                          // RaisedButton.icon(
-                          //   color: Colors.white,
-                          //   icon: Icon(FontAwesomeIcons.mailchimp),
-                          //   label: Text("Guest"),
-                          //   shape: RoundedRectangleBorder(
-                          //     borderRadius: BorderRadius.circular(8),
-                          //   ),
-                          //   elevation: 8,
-                          //   onPressed: () {
-                          //     //_signInAnonymously();
-                          //     Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) => HomePage()),
-                          //     );
-                          //   },
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: FlatButton(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text('Need an Account?'),
-                            Text(
-                              ' Sign up',
-                              style: TextStyle(
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          _pageController.animateToPage(
-                            1,
-                            curve: Curves.easeInOutExpo,
-                            duration: Duration(milliseconds: 1000),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-              Center(
-                  child: Container(
-                      child: buildSignUp(_height, _width, _fourFifthsWidth))),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-//Login Code Begin
-  SingleChildScrollView buildSignIn(_height, _width, _fourFifthsWidth) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      controller: _loginPageController,
-      child: Form(
-        key: _signInFormKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          // mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Container(
-              width: _fourFifthsWidth,
-              child: signInEmail("Email", Icons.mail_outline),
-            ),
-            Container(
-              width: _fourFifthsWidth,
-              child: signInPassword("Password", Icons.lock_outline),
-              //margin: EdgeInsets.only(bottom: 35),
-            ),
-            // Container(
-            //   //rmargin: EdgeInsets.only(top:125),
-            //   child: buildLoginCard(),
-            // ),
-            Container(
-              child:
-                  buildThirdPartySignIn(), //google,facebook,twitter signin buttons
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Container signInEmail(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        //color: Colors.red,
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(16),
-        //     topRight: Radius.circular(16),
-        //   ),
-        // ),
-        elevation: 0,
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: TextFormField(
-            autofocus: false,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signInEmailController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              //border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (String value) {
-              if (value.isEmpty) {
-                return 'Please enter some text';
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container signInPassword(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.only(
-        //     bottomLeft: Radius.circular(16),
-        //     bottomRight: Radius.circular(16),
-        //   ),
-        // ),
-        elevation: 0,
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: TextFormField(
-            autofocus: false,
-            obscureText: true,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signInPasswordController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              //border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (String value) {
-              if (value.isEmpty) {
-                return 'Please enter some text';
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  dynamic buildLoginCard() {
-    return FlatButton.icon(
-      highlightColor: Colors.transparent,
-      splashColor: Theme.Colors.loginGradientEnd,
-      color: Colors.lightGreenAccent,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8.0))),
-      icon: Icon(Icons.security),
-      padding: EdgeInsets.all(8),
-      label: Text(
-        "Sign In",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 22.0,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      onPressed: _emailPasswordSignIn,
-    );
-  }
-
-  Padding buildSeparator() {
-    return Padding(
-      padding: EdgeInsets.all(15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Colors.white10,
-                    Colors.white,
-                  ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(1.0, 1.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
-            ),
-            width: MediaQuery.of(context).size.width * .33,
-            height: 1.0,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Colors.white,
-                    Colors.white10,
-                  ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(1.0, 1.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
-            ),
-            width: MediaQuery.of(context).size.width * .33,
-            height: 1.0,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _emailPasswordSignIn() async {
-    final formState = _signInFormKey.currentState;
-    bool alertError = false;
-    if (_signInFormKey.currentState.validate()) {
-      formState.save();
-      try {
-        FirebaseUser userLoginEmailPassword;
-        userLoginEmailPassword = await _auth.signInWithEmailAndPassword(
-          email: _signInEmailController.text,
-          password: _signInPasswordController.text,
-        );
-        print("UserName: ${userLoginEmailPassword.displayName}");
-        userEmailStore = userLoginEmailPassword.displayName;
-        Navigator.of(context).pushNamed(HomePage.tag);
-      } catch (e) {
-        print(e.message);
-        alertError = true;
-      }
-    }
-    if (alertError == true) {
-      return AlertDialog(
-        title: Text('Error loggin in'),
-        content: Text('Re-enter ID/Passowrd'),
-      );
-    }
-  }
-
-  ButtonBar buildThirdPartySignIn() {
-    return ButtonBar(
-      alignment: MainAxisAlignment.spaceAround,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        IconButton(
-          color: Colors.black,
-          icon: Icon(FontAwesomeIcons.google),
-          //label: Text("Google"),
-          onPressed: () async {
-            _signIn();
-           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ),
-            );
-          },
-        ),
-        IconButton(
-          color: Colors.black,
-          icon: Icon(FontAwesomeIcons.facebook),
-          //label: Text("Google"),
-          onPressed: () async {
-            _signIn();
-          },
-        ),
-        IconButton(
-          color: Colors.black,
-          icon: Icon(FontAwesomeIcons.twitter),
-          //label: Text("Google"),
-          onPressed: () async {
-            _signIn();
-          },
-        ),
-        RaisedButton.icon(
-          color: Colors.lightGreenAccent,
-          icon: Icon(FontAwesomeIcons.mailchimp),
-          label: Text("Guest"),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          elevation: 8,
-          highlightElevation: 2,
-          onPressed: () {
-            //_signInAnonymously();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ),
-            );
-          },
-        ),
-        /*RaisedButton.icon(
-          color: Colors.white,
-          icon: Icon(FontAwesomeIcons.acquisitionsIncorporated),
-          label: Text("Anonymous Login"),
-          onPressed: () {
-            _signInAnonymously();
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          },
-        ),*/
-      ],
-    );
-  }
-
-  void _signInAnonymously() async {
-    final FirebaseUser user = await _auth.signInAnonymously();
-    assert(user != null);
-    assert(user.isAnonymous);
-    assert(!user.isEmailVerified);
-    assert(await user.getIdToken() != null);
-    if (Platform.isIOS) {
-      // Anonymous auth doesn't show up as a provider on iOS
-      assert(user.providerData.isEmpty);
-    } else if (Platform.isAndroid) {
-      // Anonymous auth does show up as a provider on Android
-      assert(user.providerData.length == 1);
-      assert(user.providerData[0].providerId == 'firebase');
-      assert(user.providerData[0].uid != null);
-      assert(user.providerData[0].displayName == null);
-      assert(user.providerData[0].photoUrl == null);
-      assert(user.providerData[0].email == null);
-    }
-
-    final FirebaseUser fireCurrentUser = await _auth.currentUser();
-    assert(user.uid == fireCurrentUser.uid);
-    setState(() {
-      if (user != null) {
-        _success = true;
-        _userID = user.uid;
-      } else {
-        _success = false;
-      }
-    });
-  }
-
-  Future<void> _signIn() async {
-    try {
-      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final FirebaseUser user = await _auth.signInWithCredential(credential);
-      print("signed in " + user.displayName);
-    } catch (error) {
-      print(error);
-    }
-  }
-//Login Code End
-
-//SignUp Code Begin
-
-  SingleChildScrollView buildSignUp(_height, _width, _fourFifthsWidth) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      controller: _signUpPageController,
-      //height: _height * .5,
-      //color: Color.fromARGB(0, 73, 144, 226), //Colors.white,
-      child: Form(
-        key: _signupFormKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          //mainAxisSize: MainAxisSize.min,
-          /* alignment: AlignmentDirectional.center,
-          overflow: Overflow.clip,
-          fit: StackFit.loose,*/
-          children: <Widget>[
-            /*Container(
-              height: _height * .33,
-              width: _width,
-              color: Color.fromARGB(255, 73, 144, 226),//Colors.black,
-              child: Image.network(
-                  'https://avatars0.githubusercontent.com/u/43255530?s=200&v=4'),
-            ),*/
-            //Logo PlaceHolder
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              //mainAxisSize: MainAxisSize.min,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Form(
+            key: _loginPageFormKey,
+            child: Column(
               children: <Widget>[
                 Container(
-                  child: _showErrorMessage(),
-                ),
-                Container(
-                  width: _fourFifthsWidth,
-                  child: signUpName("Name", Icons.mail_outline),
-                ),
-                Container(
-                  width: _fourFifthsWidth,
-                  child: signUpEmail("Email", Icons.mail_outline),
-                ),
-                Container(
-                  width: _fourFifthsWidth,
-                  child: signUpPassword("Password", Icons.lock_outline),
-                ),
-                Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  overflow: Overflow.visible,
-                  children: <Widget>[
-                    Container(
-                      width: _fourFifthsWidth,
-                      margin: EdgeInsets.only(bottom: 25),
-                      child: signUpPasswordConfirmation(
-                          "Confirmation", Icons.lock_outline),
+                  padding: EdgeInsets.all(8),
+                  child: Card(
+                    elevation: 4,
+                    shape: CircleBorder(
+                      side: BorderSide(
+                          style: BorderStyle.solid, color: Colors.blue),
                     ),
-                    Container(
-                      child: buildSignUpCard(),
+                    color: Colors.blue,
+                    child: Container(
+                      height: 150,
+                      width: 150,
+                      //color: Colors.blue,
+                      // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
+                      // color: Colors.blue),
+                      child: Center(
+                        child: Text(
+                          'FlyX',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ),
                     ),
-                  ],
+                  ),
                 ),
                 Container(
-                  child: buildSeparator(),
+                  height: 480,
+                  child: Center(
+                    child: PageView(
+                      controller: _loginPageController,
+                      // onPageChanged: (pageLocation) {
+                      //   if (pageLocation == 0) {
+                      //    setState(() {
+                      //      _pageViewContainerHeight = 300;
+                      //    });
+                      //   }else if(pageLocation == 1){
+                      //       setState(() {
+                      //      _pageViewContainerHeight = 400;
+                      //    });
+                      //   }
+                      // },
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 100, horizontal: 0),
+                          child: Card(
+                            elevation: 8,
+                            margin: EdgeInsets.all(16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              side: BorderSide(color: Colors.black),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: 'Email',
+                                        icon: Icon(
+                                          Icons.mail_outline,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.black),
+                                      validator: (enteredEmail) =>
+                                          !(enteredEmail.contains('@'))
+                                              ? "Invalid Email"
+                                              : null,
+                                      controller: _loginPageEmailController,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: TextFormField(
+                                      obscureText: true,
+                                      validator: (enteredPassword) =>
+                                          enteredPassword.length < 6
+                                              ? 'Password too short.'
+                                              : null,
+                                      controller: _loginPagePasswordController,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          icon: Icon(
+                                            Icons.lock_outline,
+                                            color: Colors.black,
+                                          ),
+                                          hintText: "Password"),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.google),
+                                          //label: Text("Google"),
+                                          onPressed: () async =>
+                                              authService.googleSignIn(),
+                                        ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.facebook),
+                                          //label: Text("Google"),
+                                          onPressed: () async {
+                                            //_signIn();
+                                          },
+                                        ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.twitter),
+                                          //label: Text("Google"),
+                                          onPressed: () async {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.github),
+                                          //label: Text("Google"),
+                                          onPressed: () async =>
+                                              authService.googleSignIn(),
+                                        ),
+                                        MaterialButton(
+                                          elevation: 8,
+                                          highlightElevation: 0,
+                                          padding: EdgeInsets.all(8),
+                                          color: Colors.lightGreenAccent,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              side: BorderSide(
+                                                  color: Colors.black)),
+                                          child: Icon(
+                                            FontAwesomeIcons.signInAlt,
+                                            color: Colors.black,
+                                            size: 23,
+                                          ),
+                                          // Text(
+                                          //   'Login',
+                                          //   style: TextStyle(
+                                          //       fontWeight: FontWeight.w700,
+                                          //       fontSize: 22),
+                                          // ),
+                                          onPressed: () async {
+                                            if (_loginPageFormKey.currentState
+                                                .validate()) {
+                                              authService
+                                                  .signInWithEmailAndPassword(
+                                                      _loginPageEmailController,
+                                                      _loginPagePasswordController);
+                                              if (_successSignInWithEmailPasswordLogin) {
+                                                print(
+                                                  'Welcome ' + _userEmail,
+                                                );
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomePage(),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 25, horizontal: 0),
+                          child: Card(
+                            elevation: 8,
+                            margin: EdgeInsets.all(16),
+                            //color: Color.fromARGB(255, 247, 247, 247),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              side: BorderSide(color: Colors.black),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: 'Username',
+                                        icon: Icon(
+                                          FontAwesomeIcons.user,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.black),
+                                      validator: (enteredEmail) =>
+                                          (enteredEmail.length > 0)
+                                              ? null
+                                              : "Invalid Email",
+                                      controller: _signUpPageUserNameController,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: 'Email',
+                                        icon: Icon(
+                                          Icons.mail_outline,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      style: TextStyle(color: Colors.black),
+                                      validator: (enteredEmail) =>
+                                          !(enteredEmail.contains('@'))
+                                              ? "Invalid Email"
+                                              : null,
+                                      controller: _signUpPageEmailController,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: TextFormField(
+                                      obscureText: true,
+                                      validator: (enteredPassword) =>
+                                          enteredPassword.length < 6
+                                              ? 'Password too short.'
+                                              : null,
+                                      controller: _signUpPagePasswordController,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          icon: Icon(
+                                            Icons.lock_outline,
+                                            color: Colors.black,
+                                          ),
+                                          hintText: "Password"),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: TextFormField(
+                                      obscureText: true,
+                                      validator: (enteredPassword) =>
+                                          enteredPassword.length < 6
+                                              ? 'Password too short.'
+                                              : null,
+                                      controller:
+                                          _signUpPagePasswordConfirmController,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          icon: Icon(
+                                            Icons.lock_outline,
+                                            color: Colors.black,
+                                          ),
+                                          hintText: "Confirm Password"),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: Divider(
+                                      color: Colors.black,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.google),
+                                          //label: Text("Google"),
+                                          onPressed: () async {},
+                                        ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(
+                                              FontAwesomeIcons.facebookSquare),
+                                          //label: Text("Google"),
+                                          onPressed: () async {
+                                            //_signIn();
+                                          },
+                                        ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.twitter),
+                                          //label: Text("Google"),
+                                          onPressed: () async {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        MaterialButton(
+                                          elevation: 8,
+                                          highlightElevation: 0,
+                                          padding: EdgeInsets.all(8),
+                                          color: Colors.lightGreenAccent,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              side: BorderSide(
+                                                  color: Colors.black)),
+                                          child: Icon(
+                                            FontAwesomeIcons.signInAlt,
+                                            color: Colors.black,
+                                            size: 23,
+                                          ),
+                                          // Text(
+                                          //   'Login',
+                                          //   style: TextStyle(
+                                          //       fontWeight: FontWeight.w700,
+                                          //       fontSize: 22),
+                                          // ),
+                                          onPressed: () async {
+                                            if (_loginPageFormKey.currentState
+                                                .validate()) {
+                                              authService.signUpWithEmailAndPassword(
+                                                  context,
+                                                  _signUpPageUserNameController,
+                                                  _signUpPageEmailController,
+                                                  _signUpPagePasswordConfirmController);
+                                              if (_successSignInWithEmailPasswordLogin) {
+                                                print(
+                                                  'Welcome ' + _userEmail,
+                                                );
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomePage(),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 Container(
-                  child:
-                      buildThirdPartySignIn(), //google,facebook,twitter signin buttons
+                  child: FlatButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text('Need an Account?'),
+                        Text(
+                          ' Sign Up',
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      _loginPageController.animateToPage(
+                        1,
+                        curve: Curves.easeInOutExpo,
+                        duration: Duration(milliseconds: 1000),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Card buildSignUpCard() {
-    return Card(
-      elevation: 8,
-      color: Colors.lightGreenAccent,
-      child: FlatButton.icon(
-        color: Colors.lightGreenAccent,
-        highlightColor: Colors.transparent,
-        splashColor: Theme.Colors.loginGradientEnd,
-        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        icon: Icon(Icons.security),
-        label: Text(
-          "SIGN UP",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 25.0,
-            fontFamily: "Nunito",
-          ),
-        ),
-        onPressed: () async {
-          if (_signupFormKey.currentState.validate()) {
-            _register();
-            //_authenticate;
-          }
-          Navigator.of(context).pushNamed(HomePage.tag);
-        },
-        /*() {
-                     //Navigator.of(context).pushNamed(FloatActBttn.tag);
-                      Navigator.of(context).pushNamed(InputForm.tag);
-                    }*/
-      ),
-    );
-  }
-
-  void _register() async {
-    final FirebaseUser user = await _auth.createUserWithEmailAndPassword(
-      email: _signUpEmailController.text,
-      password: _signUpPasswordController.text,
-    );
-
-    if (user != null) {
-      //Navigator.of(context).pushNamed(InputForm.tag);
-      setState(() {
-        _successSignUp = true;
-        _userEmail = user.email;
-      });
-    } else {
-      _successSignUp = false;
-    }
-  }
-
-  Widget _showErrorMessage() {
-    if (_errorMessage.length > 0 && _errorMessage != null) {
-      return new Text(
-        _errorMessage,
-        style: TextStyle(
-            fontSize: 13.0,
-            color: Colors.red,
-            height: 1.0,
-            fontWeight: FontWeight.w300),
-      );
-    } else {
-      return new Container(
-        height: 0.0,
-      );
-    }
-  }
-
-  Container signUpName(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 8,
-        child: Padding(
-          padding: EdgeInsets.all(25.0),
-          child: TextFormField(
-            autofocus: false,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signUpNameController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Name cannot be Empty';
-              }
-            },
           ),
         ),
       ),
     );
   }
 
-  Container signUpEmail(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 8,
-        child: Padding(
-          padding: EdgeInsets.all(25.0),
-          child: TextFormField(
-            autofocus: false,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signUpEmailController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (String value) {
-              if (value.isEmpty) {
-                return 'Email field cannot be empty';
-              }
-            },
-          ),
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _loginPageEmailController.dispose();
+    _loginPagePasswordController.dispose();
+    super.dispose();
   }
 
-  Container signUpPassword(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 8,
-        child: Padding(
-          padding: EdgeInsets.all(25.0),
-          child: TextFormField(
-            autofocus: false,
-            obscureText: true,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signUpPasswordController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (String value) {
-              if (value.isEmpty) {
-                return 'Password Field cannot be empty';
-              }
-            },
-          ),
-        ),
-      ),
-    );
+  // Sign in/up with email and password hooked to FireBase.
+
+}
+
+class RootPage extends StatefulWidget {
+  @override
+  _RootPageState createState() => _RootPageState();
+}
+
+class _RootPageState extends State<RootPage> {
+  Map<String, dynamic> _profile;
+  bool _loading = false;
+  @override
+  void initState() {
+    super.initState();
+    authService.profile.listen((state) => setState(() => _profile = state));
+
+    authService.loading.listen((state) => setState(() => _loading = state));
   }
 
-  Container signUpPasswordConfirmation(String text, dynamic fieldIcon) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 8,
-        child: Padding(
-          padding: EdgeInsets.all(25.0),
-          child: TextFormField(
-            autofocus: false,
-            obscureText: true,
-            //focusNode: myFocusNodeEmailLogin,
-            controller: _signUpPasswordConfirmController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                fontFamily: "Nunito", fontSize: 16.0, color: Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              icon: Icon(
-                fieldIcon,
-                color: Colors.redAccent,
-                size: 22.0,
-              ),
-              hintText: text,
-              hintStyle: TextStyle(fontFamily: "Nunito", fontSize: 17.0),
-            ),
-            validator: (String value) {
-              if (value.isEmpty) {
-                return 'Confirmation Field cannot be empty.';
-              }
-            },
-          ),
-        ),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: authService.user,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return HomePage();
+        } else {
+          return LoginPage();
+        }
+      },
     );
   }
-//SignUp Code End
 }

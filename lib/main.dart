@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flyx/HomePage/home.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 
 void main() {
   SystemChrome.setEnabledSystemUIOverlays([]);
@@ -10,18 +10,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  GoogleSignInAccount _currentUser;
-  final routes = <String, WidgetBuilder>{
-  };
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'OpenSans'),
-      home: LoginPage(),
-      routes: routes,
-
+      home: RootPage(),
     );
   }
 }
