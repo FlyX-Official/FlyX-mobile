@@ -8,11 +8,14 @@ import 'package:flyx/HomePage/oldhome.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:groovin_widgets/groovin_widgets.dart';
+import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
+final GoogleSignIn _googleSignIn = GoogleSignIn();
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
 
@@ -23,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   GlobalKey _rubberBotSheetKey = GlobalKey();
+
 
   _HomePageState() {
     authService.profile.listen((state) => setState(() => _profile = state));
@@ -79,6 +83,9 @@ class _HomePageState extends State<HomePage>
 
   bool _isFromOpen, _isToOpen;
 
+
+  GoogleSignInAccount _currentUser;
+
   TextEditingController _from = TextEditingController();
   TextEditingController _to = TextEditingController();
 
@@ -119,7 +126,30 @@ class _HomePageState extends State<HomePage>
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
                 icon: Icon(Icons.account_box),
-                onPressed: () {},
+                onPressed: () {
+                  return showRoundedModalBottomSheet(
+                    autoResize: true,
+                    context: context,
+                    dismissOnTap: true,
+                    builder: (BuildContext context) {
+                      return Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ModalDrawerHandle(),
+                            ),
+                            Container(
+                              height: _mediaQuery.size.height * .50,
+                              child: authService.getProfile(),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             )
           ],
@@ -129,13 +159,23 @@ class _HomePageState extends State<HomePage>
             _mediaQuery, _backGroundColor, _upperLayerWidth, _color2),
         drawer: Drawer(
           elevation: 8,
-          child: Container(
-            height: 300,
-            child: UserAccountsDrawerHeader(
-              currentAccountPicture: null,
-              accountEmail: Text('Maheshwar.ravuri@gmail.com'),
-              accountName: Text('Maheshwar Ravuri'),
-            ),
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: 300,
+                child: UserAccountsDrawerHeader(
+                  currentAccountPicture: null,
+                  accountEmail: Text('Maheshwar.ravuri@gmail.com'),
+                  accountName: Text('Maheshwar Ravuri'),
+                ),
+              ),
+              Container(
+                child: FlatButton(
+                  child: Text('Sign Out'),
+                  onPressed: () => authService.signOut(),
+                ),
+              ),
+            ],
           ),
         ),
         resizeToAvoidBottomInset: true,
@@ -509,7 +549,6 @@ class _HomePageState extends State<HomePage>
                       Container(
                         margin: EdgeInsets.only(left: 8, right: 8),
                         child: Card(
-                          
                           elevation: 4,
                           color: Colors.white,
                           child: Padding(
@@ -816,7 +855,7 @@ class _HomePageState extends State<HomePage>
             disabledColor: Colors.transparent,
           ),
           FlatButton(
-            child: Text('ROUND TRIP'),
+            child: Text('TWO WAY'),
             color: Colors.white,
             onPressed: () {},
           ),
@@ -835,6 +874,8 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
 
+    _googleSignIn.signInSilently();
+
     authService.profile.listen((state) => setState(() => _profile = state));
 
     authService.loading.listen((state) => setState(() => _loading = state));
@@ -845,7 +886,25 @@ class _HomePageState extends State<HomePage>
     _controller = RubberAnimationController(
         vsync: this,
         dismissable: true,
-        halfBoundValue: AnimationControllerValue(percentage: 0.5),
-        duration: Duration(milliseconds: 200));
+        lowerBoundValue: AnimationControllerValue(percentage: 0.1),
+        halfBoundValue: AnimationControllerValue(pixel: 500),
+        upperBoundValue: AnimationControllerValue(percentage: 0.975),
+        duration: Duration(milliseconds: 200),
+        animationBehavior: AnimationBehavior.preserve);
+
+    _controller.addStatusListener(_statusListener);
+    _controller.animationState.addListener(_stateListener);
+  }
+
+  void _stateListener() {
+    print("state changed ${_controller.animationState.value}");
+  }
+
+  void _statusListener(AnimationStatus status) {
+    print("changed status ${_controller.status}");
+  }
+
+  void _expand() {
+    _controller.expand();
   }
 }

@@ -11,15 +11,10 @@ import 'package:rxdart/rxdart.dart';
 import 'package:flyx/HomePage/home.dart';
 
 String userEmail, userName, userPhoto;
-
+GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 class AuthService {
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>[
-      'email',
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
-    ],
-  );
+  GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
 
@@ -27,7 +22,11 @@ class AuthService {
   Observable<Map<String, dynamic>> profile; // custom user data in Firestore
   PublishSubject loading = PublishSubject();
 
-  bool _successSignInWithEmailPasswordLogin,_successSignUpWithEmailPassword;
+  bool _successSignInWithEmailPasswordLogin, _successSignUpWithEmailPassword;
+
+  String _userID;
+
+  bool _success;
 
   // constructor
   AuthService() {
@@ -100,9 +99,11 @@ class AuthService {
       );
 
       final FirebaseUser user = await _auth.signInWithCredential(credential);
-      print("Using Google signed in " + user.displayName);
+      // print("Using Google signed in " + user.displayName);
+      // updateUserDataGoogleSignIn(user);
+      // print("user name: ${user.displayName}");
       updateUserDataGoogleSignIn(user);
-      print("user name: ${user.displayName}");
+      print("Google SIgn IN Email: ${user.email}");
 
       loading.add(false);
       return user;
@@ -113,9 +114,7 @@ class AuthService {
 
   void updateUserDataGoogleSignIn(FirebaseUser user) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
-    userEmail = user.email;
-    userName = user.displayName;
-    userPhoto = user.photoUrl;
+      
     return ref.setData({
       'uid': user.uid,
       'email': user.email,
@@ -158,11 +157,37 @@ class AuthService {
   Future<String> signOut() async {
     try {
       await _auth.signOut();
-      await _googleSignIn.signOut();
+      await _googleSignIn.disconnect();
       return 'SignOut';
     } catch (e) {
       return e.toString();
     }
+  }
+
+  void silentGoogleSignIn() {
+    _googleSignIn.signInSilently();
+  }
+
+  Widget getProfile() {
+    //silentGoogleSignIn();
+    return StreamBuilder<QuerySnapshot>(
+      stream: authService._db.collection('UsersDetails').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const Text('Loading...');
+        return ListView(
+          children: snapshot.data.documents.map(
+            (DocumentSnapshot document) {
+              return UserAccountsDrawerHeader(
+                accountName: Text(document['methodSignedIn']),
+                accountEmail: Text(document['displayName']),
+                currentAccountPicture:
+                    Image.network(document['photoURL'].toString()),
+              );
+            },
+          ).toList(),
+        );
+      },
+    );
   }
 }
 
