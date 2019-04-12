@@ -96,9 +96,9 @@ flutter:
           - asset: lib/assets/fonts/OpenSans-Regular.ttf
           - asset: lib/assets/fonts/OpenSans-SemiBold.ttf           
           - asset: lib/assets/fonts/OpenSans-SemiBoldItalic.ttf           
-      - family: Dokdo
+      - family: Fredoka
         fonts:
-          - asset: lib/assets/fonts/Dokdo-Regular.ttf
+          - asset: lib/assets/fonts/FredokaOne-Regular.ttf
             
     
   # For details regarding fonts from package dependencies,

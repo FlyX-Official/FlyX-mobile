@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 46, 209, 153),
+      backgroundColor: const Color.fromARGB(255, 100, 135, 165),
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 8),
@@ -59,15 +59,16 @@ class _LoginPageState extends State<LoginPage>
                 Container(
                   padding: EdgeInsets.all(8),
                   child: Card(
-                    elevation: 4,
+                    elevation: 2,
                     shape: CircleBorder(
                       side: BorderSide(
-                          style: BorderStyle.solid, color: Colors.blue),
+                          style: BorderStyle.solid,
+                          color: Color.fromARGB(255, 46, 209, 153)),
                     ),
-                    color: Colors.blue,
+                    color: Color.fromARGB(255, 46, 209, 153),
                     child: Container(
-                      height: 150,
-                      width: 150,
+                      height: 200,
+                      width: 200,
                       //color: Colors.blue,
                       // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
                       // color: Colors.blue),
@@ -75,9 +76,12 @@ class _LoginPageState extends State<LoginPage>
                         child: Text(
                           'FlyX',
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700),
+                            fontFamily: 'Fredoka',
+                            //fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -108,7 +112,7 @@ class _LoginPageState extends State<LoginPage>
                             margin: EdgeInsets.all(16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
-                              side: BorderSide(color: Colors.black),
+                              // side: BorderSide(color: Colors.black),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -213,15 +217,16 @@ class _LoginPageState extends State<LoginPage>
                                           elevation: 8,
                                           highlightElevation: 0,
                                           padding: EdgeInsets.all(8),
-                                          color: Colors.lightGreenAccent,
+                                          color:
+                                              Color.fromARGB(255, 46, 209, 153),
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                  color: Colors.black)),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            //side: BorderSide(color: Colors.black),
+                                          ),
                                           child: Icon(
                                             FontAwesomeIcons.signInAlt,
-                                            color: Colors.black,
+                                            color: Colors.white,
                                             size: 23,
                                           ),
                                           // Text(
@@ -269,7 +274,7 @@ class _LoginPageState extends State<LoginPage>
                             //color: Color.fromARGB(255, 247, 247, 247),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
-                              side: BorderSide(color: Colors.black),
+                              // side: BorderSide(color: Colors.black),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -416,19 +421,26 @@ class _LoginPageState extends State<LoginPage>
                                             );
                                           },
                                         ),
+                                        IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(FontAwesomeIcons.github),
+                                          //label: Text("Google"),
+                                          onPressed: () async =>
+                                              authService.googleSignIn(),
+                                        ),
                                         MaterialButton(
                                           elevation: 8,
                                           highlightElevation: 0,
                                           padding: EdgeInsets.all(8),
-                                          color: Colors.lightGreenAccent,
+                                          color: Color.fromARGB(255, 46, 209, 153),
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                  color: Colors.black)),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            //side:BorderSide(color: Colors.black),
+                                          ),
                                           child: Icon(
                                             FontAwesomeIcons.signInAlt,
-                                            color: Colors.black,
+                                            color: Colors.white,
                                             size: 23,
                                           ),
                                           // Text(
@@ -481,7 +493,7 @@ class _LoginPageState extends State<LoginPage>
                         Text(
                           ' Sign Up',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: Color.fromARGB(255, 46, 209, 153),
                           ),
                         ),
                       ],

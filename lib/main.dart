@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flyx/RootPage/root.dart';
 
 void main() {
-  SystemChrome.setEnabledSystemUIOverlays([]);
+  //SystemChrome.setEnabledSystemUIOverlays([]);
   runApp(MyApp());
 }
 

@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   GlobalKey _rubberBotSheetKey = GlobalKey();
 
-  PageController lowerLayerPageViewController;
+  final lowerLayerPageViewController= PageController();
 
   _HomePageState() {
     authService.profile.listen((state) => setState(() => _profile = state));
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage>
     final MediaQueryData _mediaQuery = MediaQuery.of(context);
     final dynamic _upperLayerWidth = _mediaQuery.size.width * .95;
     final dynamic _backGroundColor = Color.fromARGB(255, 247, 247, 247);
-    var _color2 = Color.fromARGB(255, 46, 209, 153);
+    var _color2 = Color.fromARGB(255, 100, 135, 165);
     return SafeArea(
       child: Scaffold(
         
@@ -280,6 +280,7 @@ class _HomePageState extends State<HomePage>
         child: PageView(
           controller: lowerLayerPageViewController,
           scrollDirection: Axis.horizontal,
+          physics: BouncingScrollPhysics(),
           //onPageChanged: ,
           children: <Widget>[
             Container(
@@ -544,7 +545,7 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Map<String, Object> postToGlitchServerData() {
+  Map<String, Object> postToHerokuServerData() {
     return {
       'oneWay': false,
       'from': "${_from.text}",
@@ -563,8 +564,8 @@ class _HomePageState extends State<HomePage>
     };
   }
 
-  postToGlitchServer() {
-    var testData = postToGlitchServerData();
+  postToHerokuServer() {
+    var testData = postToHerokuServerData();
     var testDataEnc = json.encode(testData);
     print(testDataEnc);
     var url =
@@ -888,7 +889,7 @@ class _HomePageState extends State<HomePage>
                           onPressed: () {
                             // _searchPageCollapseed();
                             _collapse();
-                            postToGlitchServer();
+                            postToHerokuServer();
                             PageItem(
                               data: responseTicketData,
                             );
@@ -898,7 +899,7 @@ class _HomePageState extends State<HomePage>
                             lowerLayerPageViewController.animateToPage(
                               1,
                               duration: Duration(milliseconds: 1000),
-                              curve: Curves.easeInOutExpo,
+                              curve: Curves.easeInOutExpo.flipped,
                             );
                           },
                         ),
