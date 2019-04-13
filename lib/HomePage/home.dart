@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   GlobalKey _rubberBotSheetKey = GlobalKey();
 
-  final lowerLayerPageViewController= PageController();
+  final lowerLayerPageViewController = PageController();
 
   _HomePageState() {
     authService.profile.listen((state) => setState(() => _profile = state));
@@ -113,7 +113,6 @@ class _HomePageState extends State<HomePage>
     var _color2 = Color.fromARGB(255, 100, 135, 165);
     return SafeArea(
       child: Scaffold(
-        
         appBar: AppBar(
           backgroundColor: _color2,
           shape: RoundedRectangleBorder(
@@ -140,7 +139,7 @@ class _HomePageState extends State<HomePage>
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
                             Container(
-                             // color: Color.fromARGB(255, 46, 209, 153),
+                              // color: Color.fromARGB(255, 46, 209, 153),
                               padding: const EdgeInsets.all(8.0),
                               child: ModalDrawerHandle(
                                 handleColor: Color.fromARGB(255, 46, 209, 153),
@@ -176,8 +175,7 @@ class _HomePageState extends State<HomePage>
                                               borderRadius:
                                                   BorderRadius.circular(16)),
                                           child: ListTile(
-                                            leading:
-                                                Icon(Icons.local_airport),
+                                            leading: Icon(Icons.local_airport),
                                             title: Text("Preferred Airport"),
                                           ),
                                         ),
@@ -213,18 +211,24 @@ class _HomePageState extends State<HomePage>
           elevation: 8,
           child: Column(
             children: <Widget>[
-              Container(
-                height: 300,
-                child: UserAccountsDrawerHeader(
-                  currentAccountPicture: null,
-                  accountEmail: Text('Maheshwar.ravuri@gmail.com'),
-                  accountName: Text('Maheshwar Ravuri'),
-                ),
+              Expanded(
+                child: Align(
+                    alignment: FractionalOffset.topCenter,
+                    child: authService.buildDrawerHeader()),
               ),
               Container(
-                child: FlatButton(
+                child: RaisedButton(
                   child: Text('Sign Out'),
                   onPressed: () => authService.signOut(),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: IconButton(
+                    leading: Icon(Icons.settings),
+                    title: Text('Settings'),
+                  ),
                 ),
               ),
             ],
@@ -919,9 +923,9 @@ class _HomePageState extends State<HomePage>
     final MediaQueryData _mediaQuery = MediaQuery.of(context);
     final dynamic _menuLayerWidth = _mediaQuery.size.width;
     return Container(
-      
       width: _menuLayerWidth * .95,
-      decoration: BoxDecoration(color: _color2, border: Border.all(color: Colors.black)),
+      decoration: BoxDecoration(
+          color: _color2, border: Border.all(color: Colors.black)),
       margin: EdgeInsets.only(left: _menuLayerWidth * .025),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -960,8 +964,6 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-
-    _googleSignIn.signInSilently();
 
     authService.profile.listen((state) => setState(() => _profile = state));
 

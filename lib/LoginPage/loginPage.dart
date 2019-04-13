@@ -211,7 +211,7 @@ class _LoginPageState extends State<LoginPage>
                                           icon: Icon(FontAwesomeIcons.github),
                                           //label: Text("Google"),
                                           onPressed: () async =>
-                                              authService.googleSignIn(),
+                                              authService.signInWithGoogle(),
                                         ),
                                         MaterialButton(
                                           elevation: 8,

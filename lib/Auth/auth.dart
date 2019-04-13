@@ -10,11 +10,16 @@ import 'package:rxdart/rxdart.dart';
 
 import 'package:flyx/HomePage/home.dart';
 
-String userEmail, userName, userPhoto;
-GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+String userEmail, userName, userPhoto, fireStoreUid;
+
 class AuthService {
-  GoogleSignIn _googleSignIn = GoogleSignIn();
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>[
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/userinfo.email'
+    ],
+  );
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
 
@@ -86,7 +91,7 @@ class AuthService {
     }
   }
 
-  Future<FirebaseUser> googleSignIn() async {
+  dynamic googleSignIn() async {
     try {
       loading.add(true);
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
@@ -112,9 +117,29 @@ class AuthService {
     }
   }
 
-  void updateUserDataGoogleSignIn(FirebaseUser user) async {
+  dynamic signInWithGoogle() async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final FirebaseUser user = await _auth.signInWithCredential(credential);
+    assert(user.email != null);
+    assert(user.displayName != null);
+    assert(!user.isAnonymous);
+    assert(await user.getIdToken() != null);
+
+    final FirebaseUser currentUser = await _auth.currentUser();
+    assert(user.uid == currentUser.uid);
+    updateUserDataGoogleSignIn(user);
+  }
+
+  dynamic updateUserDataGoogleSignIn(FirebaseUser user) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
-      
+
+    fireStoreUid = user.uid;
     return ref.setData({
       'uid': user.uid,
       'email': user.email,
@@ -128,6 +153,7 @@ class AuthService {
   void updateUserDataEmailReSignIn(FirebaseUser user) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
 
+    fireStoreUid = user.uid;
     return ref.setData({
       'uid': user.uid,
       'email': user.email,
@@ -144,6 +170,7 @@ class AuthService {
   ) async {
     DocumentReference ref = _db.collection('UsersDetails').document(user.uid);
 
+    fireStoreUid = user.uid;
     return ref.setData({
       'uid': user.uid,
       'email': user.email,
@@ -171,18 +198,45 @@ class AuthService {
   Widget getProfile() {
     silentGoogleSignIn();
     return StreamBuilder<QuerySnapshot>(
-      stream: authService._db.collection('UsersDetails').snapshots(),
+      stream: authService._db
+          .collection('UsersDetails')
+          .where('uid', isEqualTo: fireStoreUid)
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Text('Loading...');
         return ListView(
           children: snapshot.data.documents.map(
             (DocumentSnapshot document) {
               return UserAccountsDrawerHeader(
-                accountName: Text(document['methodSignedIn']),
+                accountName: Text(document['email']),
                 accountEmail: Text(document['displayName']),
                 currentAccountPicture:
                     Image.network(document['photoURL'].toString()),
-                    
+              );
+            },
+          ).toList(),
+        );
+      },
+    );
+  }
+
+  Widget buildDrawerHeader() {
+    silentGoogleSignIn();
+    return StreamBuilder<QuerySnapshot>(
+      stream: authService._db
+          .collection('UsersDetails')
+          .where('uid', isEqualTo: fireStoreUid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const Text('Loading...');
+        return ListView(physics: NeverScrollableScrollPhysics(),
+          children: snapshot.data.documents.map(
+            (DocumentSnapshot document) {
+              return UserAccountsDrawerHeader(
+                accountName: Text(document['email']),
+                accountEmail: Text(document['displayName']),
+                currentAccountPicture:
+                    Image.network(document['photoURL'].toString()),
               );
             },
           ).toList(),
