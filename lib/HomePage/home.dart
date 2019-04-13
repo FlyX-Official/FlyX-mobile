@@ -111,6 +111,8 @@ class _HomePageState extends State<HomePage>
     final dynamic _upperLayerWidth = _mediaQuery.size.width * .95;
     final dynamic _backGroundColor = Color.fromARGB(255, 247, 247, 247);
     var _color2 = Color.fromARGB(255, 100, 135, 165);
+    double _profileButtonHeight = 4;
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -138,60 +140,92 @@ class _HomePageState extends State<HomePage>
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            Container(
+                            Card(
                               // color: Color.fromARGB(255, 46, 209, 153),
-                              padding: const EdgeInsets.all(8.0),
+                              margin: const EdgeInsets.all(8.0),
+                              elevation: 0,
                               child: ModalDrawerHandle(
                                 handleColor: Color.fromARGB(255, 46, 209, 153),
                               ),
                             ),
-                            Container(
-                              height: _mediaQuery.size.height * .50,
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                      height: 175,
-                                      child: authService.getProfile()),
-                                  Container(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Card(
-                                          elevation: 8,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16)),
-                                          child: ListTile(
-                                            leading:
-                                                Icon(Icons.monetization_on),
-                                            title: Text("Preferred Currency"),
+                            SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              child: Container(
+                                height: _mediaQuery.size.height * .50,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 160,
+                                      child: Stack(
+                                        alignment:
+                                            AlignmentDirectional.bottomEnd,
+                                        children: <Widget>[
+                                          Container(
+                                            child: authService
+                                                .appDrawerUserAccountDrawerHeader(),
                                           ),
-                                        ),
-                                        Card(
-                                          elevation: 8,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16)),
-                                          child: ListTile(
-                                            leading: Icon(Icons.local_airport),
-                                            title: Text("Preferred Airport"),
+                                          Container(
+                                            child: Card(
+                                              elevation: 2,
+                                              child: FlatButton.icon(
+                                                icon: Icon(
+                                                  FontAwesomeIcons.signOutAlt,
+                                                  color: Colors.black,
+                                                ),
+                                                label: Text('Sign Out'),
+                                                onPressed: () async {
+                                                  authService.signOut();
+                                                },
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        Card(
-                                          color: Colors.white,
-                                          child: MaterialButton(
-                                            child: Text('Sign OUT'),
-                                            onPressed: () async {
-                                              authService.signOut();
-                                            },
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    Container(
+                                      width: _mediaQuery.size.width,
+                                      alignment: FractionalOffset.bottomLeft,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Card(
+                                            elevation: _profileButtonHeight,
+                                            child: FlatButton.icon(
+                                              icon: Icon(Icons.monetization_on),
+                                              label: Text('Preferred Currency'),
+                                              onPressed: () {},
+                                            ),
+                                          ),
+                                          Card(
+                                            elevation: _profileButtonHeight,
+                                            child: FlatButton.icon(
+                                              icon: Icon(Icons.local_airport),
+                                              label: Text('Preferred Airport'),
+                                              onPressed: () {},
+                                            ),
+                                          ),
+                                          Card(
+                                            elevation: _profileButtonHeight,
+                                            child: FlatButton.icon(
+                                              icon: Icon(
+                                                  FontAwesomeIcons.signOutAlt),
+                                              label: Text('Sign OUT'),
+                                              onPressed: () async {
+                                                authService.signOut();
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             )
                           ],
@@ -216,18 +250,29 @@ class _HomePageState extends State<HomePage>
                     alignment: FractionalOffset.topCenter,
                     child: authService.buildDrawerHeader()),
               ),
-              Container(
-                child: RaisedButton(
-                  child: Text('Sign Out'),
-                  onPressed: () => authService.signOut(),
+              ListTile(
+                leading: Icon(Icons.notification_important),
+                title: Text('Saved Tickets'),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: FractionalOffset.center,
+                  child: RaisedButton.icon(
+                    icon: Icon(FontAwesomeIcons.signOutAlt),
+                    label: Text('Sign out'),
+                    onPressed: () {
+                      authService.signOut();
+                    },
+                  ),
                 ),
               ),
               Expanded(
                 child: Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: IconButton(
-                    leading: Icon(Icons.settings),
-                    title: Text('Settings'),
+                  alignment: FractionalOffset.bottomLeft,
+                  child: FlatButton.icon(
+                    icon: Icon(Icons.settings),
+                    label: Text('Settings'),
+                    onPressed: () {},
                   ),
                 ),
               ),

@@ -195,7 +195,7 @@ class AuthService {
     _googleSignIn.signInSilently();
   }
 
-  Widget getProfile() {
+  Widget appDrawerUserAccountDrawerHeader() {
     silentGoogleSignIn();
     return StreamBuilder<QuerySnapshot>(
       stream: authService._db
@@ -205,13 +205,17 @@ class AuthService {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Text('Loading...');
         return ListView(
+          physics: NeverScrollableScrollPhysics(),
           children: snapshot.data.documents.map(
             (DocumentSnapshot document) {
               return UserAccountsDrawerHeader(
-                accountName: Text(document['email']),
-                accountEmail: Text(document['displayName']),
-                currentAccountPicture:
-                    Image.network(document['photoURL'].toString()),
+                accountName: Text(document['displayName']),
+                accountEmail: Text(document['email']),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    document['photoURL'].toString(),
+                  ),
+                ),
               );
             },
           ).toList(),
@@ -229,14 +233,18 @@ class AuthService {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Text('Loading...');
-        return ListView(physics: NeverScrollableScrollPhysics(),
+        return ListView(
+          physics: NeverScrollableScrollPhysics(),
           children: snapshot.data.documents.map(
             (DocumentSnapshot document) {
               return UserAccountsDrawerHeader(
-                accountName: Text(document['email']),
-                accountEmail: Text(document['displayName']),
-                currentAccountPicture:
-                    Image.network(document['photoURL'].toString()),
+                accountName: Text(document['displayName']),
+                accountEmail: Text(document['email']),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    document['photoURL'].toString(),
+                  ),
+                ),
               );
             },
           ).toList(),
