@@ -31,7 +31,6 @@ class _LoginPageState extends State<LoginPage>
       TextEditingController();
 
   String _userEmail, _userName, _userPhoto, _googleUserId;
-  String _githubAccessToken = 'd7b96d4da97bbfbb0a58068507d82a9bc9ef42b3';
   bool _successSignInWithEmailPasswordLogin,
       _successSignUpWithEmailPassword,
       _successGoogleSignIn;

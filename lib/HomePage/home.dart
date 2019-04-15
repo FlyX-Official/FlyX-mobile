@@ -970,7 +970,9 @@ class _HomePageState extends State<HomePage>
     return Container(
       width: _menuLayerWidth * .95,
       decoration: BoxDecoration(
-          color: _color2, border: Border.all(color: Colors.black)),
+        color: _color2,
+        //border: Border.all(color: Colors.black),
+      ),
       margin: EdgeInsets.only(left: _menuLayerWidth * .025),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
