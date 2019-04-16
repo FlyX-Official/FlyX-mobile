@@ -83,6 +83,9 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:flyx/Json/data.dart';
+
 import 'package:flyx/Auth/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
@@ -1548,6 +1551,8 @@ class PageItem extends StatelessWidget {
   final List data;
   @override
   Widget build(BuildContext context) {
+
+    
     final MediaQueryData mediaQuery = MediaQuery.of(context);
 
     return Stack(children: <Widget>[
@@ -2014,7 +2019,7 @@ class PageItem extends StatelessWidget {
               child: RaisedButton(
                 color: Colors.lightGreenAccent,
                 onPressed: () async {
-                  String url = data[1]['deep_link'];
+                  String url = data[num]['deep_link'];
                   if (await canLaunch(url)) {
                     await launch(url);
                     print(url);
@@ -2034,5 +2039,6 @@ class PageItem extends StatelessWidget {
     ]);
   }
 }
+
 
 // Login Page Code

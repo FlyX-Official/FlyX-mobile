@@ -431,7 +431,8 @@ class _LoginPageState extends State<LoginPage>
                                           elevation: 8,
                                           highlightElevation: 0,
                                           padding: EdgeInsets.all(8),
-                                          color: Color.fromARGB(255, 46, 209, 153),
+                                          color:
+                                              Color.fromARGB(255, 46, 209, 153),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(8),
@@ -456,18 +457,6 @@ class _LoginPageState extends State<LoginPage>
                                                   _signUpPageUserNameController,
                                                   _signUpPageEmailController,
                                                   _signUpPagePasswordConfirmController);
-                                              if (_successSignInWithEmailPasswordLogin) {
-                                                print(
-                                                  'Welcome ' + _userEmail,
-                                                );
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomePage(),
-                                                  ),
-                                                );
-                                              }
                                             }
                                           },
                                         ),

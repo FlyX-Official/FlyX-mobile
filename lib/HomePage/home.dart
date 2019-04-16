@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+
+import 'package:flyx/Json/data.dart';
+
 import 'package:flyx/Auth/auth.dart';
 import 'package:flyx/HomePage/oldhome.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -186,13 +189,14 @@ class _HomePageState extends State<HomePage>
                                     ),
                                     Container(
                                       width: _mediaQuery.size.width,
-                                      alignment: FractionalOffset.bottomLeft,
+                                      margin: EdgeInsets.all(8),
+                                      alignment: FractionalOffset.center,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                            CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Card(
                                             elevation: _profileButtonHeight,
@@ -208,17 +212,6 @@ class _HomePageState extends State<HomePage>
                                               icon: Icon(Icons.local_airport),
                                               label: Text('Preferred Airport'),
                                               onPressed: () {},
-                                            ),
-                                          ),
-                                          Card(
-                                            elevation: _profileButtonHeight,
-                                            child: FlatButton.icon(
-                                              icon: Icon(
-                                                  FontAwesomeIcons.signOutAlt),
-                                              label: Text('Sign OUT'),
-                                              onPressed: () async {
-                                                authService.signOut();
-                                              },
                                             ),
                                           ),
                                         ],
@@ -629,6 +622,7 @@ class _HomePageState extends State<HomePage>
         print("Response body: ${response.body}");
         dynamic responseData = jsonDecode(response.body);
         responseTicketData = responseData["data"];
+        dataFromJson(response.body);
         TicketListViewBuilder(
           data: responseTicketData,
         );
