@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "882535873724-p9nrskjguqaot5f2kpmb9939skqgg29a.apps.googleusercontent.com",
+          "client_id": "882535873724-b17jsg7k306mjfhtncke7h50a2om704q.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.flyx",
-            "certificate_hash": "b7d437b1bbfc1e5737b0fcdc98de9ab0cee335db"
+            "certificate_hash": "9444f71abbba5fb7258814f190bf5d0d33df2a14"
           }
         },
         {
@@ -29,15 +29,11 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDTiueAqzT0tG56sIQi5SUgcGDP6MfQppI"
+          "current_key": "AIzaSyCs2lR8K0qYr212Pnu2vEx1a1TSREyB8ww"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com",
@@ -51,9 +47,6 @@
               }
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

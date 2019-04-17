@@ -34,6 +34,7 @@ android {
     dependencies {
         implementation 'com.google.firebase:firebase-bom:17.0.0'
         api 'com.google.firebase:firebase-core'
+        api 'com.google.firebase:firebase-auth:16.0.5'
     }
 
     defaultConfig {
@@ -44,7 +45,7 @@ android {
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -67,7 +68,14 @@ dependencies {
     implementation 'com.google.guava:guava:27.1-android'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.core:core:1.+' 
+    implementation 'androidx.appcompat:appcompat:1.+'
+    implementation "androidx.media:media:1.1.0-alpha01"
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation 'com.google.firebase:firebase-bom:17.0.0'
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
     api 'com.google.firebase:firebase-core'
 
 }

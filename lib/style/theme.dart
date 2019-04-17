@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 class Colors {
   const Colors();
 
-  static const Color loginGradientStart = const Color(0xFFfb6c70);
-  static const Color loginGradientEnd = const Color(0xFFfb6c70);
+  static const Color loginGradientStart = const Color.fromARGB(255, 46, 209, 153);
+  static const Color loginGradientEnd = const Color.fromARGB(255, 36, 180, 222);
 
   static const primaryGradient = const LinearGradient(
     colors: const [loginGradientStart, loginGradientEnd],
