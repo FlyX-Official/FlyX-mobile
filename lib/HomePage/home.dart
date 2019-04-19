@@ -8,6 +8,7 @@ import 'package:flyx/Json/data.dart';
 
 import 'package:flyx/Auth/auth.dart';
 import 'package:flyx/HomePage/oldhome.dart';
+import 'package:flyx/JsonClasses/post.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,8 +18,6 @@ import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
-
-final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -587,34 +586,47 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Map<String, Object> postToHerokuServerData() {
-    return {
-      'oneWay': false,
-      'from': "${_from.text}",
-      'to': '${_to.text}',
-      'radiusFrom': _fromSlider,
-      'radiusTo': _toSlider,
-      "departureWindow": {
-        'start': _originDate[0].toString(),
-        'end': _originDate[1].toString(),
-      }, //_originDate.toList(),
-      "returnDepartureWindow": {
-        'start': _destinationDate[0].toString(),
-        'end': _destinationDate[1].toString(),
-      }, // _destinationDate.toList(),
-      //"TimeStamp": DateTime.now(),
-    };
-  }
+  // Map<String, Object> postToHerokuServerData() {
+  //   return {
+  //     'oneWay': false,
+  //     'from': "${_from.text}",
+  //     'to': '${_to.text}',
+  //     'radiusFrom': _fromSlider,
+  //     'radiusTo': _toSlider,
+  //     "departureWindow": {
+  //       'start': _originDate[0].toString(),
+  //       'end': _originDate[1].toString(),
+  //     }, //_originDate.toList(),
+  //     "returnDepartureWindow": {
+  //       'start': _destinationDate[0].toString(),
+  //       'end': _destinationDate[1].toString(),
+  //     }, // _destinationDate.toList(),
+  //     //"TimeStamp": DateTime.now(),
+  //   };
+  // }
 
   postToHerokuServer() {
-    var testData = postToHerokuServerData();
-    var testDataEnc = json.encode(testData);
-    print(testDataEnc);
-    var url =
+    String url =
         "https://flyx-web-hosted.herokuapp.com/search"; //https://olivine-pamphlet.glitch.me/testpost";
     http.post(
       url,
-      body: testDataEnc,
+      body: postToJson(
+        Post(
+          oneWay: false,
+          from: "${_from.text}",
+          to: '${_to.text}',
+          radiusFrom: _fromSlider,
+          radiusTo: _toSlider,
+          departureWindow: DepartureWindow(
+            start: DateTime.parse(_originDate[0].toString()),
+            end: DateTime.parse(_originDate[1].toString()),
+          ),
+          returnDepartureWindow: ReturnDepartureWindow(
+            start: DateTime.parse(_destinationDate[0].toString()),
+            end: DateTime.parse(_destinationDate[1].toString()),
+          ),
+        ),
+      ),
       headers: {"Content-Type": "application/json"},
     ).then(
       (response) {

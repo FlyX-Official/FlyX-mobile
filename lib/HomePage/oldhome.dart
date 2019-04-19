@@ -1551,8 +1551,6 @@ class PageItem extends StatelessWidget {
   final List data;
   @override
   Widget build(BuildContext context) {
-
-    
     final MediaQueryData mediaQuery = MediaQuery.of(context);
 
     return Stack(children: <Widget>[
@@ -2039,6 +2037,5 @@ class PageItem extends StatelessWidget {
     ]);
   }
 }
-
 
 // Login Page Code
