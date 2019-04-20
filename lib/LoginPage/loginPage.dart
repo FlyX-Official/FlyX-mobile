@@ -49,12 +49,12 @@ class _LoginPageState extends State<LoginPage>
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 100, 135, 165),
       body: Center(
-        child: SingleChildScrollView(
+        child: Container(
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Form(
             key: _loginPageFormKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(8),
@@ -62,13 +62,14 @@ class _LoginPageState extends State<LoginPage>
                     elevation: 2,
                     shape: CircleBorder(
                       side: BorderSide(
-                          style: BorderStyle.solid,
-                          color: Color.fromARGB(255, 46, 209, 153)),
+                        style: BorderStyle.solid,
+                        color: Color.fromARGB(255, 46, 209, 153),
+                      ),
                     ),
                     color: Color.fromARGB(255, 46, 209, 153),
                     child: Container(
-                      height: 200,
-                      width: 200,
+                      // height: 200,
+                      height: MediaQuery.of(context).size.width * .5,
                       //color: Colors.blue,
                       // decoration: BoxDecoration(borderRadius: BorderRadius.circular(16),
                       // color: Colors.blue),
@@ -94,8 +95,8 @@ class _LoginPageState extends State<LoginPage>
                       controller: _loginPageController,
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 100, horizontal: 0),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 75, horizontal: 0),
                           child: Card(
                             elevation: 8,
                             margin: EdgeInsets.all(16),
@@ -249,6 +250,32 @@ class _LoginPageState extends State<LoginPage>
                                       ],
                                     ),
                                   ),
+                                  Container(
+                                    child: FlatButton(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text('Need an Account?'),
+                                          Text(
+                                            ' Sign Up',
+                                            style: TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 46, 209, 153),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onPressed: () {
+                                        _loginPageController.animateToPage(
+                                          1,
+                                          curve: Curves.easeInOutExpo,
+                                          duration:
+                                              Duration(milliseconds: 1000),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -256,7 +283,7 @@ class _LoginPageState extends State<LoginPage>
                         ),
                         Container(
                           padding:
-                              EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+                              EdgeInsets.symmetric(vertical: 32, horizontal: 0),
                           child: Card(
                             elevation: 8,
                             margin: EdgeInsets.symmetric(
@@ -461,29 +488,6 @@ class _LoginPageState extends State<LoginPage>
                         ),
                       ],
                     ),
-                  ),
-                ),
-                Container(
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text('Need an Account?'),
-                        Text(
-                          ' Sign Up',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 46, 209, 153),
-                          ),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      _loginPageController.animateToPage(
-                        1,
-                        curve: Curves.easeInOutExpo,
-                        duration: Duration(milliseconds: 1000),
-                      );
-                    },
                   ),
                 ),
               ],
