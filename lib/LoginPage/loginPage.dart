@@ -54,6 +54,7 @@ class _LoginPageState extends State<LoginPage>
           child: Form(
             key: _loginPageFormKey,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(8),
@@ -87,21 +88,10 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
                 Container(
-                  height: 480,
+                  height: 470,
                   child: Center(
                     child: PageView(
                       controller: _loginPageController,
-                      // onPageChanged: (pageLocation) {
-                      //   if (pageLocation == 0) {
-                      //    setState(() {
-                      //      _pageViewContainerHeight = 300;
-                      //    });
-                      //   }else if(pageLocation == 1){
-                      //       setState(() {
-                      //      _pageViewContainerHeight = 400;
-                      //    });
-                      //   }
-                      // },
                       children: <Widget>[
                         Container(
                           padding: EdgeInsets.symmetric(
@@ -266,10 +256,11 @@ class _LoginPageState extends State<LoginPage>
                         ),
                         Container(
                           padding:
-                              EdgeInsets.symmetric(vertical: 25, horizontal: 0),
+                              EdgeInsets.symmetric(vertical: 16, horizontal: 0),
                           child: Card(
                             elevation: 8,
-                            margin: EdgeInsets.all(16),
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 4),
                             //color: Color.fromARGB(255, 247, 247, 247),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
