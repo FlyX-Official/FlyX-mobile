@@ -124,7 +124,7 @@ packages:
     source: hosted
     version: "2.4.3"
   font_awesome_flutter:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: font_awesome_flutter
       url: "https://pub.dartlang.org"

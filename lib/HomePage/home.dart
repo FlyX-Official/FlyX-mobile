@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage>
     authService.profile.listen((state) => setState(() => _profile = state));
 
     authService.loading.listen((state) => setState(() => _loading = state));
+    
     _from.addListener(() {
       if (_from.text.isEmpty) {
         setState(() {
@@ -361,17 +362,26 @@ class _HomePageState extends State<HomePage>
         CameraPosition(
           target: LatLng(
             (decodedOriginGeoHash.latitude > decodedDestinationGeoHash.latitude)
-                ? (decodedDestinationGeoHash.latitude +  decodedOriginGeoHash.latitude)/2
-                : (decodedOriginGeoHash.latitude + decodedDestinationGeoHash.latitude)/2,
+                ? (decodedDestinationGeoHash.latitude +
+                        decodedOriginGeoHash.latitude) /
+                    2
+                : (decodedOriginGeoHash.latitude +
+                        decodedDestinationGeoHash.latitude) /
+                    2,
             (decodedOriginGeoHash.longitude >
                     decodedDestinationGeoHash.longitude)
-                ? (decodedDestinationGeoHash.longitude - decodedOriginGeoHash.longitude)/2
-                : (decodedOriginGeoHash.longitude + decodedDestinationGeoHash.longitude)/2,
+                ? (decodedDestinationGeoHash.longitude -
+                        decodedOriginGeoHash.longitude) /
+                    2
+                : (decodedOriginGeoHash.longitude +
+                        decodedDestinationGeoHash.longitude) /
+                    2,
           ),
+          zoom: 0,
         ),
       ),
     );
-  } /// TODO needs a lot of tweaking, goes nuts if the travelling over the  Internation Date Line
+  } // TODO: needs a lot of tweaking, goes nuts if the travelling over the  Internation Date Line
 
   void _onCamerIdle() {
     Timer(Duration(seconds: 2), _getCameraIdle);
@@ -726,6 +736,7 @@ class _HomePageState extends State<HomePage>
       color: Colors.red,
       width: 20,
       geodesic: true,
+      visible: true,
       patterns: <PatternItem>[
         // patterns only works on Android as of April 19
         PatternItem.dash(40.0),
