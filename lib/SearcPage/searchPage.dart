@@ -1,24 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: SafeArea(
-        child: SearchCard(),
-        minimum: EdgeInsets.only(bottom: 8),
-      ),
-    );
-  }
-}
-
 class SearchCard extends StatefulWidget {
   @override
   _SearchCardState createState() => _SearchCardState();

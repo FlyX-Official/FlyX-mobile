@@ -62,7 +62,7 @@ class CustomSearch extends SearchDelegate<String> {
   }
 
   dynamic cities;
- // final recentCities = ['fat'];
+  // final recentCities = ['fat'];
   @override
   List<Widget> buildActions(BuildContext context) {
     // TODO: implement buildActions
@@ -109,9 +109,7 @@ class CustomSearch extends SearchDelegate<String> {
 
   dynamic buildListView() {
     _getFromData();
-    dynamic suggestionList = query.isEmpty
-        ? ""
-        : originData;
+    dynamic suggestionList = query.isEmpty ? "" : originData;
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
             onTap: () {
@@ -151,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Center(
           child: RaisedButton(
             child: Text(
-                (_searchFromField.isNotEmpty ? _searchFromField : "Search")),
+              (_searchFromField.isNotEmpty ? _searchFromField : "Search"),
+            ),
             onPressed: () {
               showSearch(
                 context: context,
