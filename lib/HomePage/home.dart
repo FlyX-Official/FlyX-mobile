@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage>
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{},
       markers1 = <MarkerId, Marker>{};
 
- dynamic combinedMarkersSet = {...markers, ...markers1};
+ //dynamic combinedMarkersSet = {...markers, ...markers1};
 
   List responseTicketData;
   MarkerId selectedMarker;
