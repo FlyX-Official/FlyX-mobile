@@ -1705,34 +1705,7 @@ class TicketListViewBuilder extends StatefulWidget {
 }
 
 class _TicketListViewBuilder extends State<TicketListViewBuilder> {
-  int _currentIndexCounter;
-  bool _isOpen = false;
-  double _thisItem = 0.0;
-
-  // Widget added(BuildContext contex) {
-  //   if (_isOpen) {
-  //     _isOpen = false;
-  //     return AnimatedContainer(
-  //       duration: const Duration(milliseconds: 120),
-  //       child: Container(
-  //         child: Text("data"),
-  //         height: 200.0,
-  //         color: Colors.red,
-  //       ),
-  //       height: _thisItem,
-  //     );
-  //   }
-  //   _isOpen = true;
-  //   return AnimatedContainer(
-  //     duration: const Duration(milliseconds: 120),
-  //     child: Container(
-  //       child: Text("data"),
-  //       height: 0.0,
-  //     ),
-  //     height: _thisItem,
-  //   );
-  // }
-
+ 
   @override
   Widget build(BuildContext context) {
     //return await buildSafeArea();

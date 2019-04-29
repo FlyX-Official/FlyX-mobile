@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -11,6 +12,7 @@ import 'package:flyx/Auth/auth.dart';
 import 'package:flyx/Json/data.dart';
 import 'package:flyx/JsonClasses/post.dart';
 import 'package:flyx/SearcPage/searchPage.dart';
+import 'package:flyx/ResponseData/route.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geohash/geohash.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -19,23 +21,27 @@ import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
+import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 LatLng decodedOriginGeoHash, decodedDestinationGeoHash;
-String _searchFromField = "", _searchToField = "",_oneWayDateRange, _returnDateRange;
+String _searchFromField = "",
+    _searchToField = "",
+    _oneWayDateRange,
+    _returnDateRange;
 List responseTicketData;
 List<String> _searchFromList = List(),
     _searchToList = List(),
     originData,
     destData;
-     List<DateTime> _originDate, _destinationDate;
+List<DateTime> _originDate, _destinationDate;
 
-// String _searchFromField = "", _searchToField = "";
-// List<String> _searchFromList = List(), _searchToList = List();
-// List<String> originData;
-// List<String> destData;
-// LatLng decodedOriginGeoHash,
-//     decodedDestinationGeoHash;
+GoogleMapController mapController;
+Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
+MarkerId selectedMarker;
+int _markerIdCounter = 1, _polylineIdCounter = 1;
+PolylineId selectedPolyline;
 
 class CustomFromSearch extends SearchDelegate<String> {
   _getFromData() async {
@@ -237,29 +243,29 @@ class CustomToSearch extends SearchDelegate<String> {
 
   dynamic buildListView() {
     _getToData();
-    dynamic suggestionList = query.isEmpty ? "" : destData;
+    dynamic _suggestionList = query.isEmpty ? "" : destData;
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
             onTap: () {
-              query = suggestionList[index];
-              _searchToField = suggestionList[index];
+              query = _suggestionList[index];
+              _searchToField = _suggestionList[index];
               showResults(context);
             },
             leading: Icon(Icons.location_city),
             title: RichText(
               text: TextSpan(
-                  text: suggestionList[index].substring(0, query.length),
+                  text: _suggestionList[index].substring(0, query.length),
                   style: TextStyle(
                       color: Colors.blue, fontWeight: FontWeight.bold),
                   children: [
                     TextSpan(
-                      text: suggestionList[index].substring(query.length),
+                      text: _suggestionList[index].substring(query.length),
                       style: TextStyle(color: Colors.grey),
                     )
                   ]),
             ),
           ),
-      itemCount: suggestionList == null ? 1 : suggestionList.length,
+      itemCount: _suggestionList == null ? 1 : _suggestionList.length,
     );
   }
 }
@@ -276,7 +282,7 @@ class _HomePageState extends State<HomePage>
 
   int _currentPage, radioValue = 0;
   bool _isOneWay;
-  double _profileButtonHeight = 4;
+  double _profileButtonHeight = 4, _fromSlider = 1, _toSlider = 1;
 
   final _lowerLayerPageViewController = PageController();
   final _searchPageController = PageController();
@@ -284,10 +290,6 @@ class _HomePageState extends State<HomePage>
   final dynamic _backGroundColor = Color.fromARGB(255, 247, 247, 247);
   var _upperLayerColor2 = Color.fromARGB(75, 46, 209, 153);
   var _color2 = Color.fromARGB(255, 100, 135, 165);
-
-  GoogleMapController mapController;
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
 
   GlobalKey<FormState> _ticketSearchFormKey = GlobalKey<FormState>();
 
@@ -303,7 +305,6 @@ class _HomePageState extends State<HomePage>
       animationBehavior: AnimationBehavior.preserve,
       initialValue: .33,
     );
-
     super.initState();
   }
 
@@ -314,6 +315,14 @@ class _HomePageState extends State<HomePage>
   }
 
 //functions
+
+void collapse(){
+  _controller.collapse();
+}
+void expand(){
+  _controller.expand();
+}
+
   void handleRadioValueChanged(int value) {
     setState(() {
       radioValue = value;
@@ -328,6 +337,127 @@ class _HomePageState extends State<HomePage>
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  void _addOriginAirportMarkers() {
+    final int markerCount = markers.length;
+
+    if (markerCount == 12) {
+      return;
+    }
+
+    final String markerIdVal = '$_searchFromField';
+    _markerIdCounter++;
+    final MarkerId markerId = MarkerId(markerIdVal);
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position:
+          LatLng(decodedOriginGeoHash.latitude, decodedOriginGeoHash.longitude),
+      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      onTap: () {
+        //_onMarkerTapped(markerId);
+      },
+    );
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0.0,
+          target: LatLng(
+              decodedOriginGeoHash.latitude, decodedOriginGeoHash.longitude),
+          tilt: 45.0,
+          zoom: 13.0,
+        ),
+      ),
+    );
+
+    setState(() {
+      markers[markerId] = marker;
+    });
+  }
+
+  void _addDestinationAirportMarkers() {
+    final int markerCount = markers.length;
+
+    if (markerCount == 12) {
+      return;
+    }
+
+    final String markerIdVal = '$_searchToField';
+    _markerIdCounter++;
+    final MarkerId markerId = MarkerId(markerIdVal);
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position: LatLng(decodedDestinationGeoHash.latitude,
+          decodedDestinationGeoHash.longitude),
+      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      onTap: () {
+        //_onMarkerTapped(markerId);
+      },
+    );
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0.0,
+          target: LatLng(decodedDestinationGeoHash.latitude,
+              decodedDestinationGeoHash.longitude),
+          tilt: 45.0,
+          zoom: 13.0,
+        ),
+      ),
+    );
+
+    setState(() {
+      markers[markerId] = marker;
+    });
+  }
+
+  void _addOriginDestinationPolyLine() {
+    final int polylineCount = polylines.length;
+
+    if (polylineCount == 12) {
+      return;
+    }
+
+    final String polylineIdVal = 'polyline_id_$_polylineIdCounter';
+    _polylineIdCounter++;
+    final PolylineId polylineId = PolylineId(polylineIdVal);
+
+    final Polyline polyline = Polyline(
+      polylineId: polylineId,
+      consumeTapEvents: true,
+      geodesic: true,
+      color: Colors.red,
+      width: 15,
+      patterns: <PatternItem>[
+        PatternItem.dash(40),
+        PatternItem.gap(20.0),
+        PatternItem.dot,
+        PatternItem.gap(20),
+      ],
+      points: _createPoints(),
+      onTap: () {
+        _onPolylineTapped(polylineId);
+      },
+    );
+
+    setState(() {
+      polylines[polylineId] = polyline;
+    });
+  }
+
+  List<LatLng> _createPoints() {
+    List<LatLng> points = <LatLng>[];
+    points.add(decodedOriginGeoHash);
+    points.add(decodedDestinationGeoHash);
+    return points;
+  }
+
+  void _onPolylineTapped(PolylineId polylineId) {
+    setState(() {
+      selectedPolyline = polylineId;
+    });
   }
 
 //functions end
@@ -480,7 +610,7 @@ class _HomePageState extends State<HomePage>
           )
         ],
       ),
-      backgroundColor: _color2,
+      backgroundColor: Colors.white,
       body: Container(
         child: RubberBottomSheet(
           key: _rubberBottomSheetKey,
@@ -496,6 +626,7 @@ class _HomePageState extends State<HomePage>
                     _currentPage = 0;
                   });
                 } else {
+                  collapse();
                   setState(() {
                     _currentPage = 1;
                   });
@@ -528,6 +659,11 @@ class _HomePageState extends State<HomePage>
                     ].toSet(),
                   ),
                 ),
+                Container(
+              child: TicketListViewBuilder(
+                data: responseTicketData,
+              ),
+            ),
               ],
             ),
           ),
@@ -539,7 +675,7 @@ class _HomePageState extends State<HomePage>
               child: Form(
                 key: _ticketSearchFormKey,
                 child: Container(
-                  height: 140,
+                  height: 164,
                   //color: _upperLayerColor2,
                   child: PageView(
                     controller: _searchPageController,
@@ -563,7 +699,7 @@ class _HomePageState extends State<HomePage>
                           children: <Widget>[
                             Container(
                               width: _mediaQuery.size.width * .4,
-                              margin: EdgeInsets.symmetric(vertical: 8),
+                              margin: EdgeInsets.symmetric(vertical: 4),
                               child: InkWell(
                                 onTap: () {
                                   showSearch(
@@ -596,7 +732,22 @@ class _HomePageState extends State<HomePage>
                                       ),
                                       height: 80,
                                     ),
-                                    Divider(),
+                                    //Divider(),
+                                    Container(
+                                      child: Slider(
+                                        value: _fromSlider,
+                                        min: 1,
+                                        max: 100,
+                                        divisions: 5,
+                                        label: '$_fromSlider Mi',
+                                        onChanged: (double value) {
+                                          _addOriginAirportMarkers();
+                                          setState(() {
+                                            _fromSlider = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -605,11 +756,11 @@ class _HomePageState extends State<HomePage>
                               height: 100,
                               width: 1.0,
                               color: Colors.redAccent,
-                              margin: EdgeInsets.symmetric(horizontal: 4),
+                              margin: EdgeInsets.symmetric(horizontal: 8),
                             ),
                             Container(
                               width: _mediaQuery.size.width * .4,
-                              margin: EdgeInsets.symmetric(vertical: 8),
+                              margin: EdgeInsets.symmetric(vertical: 4),
                               child: InkWell(
                                 onTap: () {
                                   showSearch(
@@ -642,7 +793,23 @@ class _HomePageState extends State<HomePage>
                                       ),
                                       height: 80,
                                     ),
-                                    Divider(),
+                                    // Divider(),
+                                    Container(
+                                      child: Slider(
+                                        value: _toSlider,
+                                        min: 1,
+                                        max: 100,
+                                        divisions: 5,
+                                        label: '$_toSlider Mi',
+                                        onChanged: (double value) {
+                                          _addDestinationAirportMarkers();
+                                          _addOriginDestinationPolyLine();
+                                          setState(() {
+                                            _toSlider = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -660,24 +827,31 @@ class _HomePageState extends State<HomePage>
                               margin: EdgeInsets.symmetric(vertical: 8),
                               child: InkWell(
                                 onTap: () async {
-                                  final List<DateTime> originPicked = await DateRangePicker.showDatePicker(
+                                  final List<DateTime> originPicked =
+                                      await DateRangePicker.showDatePicker(
                                     context: context,
                                     initialFirstDate: DateTime.now(),
-                                    initialLastDate: DateTime.now().add(Duration(days: 7),),
+                                    initialLastDate: DateTime.now().add(
+                                      Duration(days: 7),
+                                    ),
                                     firstDate: DateTime(2019),
                                     lastDate: DateTime(2020),
                                   );
-                                  if(originPicked != null && originPicked.length == 2){
+                                  if (originPicked != null &&
+                                      originPicked.length == 2) {
                                     print(originPicked);
                                     _originDate = originPicked.toList();
                                   }
                                   setState(() {
-                                   _oneWayDateRange =  '${_originDate.first.day.toString()} / ${_originDate.first.month.toString()}' +
-                                            ' -' + '\n${_originDate.last.day.toString()} / ${_originDate.last.month.toString()}';
+                                    _oneWayDateRange =
+                                        '${_originDate.first.day.toString()} / ${_originDate.first.month.toString()}' +
+                                            ' -' +
+                                            '\n${_originDate.last.day.toString()} / ${_originDate.last.month.toString()}';
                                   });
                                 },
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Container(
@@ -691,7 +865,9 @@ class _HomePageState extends State<HomePage>
                                     ),
                                     Container(
                                       child: Text(
-                                        (_oneWayDateRange != null)?_oneWayDateRange:'DD/MM - DD/MM',
+                                        (_oneWayDateRange != null)
+                                            ? _oneWayDateRange
+                                            : 'DD/MM - DD/MM',
                                         style: TextStyle(
                                             fontSize: 30,
                                             fontWeight: FontWeight.bold),
@@ -713,26 +889,34 @@ class _HomePageState extends State<HomePage>
                               margin: EdgeInsets.symmetric(vertical: 8),
                               child: InkWell(
                                 onTap: () async {
-                                  
-                                  final List<DateTime> returnDatePicked = await DateRangePicker.showDatePicker(
+                                  final List<DateTime> returnDatePicked =
+                                      await DateRangePicker.showDatePicker(
                                     context: context,
-                                    initialFirstDate: DateTime.now(),
-                                    initialLastDate: DateTime.now().add(Duration(days: 14),),
+                                    initialFirstDate: DateTime.now().add(
+                                      Duration(days: 7),
+                                    ),
+                                    initialLastDate: DateTime.now().add(
+                                      Duration(days: 14),
+                                    ),
                                     firstDate: DateTime(2019),
                                     lastDate: DateTime(2020),
                                   );
-                                  if(returnDatePicked != null && returnDatePicked.length == 2){
+                                  if (returnDatePicked != null &&
+                                      returnDatePicked.length == 2) {
                                     print(returnDatePicked);
-                                    _destinationDate = returnDatePicked.toList();
+                                    _destinationDate =
+                                        returnDatePicked.toList();
                                   }
                                   setState(() {
-                                   _returnDateRange =  '${_destinationDate.first.day.toString()} / ${_destinationDate.first.month.toString()}' +
-                                                  ' -'+'\n${_destinationDate.last.day.toString()} / ${_destinationDate.last.month.toString()}';
+                                    _returnDateRange =
+                                        '${_destinationDate.first.day.toString()} / ${_destinationDate.first.month.toString()}' +
+                                            ' -' +
+                                            '\n${_destinationDate.last.day.toString()} / ${_destinationDate.last.month.toString()}';
                                   });
-                                
                                 },
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Container(
@@ -746,7 +930,9 @@ class _HomePageState extends State<HomePage>
                                     ),
                                     Container(
                                       child: Text(
-                                        (_returnDateRange != null)?_returnDateRange:'DD/MM - DD/MM',
+                                        (_returnDateRange != null)
+                                            ? _returnDateRange
+                                            : 'DD/MM - DD/MM',
                                         style: TextStyle(
                                             fontSize: 30,
                                             fontWeight: FontWeight.bold),
@@ -870,8 +1056,8 @@ class _HomePageState extends State<HomePage>
             oneWay: false,
             from: "$_searchFromField",
             to: '$_searchToField',
-            // radiusFrom: _fromSlider,
-            // radiusTo: _toSlider,
+            radiusFrom: _fromSlider,
+            radiusTo: _toSlider,
             departureWindow: DepartureWindow(
               start: DateTime.parse(_originDate[0].toString()),
               end: DateTime.parse(_originDate[1].toString()),
@@ -910,3 +1096,946 @@ class _HomePageState extends State<HomePage>
     }
   }
 }
+
+class TicketListViewBuilder extends StatefulWidget {
+  final List data;
+  const TicketListViewBuilder({Key key, @required this.data}) : super(key: key);
+  @override
+  _TicketListViewBuilderState createState() => _TicketListViewBuilderState();
+}
+
+class _TicketListViewBuilderState extends State<TicketListViewBuilder> {
+  @override
+  Widget build(BuildContext context) {
+    dynamic responsePageItemTicketData = widget.data;
+    return Container(
+      padding: EdgeInsets.only(bottom: 80),
+      child: ListView.builder(
+        itemCount: widget.data == null ? 0 : widget.data.length,
+        itemBuilder: (context, i) {
+          return Hero(
+            tag: "card$i",
+              child: Container(
+                padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Stack(
+                    children: <Widget>[
+                      buildTicketCardContainer(i, context),
+                      Positioned(
+                        left: 0.0,
+                        top: 0.0,
+                        bottom: 0.0,
+                        right: 0.0,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () async {
+                              await Future.delayed(Duration(milliseconds: 500));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return PageItem(
+                                        num: i,
+                                        data: responsePageItemTicketData);
+                                  },
+                                  fullscreenDialog: true,
+                                  maintainState: true,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+        },
+      ),
+    );
+  }
+    Container buildTicketCardContainer(int i, BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            color: Color.fromARGB(255, 100, 135, 165),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          "${widget.data[i]['flyFrom'].toString()}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                        child: Icon(
+                          FontAwesomeIcons.exchangeAlt,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        child: Text(
+                          "${widget.data[i]['flyTo'].toString()}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), //${widget.data[i]['dTimeUTC'].toString()} UTC"),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Text(
+                    "\$${widget.data[i]['price'].toString()}.00",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+
+                      fontWeight: FontWeight.bold,
+                      //fontWeight: FontWeight.w700,
+                    ),
+                  ), // ${widget.data[i]['aTimeUTC'].toString()} UTC"),
+                ),
+              ],
+            ),
+          ),
+          //BlueBar
+          Container(
+            child: Column(
+              children: <Widget>[
+                //Divider(color: Colors.transparent,),
+                Container(
+                  margin: EdgeInsets.only(top: 16),
+                  color: Colors.white,
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityFrom'].toString()}",
+                            //       style: TextStyle(
+                            //           //fontFamily: "OpenSans",
+                            //           //fontSize: 14,
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyFrom'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                    //fontFamily: "OpenSans",
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).day.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).month.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['dTimeUTC'] * 1000, isUtc: true).year.toString()}"),
+                            ),
+                          ],
+                        ),
+                      ), // Origin Data
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            child: Card(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Color(0XFFE4E4E4),
+                                ),
+                                width: MediaQuery.of(context).size.width * .30,
+                                //color: Color(0XFFE4E4E4),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '7 Stops',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * .30,
+                            //padding: EdgeInsets.only(bottom: 8),
+                            child: Center(
+                              child: Text(
+                                "${widget.data[i]['fly_duration'].toString()}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityTo'].toString()}",
+                            //       style: TextStyle(
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyTo'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text("${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).day.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).month.toString()}" +
+                                  "-${DateTime.fromMillisecondsSinceEpoch(widget.data[i]['aTimeUTC'] * 1000, isUtc: true).year.toString()}"),
+                            ),
+                          ],
+                        ),
+                      ), // Destination Data
+                    ],
+                  ),
+                ),
+                // if Roundtip
+                Container(
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Divider(
+                    height: 25,
+                    color: Colors.black,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    bottom: 16,
+                  ),
+                  color: Colors.white,
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityFrom'].toString()}",
+                            //       style: TextStyle(
+                            //           //fontFamily: "OpenSans",
+                            //           //fontSize: 14,
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyTo'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                    //fontFamily: "OpenSans",
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Origin Data
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Card(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Color(0XFFE4E4E4),
+                              ),
+                              width: MediaQuery.of(context).size.width * .30,
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Center(
+                                child: Text(
+                                  '3 Stops',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * .30,
+                            //padding: EdgeInsets.only(bottom: 8),
+                            child: Center(
+                              child: Text(
+                                "${widget.data[i]['return_duration'].toString()}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 24),
+                        width: MediaQuery.of(context).size.width * .12,
+                        child: Center(
+                          child: Icon(
+                            FontAwesomeIcons.arrowCircleRight,
+                            color: Color.fromARGB(255, 34, 180, 222),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(left: 8, right: 8),
+                      ),
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            // Container(
+                            //   width: MediaQuery.of(context)
+                            //           .size
+                            //           .width *
+                            //       .15,
+                            //   child: Center(
+                            //     child: Text(
+                            //       "${widget.data[i]['cityTo'].toString()}",
+                            //       style: TextStyle(
+                            //           color: Colors
+                            //               .lightBlueAccent),
+                            //     ),
+                            //   ),
+                            // ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: Center(
+                                child: Text(
+                                  "${widget.data[i]['flyFrom'].toString()}",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    color: Color(0XFF4a4a4a),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              child: Text('4/23'),
+                            ),
+                          ],
+                        ),
+                      ), // Destination Data
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          //Everything under
+        ],
+      ),
+    );
+  }
+
+}
+class PageItem extends StatefulWidget {
+  const PageItem({Key key, this.num, this.data}) : super(key: key);
+
+  final int num;
+  final List data;
+  @override
+  _PageItemState createState() => _PageItemState();
+}
+
+class _PageItemState extends State<PageItem> {
+  @override
+  Widget build(BuildContext context) {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+
+    return Stack(children: <Widget>[
+      Material(
+        child: Column(
+          children: <Widget>[
+            Material(
+              child: Container(
+                height: MediaQuery.of(context).size.height * .25,
+                //margin: EdgeInsets.all(8),
+                //color: Color(0xc25737373),
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  //myLocationEnabled: true,
+                  //compassEnabled: true,
+                  //onMapCreated: _onMapCreated,
+                  //zoomGesturesEnabled: true,
+                  //markers: Set<Marker>.of(markers.values),
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(40.5436, -101.9734347),
+                    zoom: 1.0,
+                    tilt: 45,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(16))),
+              //margin: EdgeInsets.symmetric(horizontal: 8),
+              //height: mediaQuery.size.height * .33,
+              child: Hero(
+                tag: "card$num",
+                child: Material(
+                  type: MaterialType.card,
+                  elevation: 0,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                    //color: Colors.red,
+                    //child:Text("Card $num pressed\n${widget.data[widget.num]['flyFrom']}"),
+                    elevation: 8,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16)),
+                            color: Color.fromARGB(255, 100, 135, 165),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Text(
+                                        "${widget.data[widget.num]['flyFrom'].toString()}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ), //${widget.data[widget.num]['dTimeUTC'].toString()} UTC"),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                      child: Icon(
+                                        FontAwesomeIcons.exchangeAlt,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        "${widget.data[widget.num]['flyTo'].toString()}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ), //${widget.data[widget.num]['dTimeUTC'].toString()} UTC"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                child: Text(
+                                  "\$${widget.data[widget.num]['price'].toString()}.00",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 32,
+
+                                    fontWeight: FontWeight.bold,
+                                    //fontWeight: FontWeight.w700,
+                                  ),
+                                ), // ${widget.data[widget.num]['aTimeUTC'].toString()} UTC"),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //BlueBar
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              //Divider(color: Colors.transparent,),
+                              Container(
+                                margin: EdgeInsets.only(top: 16),
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${widget.data[widget.num]['cityFrom'].toString()}",
+                                          //       style: TextStyle(
+                                          //           //fontFamily: "OpenSans",
+                                          //           //fontSize: 14,
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
+
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${widget.data[widget.num]['flyFrom'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                  //fontFamily: "OpenSans",
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Origin Data
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        Container(
+                                          child: Card(
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: Color(0XFFE4E4E4),
+                                              ),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  .30,
+                                              //color: Color(0XFFE4E4E4),
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 8,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  '7 Stops',
+                                                  style: TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .30,
+                                          //padding: EdgeInsets.only(bottom: 8),
+                                          child: Center(
+                                            child: Text(
+                                              "${widget.data[widget.num]['fly_duration'].toString()}",
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${widget.data[widget.num]['cityTo'].toString()}",
+                                          //       style: TextStyle(
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${widget.data[widget.num]['flyTo'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Destination Data
+                                  ],
+                                ),
+                              ),
+                              // if Roundtip
+                              Container(
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Divider(
+                                  height: 25,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                  bottom: 16,
+                                ),
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${widget.data[widget.num]['flyTo'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                  //fontFamily: "OpenSans",
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Origin Data
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        Card(
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: Color(0XFFE4E4E4),
+                                            ),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .30,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: Center(
+                                              child: Text(
+                                                '3 Stops',
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              .30,
+                                          //padding: EdgeInsets.only(bottom: 8),
+                                          child: Center(
+                                            child: Text(
+                                              "${widget.data[widget.num]['return_duration'].toString()}",
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 24),
+                                      width: MediaQuery.of(context).size.width *
+                                          .12,
+                                      child: Center(
+                                        child: Icon(
+                                          FontAwesomeIcons.arrowCircleRight,
+                                          color:
+                                              Color.fromARGB(255, 34, 180, 222),
+                                        ),
+                                      ),
+                                      padding:
+                                          EdgeInsets.only(left: 8, right: 8),
+                                    ),
+                                    Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // Container(
+                                          //   width: MediaQuery.of(context)
+                                          //           .size
+                                          //           .width *
+                                          //       .15,
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "${widget.data[widget.num]['cityTo'].toString()}",
+                                          //       style: TextStyle(
+                                          //           color: Colors
+                                          //               .lightBlueAccent),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .15,
+                                            child: Center(
+                                              child: Text(
+                                                "${widget.data[widget.num]['flyFrom'].toString()}",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: Color(0XFF4a4a4a),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text('4/23'),
+                                          ),
+                                        ],
+                                      ),
+                                    ), // Destination Data
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //Everything under
+                      ],
+                    ),
+                  ),
+                  // child: ListTile(
+                  //   title: Text("Item $num"),
+                  //   subtitle: Text("This is item #$num"),
+                  // ),
+                  // itemCount: data.length,//data == null ? 0 : data.length,
+                  //     itemBuilder: (context, num) {
+                  //     return Card(
+                  //       child:
+                  //           Text("Card $num pressed\n${widget.data[widget.num]['flyFrom']}"),
+                  //     );
+                  //     },
+                ),
+              ),
+            ),
+            Container(
+              child: RaisedButton(
+                color: Colors.lightGreenAccent,
+                onPressed: () async {
+                  String url = widget.data[widget.num]['deep_link'];
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                    print(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: Text('Purchase ticket '),
+              ),
+            ),
+            Expanded(
+              child: Center(child: Text("Some more content goes here!")),
+            )
+          ],
+        ),
+      ),
+    ]);
+  }
+}
+
