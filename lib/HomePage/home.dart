@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
-
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -19,6 +18,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:rounded_modal/rounded_modal.dart';
 import 'package:rubber/rubber.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -30,10 +30,10 @@ String _searchFromField = "",
     _oneWayDateRange,
     _returnDateRange;
 List responseTicketData;
-List<String> _searchFromList = List(),
-    _searchToList = List(),
-    originData,
-    destData;
+List<String> _searchFromList = List(), _searchToList = List(), destData;
+
+List<String> originData;
+
 List<DateTime> _originDate, _destinationDate;
 
 GoogleMapController mapController;
@@ -41,54 +41,120 @@ Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
 MarkerId selectedMarker;
 int _markerIdCounter = 1, _polylineIdCounter = 1;
+double _fromSlider = 1, _toSlider = 1;
 PolylineId selectedPolyline;
 
+class Suggestions {
+  String airportCode;
+  String airportCodeSugg;
+  String location;
+  String originCity;
+  String combined;
+  Object mapboxlocation;
+  String airportName;
+
+  Suggestions({
+    this.airportCode,
+    this.airportCodeSugg,
+    this.location,
+    this.originCity,
+    this.combined,
+    this.mapboxlocation,
+    this.airportName,
+  });
+
+  // factory Suggestions.fromRawJson(String str) =>
+  //     Suggestions.fromJson(json.decode(str));
+
+  factory Suggestions.fromJson(Map<String, dynamic> json) => Suggestions(
+        airportCode: json["Airport_code"] == null ? null : json["Airport_code"],
+        airportCodeSugg: json["Airport_code_sugg"] == null
+            ? null
+            : json["Airport_code_sugg"],
+        location: json["location"] == null ? null : json["location"],
+        originCity: json["Origin_City"] == null ? null : json["Origin_City"],
+        combined: json["Combined"] == null ? null : json["Combined"],
+        mapboxlocation:
+            json["mapboxlocation"] == null ? null : json["mapboxlocation"],
+        airportName: json["Airport_Name"] == null ? null : json["Airport_Name"],
+      );
+}
+
+Future<List<Suggestions>> pingHeroku(
+  String hintText,
+) async {
+  //String url = "https://flyx-web-hosted.herokuapp.com/autocomplete?q=$hintText";
+  final response = await http
+      .get('https://flyx-web-hosted.herokuapp.com/autocomplete?q=$hintText');
+
+  if (response.statusCode == 200) {
+    final jsonresponse = json.decode(response.body);
+    //sonresponse.forEach((f) => originData.add(f["Combined"]));
+    print(jsonresponse);
+    return compute(parseSuggestions, response.body);
+    //Suggestions.fromJson(jsonresponse[0]); //Suggestions.fromRawJson(response.body);
+  } else {
+    throw Exception('Failed to contact Server');
+  }
+}
+
+List<Suggestions> parseSuggestions(String responseBody) {
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Suggestions>((json) => Suggestions.fromJson(json)).toList();
+}
+
 class CustomFromSearch extends SearchDelegate<String> {
-  _getFromData() async {
-    while (query.isNotEmpty) {
-      _searchFromList = await _getFromSuggestions(query) ?? null;
-      return _searchFromList;
-    }
-  }
+  final Future<Suggestions> suggestionList;
 
-  dynamic _getFromSuggestions(String hintText) async {
-    var _client = http.Client();
+  CustomFromSearch({Key key, this.suggestionList});
 
-    try {
-      String url =
-          "https://flyx-web-hosted.herokuapp.com/autocomplete?q=$hintText";
+//   _getFromData() async {
+//     while (query.isNotEmpty) {
+//       _searchFromList = await _getFromSuggestions(query) ?? null;
 
-      var response = await _client
-          .get(Uri.parse(url), headers: {"Accept": "application/json"});
+//       return _searchFromList;
+//     }
+//   }
 
-      List decode = json.decode(response.body);
-      dynamic sugg = await decode[0]['Combined'];
-      dynamic center = Geohash.decode(decode[0]['location']);
-      var _latitude = center.x;
-      var _longitude = center.y;
+//   dynamic _getFromSuggestions(String hintText) async {
+//     var _client = http.Client();
 
-      decodedOriginGeoHash = LatLng(_latitude, _longitude);
-      print(decodedOriginGeoHash);
-      print("Top Suggestion ===> $sugg");
+//     try {
+//       String url =
+//           "https://flyx-web-hosted.herokuapp.com/autocomplete?q=$hintText";
 
-      if (response.statusCode != HttpStatus.ok || decode.length == 0) {
-        return null;
-      }
-      List<String> _suggestedWords = List();
+//       var response = await _client
+//           .get(Uri.parse(url), headers: {"Accept": "application/json"});
 
-      if (decode.length == 0) return null;
+//       List decode = json.decode(response.body);
+//       dynamic sugg = await decode[0]['Combined'];
+//       dynamic center = Geohash.decode(decode[0]['location']);
+//       var _latitude = center.x;
+//       var _longitude = center.y;
 
-      decode.forEach((f) => _suggestedWords.add(f["Combined"]));
-//    String data = decode[0]["word"];
-      print("Suggestion List: ==> $_suggestedWords");
-      originData = _suggestedWords;
-      return _suggestedWords;
-    } finally {
-      _client.close();
-    }
-  }
+//       decodedOriginGeoHash = LatLng(_latitude, _longitude);
+//       print(decodedOriginGeoHash);
+//       print("Top Suggestion ===> $sugg");
 
-  dynamic cities;
+//       if (response.statusCode != HttpStatus.ok || decode.length == 0) {
+//         return null;
+//       }
+//       List<String> _suggestedWords = List();
+
+//       if (decode.length == 0) return null;
+
+//       decode.forEach((f) => _suggestedWords.add(f["Combined"]));
+// //    String data = decode[0]["word"];
+//       print("Suggestion List: ==> $_suggestedWords");
+//       originData = _suggestedWords;
+
+//       return _suggestedWords;
+//     } finally {
+//       _client.close();
+//     }
+//   }
+
   // final recentCities = ['fat'];
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -123,46 +189,66 @@ class CustomFromSearch extends SearchDelegate<String> {
       close(context, null);
     }
 
-    // TODO: implement buildResults
     return _closeSearchPage();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
-    _getFromData();
-    dynamic buildListView() {
-      dynamic suggestionList = query.isEmpty ? "" : originData;
-      return ListView.builder(
-        itemCount: suggestionList == null ? 1 : suggestionList.length,
-        itemBuilder: (context, index) => ListTile(
-              onTap: () {
-                query = suggestionList[index];
-                _searchFromField = suggestionList[index];
-                showResults(context);
-              },
-              leading: Icon(Icons.location_city),
-              title: RichText(
-                text: TextSpan(
-                    text: suggestionList[index].substring(0, query.length),
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold),
-                    children: [
-                      TextSpan(
-                        text: suggestionList[index].substring(query.length),
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    ]),
-              ),
-            ),
-      );
-    }
+    return Container(
+      child: FutureBuilder<List<Suggestions>>(
+        future: pingHeroku(query),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          return snapshot.hasData
+              ? OriginSuggestionList(
+                  suggestionsL: snapshot.data,
+                )
 
-    return buildListView();
+              ///Text('city ${snapshot.data.combined}')
+              : Center(
+                  child: CircularProgressIndicator(),
+                );
+        },
+      ),
+    );
+  }
+}
+
+class OriginSuggestionList extends StatelessWidget {
+  final CustomFromSearch _delegate = CustomFromSearch();
+  final List<Suggestions> suggestionsL;
+  OriginSuggestionList({Key key, this.suggestionsL}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: suggestionsL.length,
+      itemBuilder: (context, i) {
+        return ListTile(
+          onTap: () {
+            //query = suggestionsL[i];
+            _searchFromField = suggestionsL[i].combined;
+            dynamic center = Geohash.decode(suggestionsL[i].location);
+            var _latitude = center.x;
+            var _longitude = center.y;
+
+            decodedOriginGeoHash = LatLng(_latitude, _longitude);
+            print(decodedOriginGeoHash);
+
+            Navigator.pop(context); //_delegate.close(context,null);
+          },
+          leading: Icon(Icons.location_city),
+          title: Text('${suggestionsL[i].combined}'),
+        );
+      },
+    );
   }
 }
 
 class CustomToSearch extends SearchDelegate<String> {
+  final Future<Suggestions> suggestionList;
+
+  CustomToSearch({Key key, this.suggestionList});
+
   _getToData() async {
     while (query.isNotEmpty) {
       _searchToList = await _getToSuggestions(query) ?? null;
@@ -238,37 +324,84 @@ class CustomToSearch extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return buildListView();
-  }
+    return Container(
+      child: FutureBuilder<List<Suggestions>>(
+        future: pingHeroku(query),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          return snapshot.hasData
+              ? DestinationSuggestionList(
+                  suggestionsL: snapshot.data,
+                )
 
-  dynamic buildListView() {
-    _getToData();
-    dynamic _suggestionList = query.isEmpty ? "" : destData;
-    return ListView.builder(
-      itemBuilder: (context, index) => ListTile(
-            onTap: () {
-              query = _suggestionList[index];
-              _searchToField = _suggestionList[index];
-              showResults(context);
-            },
-            leading: Icon(Icons.location_city),
-            title: RichText(
-              text: TextSpan(
-                  text: _suggestionList[index].substring(0, query.length),
-                  style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(
-                      text: _suggestionList[index].substring(query.length),
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  ]),
-            ),
-          ),
-      itemCount: _suggestionList == null ? 1 : _suggestionList.length,
+              ///Text('city ${snapshot.data.combined}')
+              : Center(
+                  child: CircularProgressIndicator(),
+                );
+        },
+      ),
     );
   }
 }
+
+class DestinationSuggestionList extends StatelessWidget {
+  final CustomFromSearch _delegate = CustomFromSearch();
+  final List<Suggestions> suggestionsL;
+  DestinationSuggestionList({Key key, this.suggestionsL}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: suggestionsL.length,
+      itemBuilder: (context, i) {
+        return ListTile(
+          onTap: () {
+            //query = suggestionsL[i];
+            _searchToField = suggestionsL[i].combined;
+            dynamic center = Geohash.decode(suggestionsL[i].location);
+            var _latitude = center.x;
+            var _longitude = center.y;
+
+            decodedDestinationGeoHash = LatLng(_latitude, _longitude);
+            print(decodedOriginGeoHash);
+
+            Navigator.pop(context); //_delegate.close(context,null);
+          },
+          leading: Icon(Icons.location_city),
+          title: Text('${suggestionsL[i].combined}'),
+        );
+      },
+    );
+  }
+}
+
+// dynamic buildListView() {
+//   _getToData();
+//   dynamic _suggestionList = query.isEmpty ? "" : destData;
+//   return ListView.builder(
+//     itemBuilder: (context, index) => ListTile(
+//           onTap: () {
+//             query = _suggestionList[index];
+//             _searchToField = _suggestionList[index];
+//             showResults(context);
+//           },
+//           leading: Icon(Icons.location_city),
+//           title: RichText(
+//             text: TextSpan(
+//                 text: _suggestionList[index].substring(0, query.length),
+//                 style: TextStyle(
+//                     color: Colors.blue, fontWeight: FontWeight.bold),
+//                 children: [
+//                   TextSpan(
+//                     text: _suggestionList[index].substring(query.length),
+//                     style: TextStyle(color: Colors.grey),
+//                   )
+//                 ]),
+//           ),
+//         ),
+//     itemCount: _suggestionList == null ? 1 : _suggestionList.length,
+//   );
+// }
+// }
 
 class HomePage extends StatefulWidget {
   @override
@@ -282,7 +415,7 @@ class _HomePageState extends State<HomePage>
 
   int _currentPage, radioValue = 0;
   bool _isOneWay;
-  double _profileButtonHeight = 4, _fromSlider = 1, _toSlider = 1;
+  double _profileButtonHeight = 4;
 
   final _lowerLayerPageViewController = PageController();
   final _searchPageController = PageController();
@@ -299,11 +432,11 @@ class _HomePageState extends State<HomePage>
       vsync: this,
       dismissable: true,
       lowerBoundValue: AnimationControllerValue(pixel: 80),
-      halfBoundValue: AnimationControllerValue(percentage: .33),
+      halfBoundValue: AnimationControllerValue(pixel: 250),
       upperBoundValue: AnimationControllerValue(percentage: 0.5),
       duration: Duration(milliseconds: 200),
       animationBehavior: AnimationBehavior.preserve,
-      initialValue: .33,
+      //initialValue: AnimationControllerValue(pixel: 200),
     );
     super.initState();
   }
@@ -316,12 +449,13 @@ class _HomePageState extends State<HomePage>
 
 //functions
 
-void collapse(){
-  _controller.collapse();
-}
-void expand(){
-  _controller.expand();
-}
+  void collapse() {
+    _controller.collapse();
+  }
+
+  void expand() {
+    _controller.expand();
+  }
 
   void handleRadioValueChanged(int value) {
     setState(() {
@@ -660,10 +794,10 @@ void expand(){
                   ),
                 ),
                 Container(
-              child: TicketListViewBuilder(
-                data: responseTicketData,
-              ),
-            ),
+                  child: TicketListViewBuilder(
+                    data: responseTicketData,
+                  ),
+                ),
               ],
             ),
           ),
@@ -764,9 +898,8 @@ void expand(){
                               child: InkWell(
                                 onTap: () {
                                   showSearch(
-                                    context: context,
-                                    delegate: CustomToSearch(),
-                                  );
+                                      context: context,
+                                      delegate: CustomToSearch());
                                 },
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1076,12 +1209,12 @@ void expand(){
           dynamic responseData = jsonDecode(response.body);
           responseTicketData = responseData["data"];
           dataFromJson(response.body);
-          // TicketListViewBuilder(
-          //   data: responseTicketData,
-          // );
-          // PageItem(
-          //   data: responseTicketData,
-          // );
+          TicketListViewBuilder(
+            data: responseTicketData,
+          );
+          PageItem(
+            data: responseTicketData,
+          );
           setState(
             () {
               var responseData = json.decode(response.body);
@@ -1097,14 +1230,15 @@ void expand(){
   }
 }
 
-class TicketListViewBuilder extends StatefulWidget {
+class TicketListViewBuilder1 extends StatefulWidget {
   final List data;
-  const TicketListViewBuilder({Key key, @required this.data}) : super(key: key);
+  const TicketListViewBuilder1({Key key, @required this.data})
+      : super(key: key);
   @override
-  _TicketListViewBuilderState createState() => _TicketListViewBuilderState();
+  _TicketListViewBuilderState1 createState() => _TicketListViewBuilderState1();
 }
 
-class _TicketListViewBuilderState extends State<TicketListViewBuilder> {
+class _TicketListViewBuilderState1 extends State<TicketListViewBuilder1> {
   @override
   Widget build(BuildContext context) {
     dynamic responsePageItemTicketData = widget.data;
@@ -1115,54 +1249,54 @@ class _TicketListViewBuilderState extends State<TicketListViewBuilder> {
         itemBuilder: (context, i) {
           return Hero(
             tag: "card$i",
-              child: Container(
-                padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
-                child: Card(
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: Stack(
-                    children: <Widget>[
-                      buildTicketCardContainer(i, context),
-                      Positioned(
-                        left: 0.0,
-                        top: 0.0,
-                        bottom: 0.0,
-                        right: 0.0,
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: InkWell(
-                            splashColor: Colors.amber,
-                            onTap: () async {
-                              await Future.delayed(Duration(milliseconds: 500));
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return PageItem(
-                                        num: i,
-                                        data: responsePageItemTicketData);
-                                  },
-                                  fullscreenDialog: true,
-                                  maintainState: true,
-                                ),
-                              );
-                            },
-                          ),
+            child: Container(
+              padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                child: Stack(
+                  children: <Widget>[
+                    buildTicketCardContainer(i, context),
+                    Positioned(
+                      left: 0.0,
+                      top: 0.0,
+                      bottom: 0.0,
+                      right: 0.0,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: InkWell(
+                          splashColor: Colors.amber,
+                          onTap: () async {
+                            await Future.delayed(Duration(milliseconds: 500));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return PageItem(
+                                      num: i, data: responsePageItemTicketData);
+                                },
+                                fullscreenDialog: true,
+                                maintainState: true,
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
+            ),
+          );
         },
       ),
     );
   }
-    Container buildTicketCardContainer(int i, BuildContext context) {
+
+  Container buildTicketCardContainer(int i, BuildContext context) {
     return Container(
       child: Column(
         children: <Widget>[
@@ -1538,8 +1672,327 @@ class _TicketListViewBuilderState extends State<TicketListViewBuilder> {
       ),
     );
   }
-
 }
+
+Future<Response> contactHeroku() async {
+  String url = "https://flyx-web-hosted.herokuapp.com/search";
+  final response = await http.post(
+    url,
+    body: postToJson(
+      Post(
+        oneWay: false,
+        from: "$_searchFromField",
+        to: '$_searchToField',
+        radiusFrom: _fromSlider,
+        radiusTo: _toSlider,
+        departureWindow: DepartureWindow(
+          start: DateTime.parse(_originDate[0].toString()),
+          end: DateTime.parse(_originDate[1].toString()),
+        ),
+        returnDepartureWindow: ReturnDepartureWindow(
+          start: DateTime.parse(_destinationDate[0].toString()),
+          end: DateTime.parse(_destinationDate[1].toString()),
+        ),
+      ),
+    ),
+    headers: {"Content-Type": "application/json"},
+  );
+  if (response.statusCode == 200) {
+    return responseFromJson(response.body);
+  } else {
+    throw Exception('Failed to contact Server');
+  }
+}
+
+class TicketListViewBuilder extends StatefulWidget {
+  final List data;
+  const TicketListViewBuilder({Key key, @required this.data}) : super(key: key);
+  @override
+  _TicketListViewBuilderState createState() => _TicketListViewBuilderState();
+}
+
+class _TicketListViewBuilderState extends State<TicketListViewBuilder> {
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
+    return Container(
+      child: FutureBuilder<Response>(
+        future: contactHeroku(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+              // height: height * .55,
+              // width: width,
+              child: ticketCard(snapshot),
+            );
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+          // By default, show a loading spinner
+          return LinearProgressIndicator();
+        },
+      ),
+    );
+  }
+
+  Container ticketCard(AsyncSnapshot<Response> snapshot) {
+    return Container(
+      child: ListView.builder(
+        itemCount: snapshot.data.data.length,
+        itemBuilder: (context, index) {
+          return Container(
+            padding: EdgeInsets.all(8),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(maintainState: true,
+                    builder: (context) {
+                      return PageItem(
+                        data: snapshot.data.data,
+                        num: index,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: Card(
+                //color: Colors.limeAccent,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                        color: Color.fromARGB(255, 100, 135, 165),
+                      ),
+                      // color: Colors.lightBlueAccent,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          // Container(
+                          //   child: Text(
+                          //     '${snapshot.data.data[index].airlines}',
+                          //     textScaleFactor: 2,
+                          //     style: TextStyle(color: Colors.white),
+                          //   ),
+                          // ),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(16),
+                              ),
+                            ),
+                            margin: EdgeInsets.only(left: 4.0),
+                            height: 40,
+                            width: MediaQuery.of(context).size.width * .66,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  snapshot.data.data[index].airlines.length,
+                              itemBuilder: (context, i) {
+                                return Container(
+                                    padding: EdgeInsets.only(right: 2),
+                                    child: Image.network(
+                                      'https://images.kiwi.com/airlines/64/${snapshot.data.data[index].airlines[i]}.png',
+                                    ));
+                              },
+                            ),
+                          ), // For AirlineLogos
+
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(16),
+                                  bottomLeft: Radius.circular(16)),
+                            ),
+                            color: Colors.lightGreenAccent,
+                            elevation: 2,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              width: MediaQuery.of(context).size.width * .25,
+                              child: Center(
+                                child: Text(
+                                  '\$${snapshot.data.data[index].price}',
+                                  textScaleFactor: 2.25,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    //Divider(color: Colors.black,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              child: Text(
+                                '${snapshot.data.data[index].cityFrom}',
+                                textScaleFactor: 1,
+                              ),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${snapshot.data.data[index].routes[0][0]}',
+                                  style: TextStyle(fontSize: 34)),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${DateFormat.MMMMd().add_jm().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTime * 1000))}'),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          child: Icon(FontAwesomeIcons.arrowAltCircleRight),
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              child: Chip(
+                                label: Text(
+                                    '${snapshot.data.data[index].route.length / 2} Stop'),
+                              ),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${snapshot.data.data[index].flyDuration}'),
+                            )
+                          ],
+                        ),
+                        Container(
+                          child: Icon(FontAwesomeIcons.arrowAltCircleRight),
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              child: Text(
+                                '${snapshot.data.data[index].cityTo}',
+                                textScaleFactor: 1,
+                              ),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${snapshot.data.data[index].routes[0][1]}',
+                                  style: TextStyle(fontSize: 34)),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${DateFormat.MMMMd().add_jm().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].aTime * 1000))}'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.black,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                              '${snapshot.data.data[index].routes[1][0]}',
+                              style: TextStyle(fontSize: 34)),
+                        ),
+                        Container(
+                          child: Icon(FontAwesomeIcons.arrowAltCircleRight),
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              child: Chip(
+                                label: Text(
+                                    '${snapshot.data.data[index].route.length / 2} Stop'),
+                              ),
+                            ),
+                            Container(
+                              child: Text(
+                                  '${snapshot.data.data[index].returnDuration}'),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          child: Icon(FontAwesomeIcons.arrowAltCircleRight),
+                        ),
+                        Container(
+                          child: Text(
+                              '${snapshot.data.data[index].routes[1][1]}',
+                              style: TextStyle(fontSize: 34)),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+
+                    // Text(
+                    //     'One-Way ${snapshot.data.data[index].routes[0]} Return Trip${snapshot.data.data[index].routes[1]}'),
+                    // Text(
+                    //     'Fly_Duration: ${snapshot.data.data[index].flyDuration} Return_Duration: ${snapshot.data.data[index].returnDuration}'),
+                    // Text('Price: ${snapshot.data.data[index].price}'),
+                    // Text("${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).day.toString()}" +
+                    //     "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).month.toString()}" +
+                    //     "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).year.toString()}"),
+                    // Container(
+                    //     color: Colors.lightGreenAccent,
+                    //     child: Text(
+                    //         'Number of Legs ${snapshot.data.data[index].route.length}')),
+                    //   Container(
+                    //     height: 300,
+                    //     width: 450,
+                    //     padding: EdgeInsets.all(8),
+                    //     child: Card(
+                    //       color: Colors.lightGreenAccent,
+                    //       child: ListView.builder(
+                    //         physics: ClampingScrollPhysics(),
+                    //         itemCount: snapshot.data.data[index].route.length,
+                    //         itemBuilder: (context, i) {
+                    //           return Column(
+                    //             children: <Widget>[
+                    //               Text(' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityFrom}\n' +
+                    //                   ' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityTo}'),
+                    //               Text(
+                    //                   'Aircraft Carrier ${snapshot.data.data[index].route[i].airline}'),
+                    //               Text("${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).day.toString()}" +
+                    //                   "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).month.toString()}" +
+                    //                   "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).year.toString()}"),
+                    //               // Text('From lat --> ${snapshot.data.data[index].route[i].latFrom}' +
+                    //               //     ' || From lng --> ${snapshot.data.data[index].route[i].lngFrom}\n' +
+                    //               //     'To lat --> ${snapshot.data.data[index].route[i].latTo}' +
+                    //               //     ' || To lng --> ${snapshot.data.data[index].route[i].lngTo}\n'),
+                    //               Text(
+                    //                   'Flight Number ${snapshot.data.data[index].route[i].flightNo}\n'),
+                    //               Chip(
+                    //                 label: Text(
+                    //                     '${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i + 1].dTimeUtc * 1000, isUtc: true).difference(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true)).inHours}H'),
+                    //               )
+                    //             ],
+                    //           );
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class PageItem extends StatefulWidget {
   const PageItem({Key key, this.num, this.data}) : super(key: key);
 
@@ -1550,6 +2003,171 @@ class PageItem extends StatefulWidget {
 }
 
 class _PageItemState extends State<PageItem> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: FutureBuilder<Response>(
+        future: contactHeroku(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+              child: pageBody(snapshot),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Container pageBody(snapshot) {
+    return Container(
+      color: Colors.white,
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height * .25,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
+            ),
+          ),
+          Container(
+            child: extentedPage(snapshot),
+          ),
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(16),
+              ),
+            ),
+            width: 300,
+            child: FlatButton(
+              //padding: EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.black, width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(16))),
+              color: Colors.lightGreenAccent,
+              child: Text(
+                'PURCHASE TICKET',
+                textScaleFactor: 1.5,
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+              ),
+              onPressed: () async {
+                String url = snapshot.data.data[num]['deep_link'];
+                if (await canLaunch(url)) {
+                  await launch(url);
+                  print(url);
+                } else {
+                  throw 'Could not launch $url';
+                }
+                // _searchPageCollapseed();
+                // postToGlitchServer();
+                // PageItem(
+                //   data: responseTicketData,
+                // );
+                // TicketListViewBuilder(
+                //   data: responseTicketData,
+                // );
+                // _pageviewcontroller.animateToPage(
+                //   2,
+                //   duration: Duration(milliseconds: 1000),
+                //   curve: Curves.easeInOutExpo.flipped,
+                // );
+              },
+            ),
+          ),
+          // Container(
+          //   child: RaisedButton(
+          //       onPressed: () async {}, child: Text('Purchase Ticket')),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Expanded extentedPage(snapshot) {
+    return Expanded(
+      //height: MediaQuery.of(context).size.height*.70,
+      child: ListView.builder(
+        itemCount: 1,
+        itemBuilder: (context, index) {
+          return Container(
+            //padding: EdgeInsets.all(8),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height * .66,
+                  width: 450,
+                  //padding: EdgeInsets.all(8),
+                  child: ListView.builder(
+                    physics: ClampingScrollPhysics(),
+                    itemCount: snapshot.data.data[index].route.length,
+                    itemBuilder: (context, i) {
+                      return Card(
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: Icon(FontAwesomeIcons.planeDeparture),
+                              title: Text('${DateFormat.MMMMd().add_jm().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTime * 1000))}'+
+                              ' ${snapshot.data.data[index].route[i].cityFrom}'),
+                              // Text(
+                              //     ' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityFrom}\n' +
+                              //         ' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityTo}'),
+                            ),
+                            ListTile(
+                              leading: Icon(FontAwesomeIcons.planeArrival),
+                              title: Text('${DateFormat.MMMMd().add_jm().format(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTime * 1000))}'+
+                              ' ${snapshot.data.data[index].route[i].cityTo}'),
+                              // Text(
+                              //     ' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].dTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityFrom}\n' +
+                              //         ' ${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).hour}:${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true).minute}  ${snapshot.data.data[index].route[i].cityTo}'),
+                            ),
+                            Container(
+                              child: Text(
+                                  'Aircraft Carrier ${snapshot.data.data[index].route[i].airline}'),
+                            ),
+                            Text("${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).day.toString()}" +
+                                "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).month.toString()}" +
+                                "-${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].dTimeUtc * 1000, isUtc: true).year.toString()}"),
+                            // Text('From lat --> ${snapshot.data.data[index].route[i].latFrom}' +
+                            //     ' || From lng --> ${snapshot.data.data[index].route[i].lngFrom}\n' +
+                            //     'To lat --> ${snapshot.data.data[index].route[i].latTo}' +
+                            //     ' || To lng --> ${snapshot.data.data[index].route[i].lngTo}\n'),
+                            Text(
+                                'Flight Number ${snapshot.data.data[index].route[i].flightNo}\n'),
+                            Text(
+                                'Return: ${snapshot.data.data[index].route[i].routeReturn}')
+                            // Chip(
+                            //   label: Text(
+                            //       '${DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i + 1].dTimeUtc * 1000, isUtc: true).difference(DateTime.fromMillisecondsSinceEpoch(snapshot.data.data[index].route[i].aTimeUtc * 1000, isUtc: true)).inHours}H'),
+                            // )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class PageItem1 extends StatefulWidget {
+  const PageItem1({Key key, this.num, this.data}) : super(key: key);
+
+  final int num;
+  final List data;
+  @override
+  _PageItemState1 createState() => _PageItemState1();
+}
+
+class _PageItemState1 extends State<PageItem1> {
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
@@ -2038,4 +2656,3 @@ class _PageItemState extends State<PageItem> {
     ]);
   }
 }
-
