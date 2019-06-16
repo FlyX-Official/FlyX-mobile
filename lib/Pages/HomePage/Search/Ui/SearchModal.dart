@@ -3,11 +3,12 @@ import 'package:flyx/Pages/HomePage/Search/Functions/AutoComplete.dart';
 
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:flyx/Pages/Logic/NetworkCalls.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 String originQuery, destinationQuery, oneWayDateRange, returnWayDateRange;
 
 List<DateTime> originDate, destinationDate;
-bool isOrigin, isOneWay;
+bool isOrigin;
 double fromSlider, toSlider;
 
 class SearchModal extends StatefulWidget {
@@ -29,7 +30,6 @@ class _SearchModalState extends State<SearchModal> {
   @override
   void initState() {
     isOrigin = false;
-    isOneWay = false;
     originQuery = 'SFO';
     destinationQuery = 'LAX';
     fromSlider = 1;
@@ -52,8 +52,11 @@ class _SearchModalState extends State<SearchModal> {
   Container _leftSide() {
     return Container(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
           Text(
             'FROM',
             style: TextStyle(
@@ -153,8 +156,11 @@ class _SearchModalState extends State<SearchModal> {
   Container _rightSide() {
     return Container(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
           Text(
             'To',
             style: TextStyle(
@@ -222,34 +228,31 @@ class _SearchModalState extends State<SearchModal> {
               textScaleFactor: 2.5,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            onPressed: isOneWay
-                ? null
-                : () async {
-                    final List<DateTime> returnDatePicked =
-                        await DateRangePicker.showDatePicker(
-                      context: context,
-                      initialFirstDate: DateTime.now().add(
-                        Duration(days: 7),
-                      ),
-                      initialLastDate: DateTime.now().add(
-                        Duration(days: 14),
-                      ),
-                      firstDate: DateTime(2019),
-                      lastDate: DateTime(2020),
-                    );
-                    if (returnDatePicked != null &&
-                        returnDatePicked.length == 2) {
-                      print(returnDatePicked);
-                      destinationDate = returnDatePicked.toList();
-                    }
+            onPressed: () async {
+              final List<DateTime> returnDatePicked =
+                  await DateRangePicker.showDatePicker(
+                context: context,
+                initialFirstDate: DateTime.now().add(
+                  Duration(days: 7),
+                ),
+                initialLastDate: DateTime.now().add(
+                  Duration(days: 14),
+                ),
+                firstDate: DateTime(2019),
+                lastDate: DateTime(2020),
+              );
+              if (returnDatePicked != null && returnDatePicked.length == 2) {
+                print(returnDatePicked);
+                destinationDate = returnDatePicked.toList();
+              }
 
-                    setState(() {
-                      returnWayDateRange =
-                          '${destinationDate.first.day.toString()} / ${destinationDate.first.month.toString()}' +
-                              ' -' +
-                              '\n${destinationDate.last.day.toString()} / ${destinationDate.last.month.toString()}';
-                    });
-                  },
+              setState(() {
+                returnWayDateRange =
+                    '${destinationDate.first.day.toString()} / ${destinationDate.first.month.toString()}' +
+                        ' -' +
+                        '\n${destinationDate.last.day.toString()} / ${destinationDate.last.month.toString()}';
+              });
+            },
           ),
         ],
       ),
@@ -264,25 +267,24 @@ class _SearchModalState extends State<SearchModal> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           _leftSide(),
-          // Column(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   mainAxisSize: MainAxisSize.min,
-          //   children: <Widget>[
-          //     Container(
-          //       width: 1,
-          //       height: 140,
-          //       color: Colors.redAccent,
-          //     ),
-          //     Container(
-          //       height: MediaQuery.of(context).size.height * .05,
-          //     ),
-          //     Container(
-          //       width: 1,
-          //       height: 140,
-          //       color: Colors.redAccent,
-          //     ),
-          //   ],
-          // ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              SizedBox(
+                height:50,
+              ),
+              Container(
+                child: Icon(FontAwesomeIcons.exchangeAlt),
+              ),
+              SizedBox(
+                height:125,
+              ),
+              Container(
+                child: Icon(FontAwesomeIcons.calendarWeek),
+              )
+            ],
+          ),
           _rightSide(),
         ],
       ),

@@ -29,7 +29,8 @@ class MyApp extends StatelessWidget {
         primaryColorLight:
             Color.fromARGB(255, 205, 205, 205), //Custom White Color
       ),
-      home: HomePage(),//Loginpage(),
+     // home: HomePage(),
+     home:Loginpage(),
     );
   }
 }

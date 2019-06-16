@@ -20,7 +20,7 @@ class HeaderLayer extends StatelessWidget {
           color: _color2),
       padding: EdgeInsets.all(8),
       child: ModalDrawerHandle(
-        handleColor: Colors.white,
+        handleColor: Color.fromARGB(255, 10, 203, 171),
         handleBorderRadius: BorderRadius.all(
           Radius.circular(8),
         ),

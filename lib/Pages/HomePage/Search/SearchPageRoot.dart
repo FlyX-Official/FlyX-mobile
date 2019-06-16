@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flyx/Pages/Logic/NetworkCalls.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rubber/rubber.dart';
 
 import 'Ui/HeaderLayer.dart';
@@ -19,13 +21,12 @@ class RubberSearch extends StatefulWidget {
 
 class _RubberSearchState extends State<RubberSearch>
     with SingleTickerProviderStateMixin {
-  GlobalKey _rubberBottomSheetKey = GlobalKey();
   void initState() {
     _controller = RubberAnimationController(
       vsync: this,
-      dismissable: true,
-      lowerBoundValue: AnimationControllerValue(pixel: 25),
-      upperBoundValue: AnimationControllerValue(pixel: 370),
+      dismissable: false,
+      lowerBoundValue: AnimationControllerValue(pixel: 89),
+      upperBoundValue: AnimationControllerValue(pixel: 380),
       duration: Duration(milliseconds: 200),
       animationBehavior: AnimationBehavior.preserve,
       //initialValue: AnimationControllerValue(pixel: 200),
@@ -69,6 +70,61 @@ class _RubberSearchState extends State<RubberSearch>
         upperLayer: SearchModal(upperLayerColor2: _upperLayerColor2),
         header: HeaderLayer(color2: _color2),
         headerHeight: 25,
+        menuLayer: Container(
+          height: 65,
+          color: Color.fromARGB(255, 100, 135, 165),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              InkWell(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      FontAwesomeIcons.arrowRight,
+                    ),
+                    Text(
+                      'One-Way',
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  expand();
+                },
+              ),
+              FloatingActionButton.extended(
+                label: const Text('Search'),
+                icon: Icon(Icons.search),
+                backgroundColor: Color.fromARGB(255, 10, 203, 171),
+                onPressed: () {
+                  twoWay();
+                },
+              ),
+              InkWell(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      FontAwesomeIcons.exchangeAlt,
+                    ),
+                    Text(
+                      'Two-Way',
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  expand();
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

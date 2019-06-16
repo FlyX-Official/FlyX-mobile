@@ -8,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flyx/Pages/HomePage/HomePage.dart';
+import 'package:flyx/Pages/HomePage/Search/SearchPageRoot.dart';
+import 'package:flyx/Pages/HomePage/Search/Ui/LowerLayer.dart';
 import 'package:flyx/Pages/HomePage/Search/Ui/SearchModal.dart';
 import 'package:flyx/Pages/Schema/OneWaySchema.dart';
 import 'package:flyx/Pages/Schema/SearchQuery.dart';
@@ -30,7 +32,6 @@ final GoogleSignIn _googleSignIn = GoogleSignIn(
 );
 final Firestore _db = Firestore.instance;
 Dio dio = Dio();
-Response response;
 Alice alice = Alice(showNotification: false);
 //Used for Autocomplete
 Future<List<Suggestions>> pingHeroku(
@@ -54,7 +55,7 @@ dynamic _write(String text) async {
 
 //Used to Search OneWay Tickets
 void oneWay() async {
-  response = await dio.post(
+  final response = await dio.post(
     'https://flyx-server.herokuapp.com/search',
     data: postToJson(
       Post(
@@ -84,8 +85,8 @@ void oneWay() async {
 }
 
 //Used to Search RoundTrip Tickets
-void twoWay() async {
-  response = await dio.post(
+Future<RoundTrip> twoWay() async {
+  final response = await dio.post(
     'https://flyx-server.herokuapp.com/search',
     data: postToJson(
       Post(
@@ -113,14 +114,25 @@ void twoWay() async {
       ),
     ),
   );
-
+  if (response.statusCode == 200) {
+    dynamic dat = jsonEncode(response.data);
+    String dataAsString = dat.toString();
+    nextPage();
+    collapse();
+    return roundTripFromJson(dataAsString);
+  } else {
+    print('network error');
+  }
   print(response.data);
-  dynamic jsonFor = json.encode(response.data);
-  //_write(response.data['data'].toString());
-  _write(jsonFor.toString());
+  // dynamic responseData;
+  // responseData = roundTripToJson(response.data);
+  // // dynamic jsonFor = json.encode(response.data);
+  // // //_write(response.data['data'].toString());
+  // // _write(jsonFor.toString());
 
-  dynamic searlize = roundTripFromJson(jsonFor);
-  _write(searlize.toString());
+  // // dynamic searlize = roundTripFromJson(jsonFor);
+  // // _write(searlize.toString());
+  // return roundTripFromJson(json.encode(response.data));
 }
 
 //Used for GooogleSignIn

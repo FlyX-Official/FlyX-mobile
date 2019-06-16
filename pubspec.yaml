@@ -18,9 +18,10 @@ environment:
 
 dependencies:
   firebase_auth:
-  cloud_firestore: 
+  cloud_firestore:
   google_sign_in:
-  font_awesome_flutter: 
+  font_awesome_flutter:
+  intl:
   google_maps_flutter:
   rubber:
   http:
@@ -46,7 +47,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - assets/Style/map_style_day.txt
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
