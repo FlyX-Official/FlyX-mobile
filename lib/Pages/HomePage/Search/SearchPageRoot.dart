@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/Pages/Logic/NetworkCalls.dart';
+import 'package:flyx/Pages/HomePage/HomePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rubber/rubber.dart';
 
@@ -52,14 +52,8 @@ class _RubberSearchState extends State<RubberSearch>
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData _mediaQuery = MediaQuery.of(context);
-
-    final _lowerLayerPageViewController = PageController();
-    final _searchPageController = PageController();
-
     var _color2 = Color.fromARGB(255, 100, 135, 165);
 
-    var _upperLayerColor2 = Color.fromARGB(75, 46, 209, 153);
     var _rubberBottomSheetKey;
 
     return Container(
@@ -67,7 +61,7 @@ class _RubberSearchState extends State<RubberSearch>
         animationController: _controller,
         key: _rubberBottomSheetKey,
         lowerLayer: LowerLayerBody(),
-        upperLayer: SearchModal(upperLayerColor2: _upperLayerColor2),
+        upperLayer: SearchModal(),
         header: HeaderLayer(color2: _color2),
         headerHeight: 25,
         menuLayer: Container(
@@ -100,7 +94,9 @@ class _RubberSearchState extends State<RubberSearch>
                 icon: Icon(Icons.search),
                 backgroundColor: Color.fromARGB(255, 10, 203, 171),
                 onPressed: () {
-                  twoWay();
+                  nextPage();
+                  collapse();
+                  // contactHeroku();
                 },
               ),
               InkWell(

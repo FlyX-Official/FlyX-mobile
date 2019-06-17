@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flyx/Pages/HomePage/Search/Ui/LowerLayer.dart';
-import 'package:flyx/Pages/HomePage/Search/Ui/SearchModal.dart';
-import 'package:flyx/Pages/Logic/NetworkCalls.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'Search/SearchPageRoot.dart';

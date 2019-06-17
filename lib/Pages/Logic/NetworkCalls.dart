@@ -8,8 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flyx/Pages/HomePage/HomePage.dart';
-import 'package:flyx/Pages/HomePage/Search/SearchPageRoot.dart';
-import 'package:flyx/Pages/HomePage/Search/Ui/LowerLayer.dart';
 import 'package:flyx/Pages/HomePage/Search/Ui/SearchModal.dart';
 import 'package:flyx/Pages/Schema/OneWaySchema.dart';
 import 'package:flyx/Pages/Schema/SearchQuery.dart';
@@ -46,15 +44,17 @@ Future<List<Suggestions>> pingHeroku(
   }
 }
 
-dynamic _write(String text) async {
+dynamic _write(String text, bool isOneWay) async {
   final directory = await getExternalStorageDirectory();
-  final file = File('${directory.path}/my_file.txt');
+  final file = isOneWay
+      ? File('${directory.path}/One_Way.json')
+      : File('${directory.path}/Round_Trip.json');
   print('File Location $file');
-  await file.writeAsString(text, mode: FileMode.writeOnly);
+  await file.writeAsString(text, mode: FileMode.write);
 }
 
 //Used to Search OneWay Tickets
-void oneWay() async {
+Future<OneWay> oneWay() async {
   final response = await dio.post(
     'https://flyx-server.herokuapp.com/search',
     data: postToJson(
@@ -74,20 +74,26 @@ void oneWay() async {
         ),
       ),
     ),
+    options: Options(responseType: ResponseType.plain),
   );
+ if (response.statusCode == 200) {
+    _write(
+      jsonEncode(response.data),
+      true,
+    );
+    return oneWayFromJson(response.data);
+  } else {
+    throw Exception('Failed to contact Server');
+  }
 
-  print(response.data);
-  dynamic jsonFor = json.encode(response.data);
-  //_write(response.data['data'].toString());
-  _write(jsonFor);
-  dynamic searlize = oneWayFromJson(response.data);
-  _write(searlize);
 }
 
 //Used to Search RoundTrip Tickets
+
 Future<RoundTrip> twoWay() async {
+  String url = "https://flyx-server.herokuapp.com/search";
   final response = await dio.post(
-    'https://flyx-server.herokuapp.com/search',
+    url,
     data: postToJson(
       Post(
         oneWay: false,
@@ -113,26 +119,17 @@ Future<RoundTrip> twoWay() async {
         ),
       ),
     ),
+    options: Options(responseType: ResponseType.plain),
   );
   if (response.statusCode == 200) {
-    dynamic dat = jsonEncode(response.data);
-    String dataAsString = dat.toString();
-    nextPage();
-    collapse();
-    return roundTripFromJson(dataAsString);
+    _write(
+      jsonEncode(response.data),
+      false,
+    );
+    return roundTripFromJson(response.data);
   } else {
-    print('network error');
+    throw Exception('Failed to contact Server');
   }
-  print(response.data);
-  // dynamic responseData;
-  // responseData = roundTripToJson(response.data);
-  // // dynamic jsonFor = json.encode(response.data);
-  // // //_write(response.data['data'].toString());
-  // // _write(jsonFor.toString());
-
-  // // dynamic searlize = roundTripFromJson(jsonFor);
-  // // _write(searlize.toString());
-  // return roundTripFromJson(json.encode(response.data));
 }
 
 //Used for GooogleSignIn

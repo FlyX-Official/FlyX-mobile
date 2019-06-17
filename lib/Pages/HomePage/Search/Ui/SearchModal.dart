@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flyx/Pages/HomePage/Search/Functions/AutoComplete.dart';
 
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
-import 'package:flyx/Pages/Logic/NetworkCalls.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 String originQuery, destinationQuery, oneWayDateRange, returnWayDateRange;
@@ -14,11 +13,7 @@ double fromSlider, toSlider;
 class SearchModal extends StatefulWidget {
   const SearchModal({
     Key key,
-    @required Color upperLayerColor2,
-  })  : _upperLayerColor2 = upperLayerColor2,
-        super(key: key);
-
-  final Color _upperLayerColor2;
+  }) : super(key: key);
 
   @override
   _SearchModalState createState() => _SearchModalState();
@@ -34,6 +29,7 @@ class _SearchModalState extends State<SearchModal> {
     destinationQuery = 'LAX';
     fromSlider = 1;
     toSlider = 1;
+
     oneWayDateRange = 'DD / MM \nDD / MM';
     returnWayDateRange = 'DD / MM \nDD / MM';
     super.initState();
@@ -136,6 +132,10 @@ class _SearchModalState extends State<SearchModal> {
               }
 
               setState(() {
+                if (originPicked != null && originPicked.length == 2) {
+                  print(originPicked);
+                  originDate = originPicked.toList();
+                }
                 oneWayDateRange =
                     '${originDate.first.day.toString()} / ${originDate.first.month.toString()}' +
                         ' -' +
@@ -247,6 +247,10 @@ class _SearchModalState extends State<SearchModal> {
               }
 
               setState(() {
+                if (returnDatePicked != null && returnDatePicked.length == 2) {
+                  print(returnDatePicked);
+                  destinationDate = returnDatePicked.toList();
+                }
                 returnWayDateRange =
                     '${destinationDate.first.day.toString()} / ${destinationDate.first.month.toString()}' +
                         ' -' +
@@ -272,13 +276,13 @@ class _SearchModalState extends State<SearchModal> {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               SizedBox(
-                height:50,
+                height: 50,
               ),
               Container(
                 child: Icon(FontAwesomeIcons.exchangeAlt),
               ),
               SizedBox(
-                height:125,
+                height: 125,
               ),
               Container(
                 child: Icon(FontAwesomeIcons.calendarWeek),
