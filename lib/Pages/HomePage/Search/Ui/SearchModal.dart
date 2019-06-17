@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flyx/Pages/HomePage/Map/Map.dart';
 import 'package:flyx/Pages/HomePage/Search/Functions/AutoComplete.dart';
 
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 String originQuery, destinationQuery, oneWayDateRange, returnWayDateRange;
 
 List<DateTime> originDate, destinationDate;
 bool isOrigin;
-double fromSlider, toSlider;
+double fromSlider,
+    toSlider,
+    originLat,
+    originLong,
+    destinationLat,
+    destinationLong;
+
+MarkerId selectedMarker;
+
+PolylineId selectedPolyline;
 
 class SearchModal extends StatefulWidget {
   const SearchModal({
@@ -21,6 +32,90 @@ class SearchModal extends StatefulWidget {
 
 class _SearchModalState extends State<SearchModal> {
   final AutoComplete _delegate = AutoComplete();
+  void addOriginAirportMarkers() {
+    final String markerIdVal = '$originQuery';
+
+    final MarkerId markerId = MarkerId(markerIdVal);
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position: LatLng(
+        originLat,
+        originLong,
+      ),
+      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      onTap: () {
+        onMarkerTapped(markerId);
+      },
+    );
+
+    markers[markerId] = marker;
+    setState(() {
+      markers[markerId] = marker;
+    });
+    myMapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0.0,
+          target: LatLng(
+            originLat,
+            originLong,
+          ),
+          tilt: 45.0,
+          zoom: 13.0,
+        ),
+      ),
+    );
+  }
+
+  void _addDestinationAirportMarkers() {
+    final String markerIdVal = '$destinationQuery';
+
+    final MarkerId markerId = MarkerId(markerIdVal);
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position: LatLng(destinationLat, destinationLong),
+      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      onTap: () {
+        //_onMarkerTapped(markerId);
+      },
+    );
+    markers[markerId] = marker;
+    setState(() {
+      markers[markerId] = marker;
+    });
+    myMapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0.0,
+          target: LatLng(destinationLat, destinationLong),
+          tilt: 45.0,
+          zoom: 13.0,
+        ),
+      ),
+    );
+  }
+
+  void onMarkerTapped(MarkerId markerId) {
+    final Marker tappedMarker = markers[markerId];
+    if (tappedMarker != null) {
+      setState(() {
+        if (markers.containsKey(selectedMarker)) {
+          final Marker resetOld = markers[selectedMarker]
+              .copyWith(iconParam: BitmapDescriptor.defaultMarker);
+          markers[selectedMarker] = resetOld;
+        }
+        selectedMarker = markerId;
+        final Marker newMarker = tappedMarker.copyWith(
+          iconParam: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueGreen,
+          ),
+        );
+        markers[markerId] = newMarker;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -91,6 +186,7 @@ class _SearchModalState extends State<SearchModal> {
             divisions: 5,
             label: '$fromSlider Mi',
             onChanged: (double value) {
+              addOriginAirportMarkers();
               setState(() {
                 fromSlider = value;
               });
@@ -199,6 +295,7 @@ class _SearchModalState extends State<SearchModal> {
             divisions: 5,
             label: '$toSlider Mi',
             onChanged: (double value) {
+              _addDestinationAirportMarkers();
               setState(() {
                 toSlider = value;
               });

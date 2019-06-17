@@ -76,7 +76,7 @@ Future<OneWay> oneWay() async {
     ),
     options: Options(responseType: ResponseType.plain),
   );
- if (response.statusCode == 200) {
+  if (response.statusCode == 200) {
     _write(
       jsonEncode(response.data),
       true,
@@ -85,7 +85,6 @@ Future<OneWay> oneWay() async {
   } else {
     throw Exception('Failed to contact Server');
   }
-
 }
 
 //Used to Search RoundTrip Tickets

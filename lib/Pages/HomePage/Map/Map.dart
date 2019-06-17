@@ -6,14 +6,19 @@ import 'package:flutter/services.dart' show rootBundle;
 
 GoogleMapController myMapController;
 String _mapStyle;
+Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-class Map extends StatefulWidget {
-  Map({Key key}) : super(key: key);
+Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
 
-  _MapState createState() => _MapState();
+class MyMap extends StatefulWidget {
+  MyMap({Key key}) : super(key: key);
+
+  _MyMapState createState() => _MyMapState();
 }
 
-class _MapState extends State<Map> {
+typedef Marker MarkerUpdateAction(Marker marker);
+
+class _MyMapState extends State<MyMap> {
   @override
   void initState() {
     rootBundle.loadString('assets/Style/map_style_day.txt').then((string) {
@@ -34,6 +39,8 @@ class _MapState extends State<Map> {
           myMapController.setMapStyle(_mapStyle);
         },
         compassEnabled: true,
+        markers: Set<Marker>.of(markers.values),
+        polylines: Set<Polyline>.of(polylines.values),
         gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
           Factory<OneSequenceGestureRecognizer>(
             () => EagerGestureRecognizer(),

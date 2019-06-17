@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flyx/Pages/HomePage/Map/Map.dart';
 import 'package:flyx/Pages/HomePage/Search/Ui/SearchModal.dart';
 import 'package:flyx/Pages/Logic/NetworkCalls.dart';
 import 'package:flyx/Pages/Schema/AutocompleteSchema.dart';
@@ -52,6 +53,7 @@ class AutoComplete extends SearchDelegate<List<Suggestions>> {
   @override
   Widget buildSuggestions(BuildContext context) {
     bool isSelected = false;
+
     return FutureBuilder<List<Suggestions>>(
       future: pingHeroku(query),
       builder: (context, snapshot) {
@@ -73,10 +75,17 @@ class AutoComplete extends SearchDelegate<List<Suggestions>> {
                   onTap: () {
                     if (isOrigin == true) {
                       originQuery = snapshot.data[index].source.iata;
+
+                      originLat = snapshot.data[index].source.latitude;
+
+                      originLong = snapshot.data[index].source.longitude;
                     }
                     if (isOrigin == false) {
                       destinationQuery = snapshot.data[index].source.iata;
+                      destinationLat = snapshot.data[index].source.latitude;
+                      destinationLong = snapshot.data[index].source.longitude;
                     }
+
                     Navigator.pop(context);
                   },
                   trailing: Icon(Icons.location_on),

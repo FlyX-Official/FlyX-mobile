@@ -30,6 +30,7 @@ dependencies:
   path_provider:
   groovin_widgets:
   date_range_picker:
+  url_launcher:
   flutter:
     sdk: flutter
 

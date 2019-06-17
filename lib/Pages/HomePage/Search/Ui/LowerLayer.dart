@@ -54,7 +54,7 @@ class _LowerLayerBodyState extends State<LowerLayerBody> {
           }
         },
         children: <Widget>[
-          Map(),
+          MyMap(),
           TicketPage(),
         ],
       ),
