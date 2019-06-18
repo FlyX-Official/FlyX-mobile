@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import 'TicketExtended.dart';
 
-
 class TicketPage extends StatefulWidget {
   TicketPage({Key key}) : super(key: key);
 
@@ -48,22 +47,22 @@ class _TicketPageState extends State<TicketPage> {
 Container ticketCard(
     BuildContext context, AsyncSnapshot<RoundTrip> snapshot, int index) {
   return Container(
-      child: InkWell(
-        onTap:() {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    maintainState: true,
-                    builder: (context) {
-                      return PageItem(
-                        data: snapshot.data.data,
-                        num: index,
-                      );
-                    },
-                  ),
-                );
-              }, 
-        child: Container(
+    child: InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            maintainState: true,
+            builder: (context) {
+              return PageItem(
+                data: snapshot.data.data,
+                num: index,
+              );
+            },
+          ),
+        );
+      },
+      child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16),
@@ -113,10 +112,11 @@ Container ticketCard(
                         itemCount: snapshot.data.data[index].airlines.length,
                         itemBuilder: (context, i) {
                           return Container(
-                              padding: EdgeInsets.only(right: 2),
-                              child: Image.network(
-                                'https://images.kiwi.com/airlines/64/${snapshot.data.data[index].airlines[i]}.png',
-                              ));
+                            padding: EdgeInsets.only(right: 2),
+                            child: Image.network(
+                              'https://images.kiwi.com/airlines/64/${snapshot.data.data[index].airlines[i]}.png',
+                            ),
+                          );
                         },
                       ),
                     ), // For AirlineLogos
@@ -226,7 +226,8 @@ Container ticketCard(
                         ),
                       ),
                       Container(
-                        child: Text('${snapshot.data.data[index].returnDuration}'),
+                        child:
+                            Text('${snapshot.data.data[index].returnDuration}'),
                       ),
                     ],
                   ),
@@ -239,7 +240,10 @@ Container ticketCard(
                   ),
                 ],
               ),
-              Divider(indent: 5,endIndent: 5,),
+              Divider(
+                indent: 5,
+                endIndent: 5,
+              ),
 
               // Text(
               //     'One-Way ${snapshot.data.data[index].routes[0]} Return Trip${snapshot.data.data[index].routes[1]}'),
@@ -291,7 +295,7 @@ Container ticketCard(
             ],
           ),
         ),
-    ),
       ),
+    ),
   );
 }
