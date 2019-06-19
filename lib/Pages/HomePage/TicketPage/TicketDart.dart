@@ -54,9 +54,10 @@ Container ticketCard(
           MaterialPageRoute(
             maintainState: true,
             builder: (context) {
-              return PageItem(
+              return TicketDetailPage(
                 data: snapshot.data.data,
-                num: index,
+                route: snapshot.data.data[index].route,
+                ticketNumber: index,
               );
             },
           ),

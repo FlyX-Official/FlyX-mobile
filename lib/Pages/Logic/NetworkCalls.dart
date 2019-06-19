@@ -77,10 +77,10 @@ Future<OneWay> oneWay() async {
     options: Options(responseType: ResponseType.plain),
   );
   if (response.statusCode == 200) {
-    _write(
-      jsonEncode(response.data),
-      true,
-    );
+    // _write(
+    //   jsonEncode(response.data),
+    //   true,
+    // );
     return oneWayFromJson(response.data);
   } else {
     throw Exception('Failed to contact Server');
@@ -121,10 +121,10 @@ Future<RoundTrip> twoWay() async {
     options: Options(responseType: ResponseType.plain),
   );
   if (response.statusCode == 200) {
-    _write(
-      jsonEncode(response.data),
-      false,
-    );
+    // _write(
+    //   jsonEncode(response.data),
+    //   false,
+    // );
     return roundTripFromJson(response.data);
   } else {
     throw Exception('Failed to contact Server');
@@ -155,7 +155,6 @@ void signInWithGoogle(context) async {
     ),
   );
 }
-
 //Used for Email Password SignIn
 
 void singInWithEmailAndPassword(
