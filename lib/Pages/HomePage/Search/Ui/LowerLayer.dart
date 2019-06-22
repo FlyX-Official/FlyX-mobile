@@ -7,6 +7,7 @@ import 'package:flyx/Pages/Schema/TwoWaySchema.dart';
 import '../../Map/Map.dart';
 
 final homePageController = PageController();
+int currentPage;
 
 class LowerLayerBody extends StatefulWidget {
   const LowerLayerBody({
@@ -25,13 +26,12 @@ class LowerLayerBody extends StatefulWidget {
 //         children: <Widget>[
 //           Container(
 //             child: Map(),
- //         ],
+//         ],
 //       ),
 //     );
 //   }
 // }
 class _LowerLayerBodyState extends State<LowerLayerBody> {
-  int currentPage;
   @override
   void initState() {
     super.initState();
@@ -47,6 +47,7 @@ class _LowerLayerBodyState extends State<LowerLayerBody> {
         onPageChanged: (index) {
           if (index == 1) {
             tmp = twoWay();
+            currentPage = 1;
             setState(() {
               index = 1;
             });
@@ -59,5 +60,4 @@ class _LowerLayerBodyState extends State<LowerLayerBody> {
       ),
     );
   }
-
 }

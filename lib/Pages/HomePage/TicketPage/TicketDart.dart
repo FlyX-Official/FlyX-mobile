@@ -52,7 +52,7 @@ Container ticketCard(
         Navigator.push(
           context,
           MaterialPageRoute(
-            maintainState: true,
+            maintainState: false,
             builder: (context) {
               return TicketDetailPage(
                 data: snapshot.data.data,

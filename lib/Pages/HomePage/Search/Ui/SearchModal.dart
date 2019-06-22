@@ -6,6 +6,8 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'LowerLayer.dart';
+
 String originQuery, destinationQuery, oneWayDateRange, returnWayDateRange;
 
 List<DateTime> originDate, destinationDate;
@@ -53,19 +55,21 @@ class _SearchModalState extends State<SearchModal> {
     setState(() {
       markers[markerId] = marker;
     });
-    myMapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          bearing: 0.0,
-          target: LatLng(
-            originLat,
-            originLong,
+    if (currentPage == 0) {
+      myMapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            bearing: 0.0,
+            target: LatLng(
+              originLat,
+              originLong,
+            ),
+            tilt: 45.0,
+            zoom: 13.0,
           ),
-          tilt: 45.0,
-          zoom: 13.0,
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _addDestinationAirportMarkers() {
@@ -85,16 +89,21 @@ class _SearchModalState extends State<SearchModal> {
     setState(() {
       markers[markerId] = marker;
     });
-    myMapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          bearing: 0.0,
-          target: LatLng(destinationLat, destinationLong),
-          tilt: 45.0,
-          zoom: 13.0,
+    if (currentPage == 0) {
+      myMapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            bearing: 0.0,
+            target: LatLng(
+              destinationLat,
+              destinationLong,
+            ),
+            tilt: 45.0,
+            zoom: 13.0,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void onMarkerTapped(MarkerId markerId) {
@@ -186,7 +195,9 @@ class _SearchModalState extends State<SearchModal> {
             divisions: 5,
             label: '$fromSlider Mi',
             onChanged: (double value) {
-              addOriginAirportMarkers();
+              if (currentPage == 0) {
+                addOriginAirportMarkers();
+              }
               setState(() {
                 fromSlider = value;
               });
@@ -295,7 +306,9 @@ class _SearchModalState extends State<SearchModal> {
             divisions: 5,
             label: '$toSlider Mi',
             onChanged: (double value) {
-              _addDestinationAirportMarkers();
+              if (currentPage == 0) {
+                _addDestinationAirportMarkers();
+              }
               setState(() {
                 toSlider = value;
               });
