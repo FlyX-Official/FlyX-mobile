@@ -10,13 +10,13 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="flyx"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCs2lR8K0qYr212Pnu2vEx1a1TSREyB8ww"/>
+        android:value="AIzaSyCs2lR8K0qYr212Pnu2vEx1a1TSREyB8ww"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

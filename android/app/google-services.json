@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "882535873724-ked25n17jp9mo2qdhikl5aa717b02pkm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flyx",
+            "certificate_hash": "21c8419aa30bcbfa7a7a9a03e550fb06da5f0270"
+          }
+        },
+        {
           "client_id": "882535873724-b17jsg7k306mjfhtncke7h50a2om704q.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -40,10 +48,10 @@
               "client_type": 3
             },
             {
-              "client_id": "882535873724-pmg49dm8ml8jepecsdpfnog0ltmod60o.apps.googleusercontent.com",
+              "client_id": "882535873724-ni61vmamo3h92oa4dofom2mukq4tvhnh.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.flyx"
+                "bundle_id": "com.example.flyx-mobile"
               }
             }
           ]

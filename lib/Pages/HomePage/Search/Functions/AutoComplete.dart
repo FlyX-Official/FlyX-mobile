@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/Pages/HomePage/Map/Map.dart';
 import 'package:flyx/Pages/HomePage/Search/Ui/SearchModal.dart';
 import 'package:flyx/Pages/Logic/NetworkCalls.dart';
 import 'package:flyx/Pages/Schema/AutocompleteSchema.dart';

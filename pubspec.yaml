@@ -26,7 +26,6 @@ dependencies:
   rubber:
   http:
   dio:
-  alice:
   path_provider:
   groovin_widgets:
   date_range_picker:
@@ -74,10 +73,10 @@ flutter:
   fonts:
     - family: GoogleSans
       fonts:
-         - asset: assets\fonts\GoogleSans-Regular.ttf
+         - asset: assets/fonts/GoogleSans-Regular.ttf
     - family: Fredoka
       fonts:
-          - asset: assets\fonts\FredokaOne-Regular.ttf
+          - asset: assets/fonts/FredokaOne-Regular.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

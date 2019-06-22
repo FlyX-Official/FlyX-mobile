@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +28,6 @@ final GoogleSignIn _googleSignIn = GoogleSignIn(
 );
 final Firestore _db = Firestore.instance;
 Dio dio = Dio();
-Alice alice = Alice(showNotification: false);
 //Used for Autocomplete
 Future<List<Suggestions>> pingHeroku(
   String query,
