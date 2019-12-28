@@ -9,19 +9,19 @@ Trip tripFromJson(String str) => Trip.fromJson(json.decode(str));
 String tripToJson(Trip data) => json.encode(data.toJson());
 
 class Trip {
-    final String searchId;
-    final List<Datum> data;
-    final List<dynamic> connections;
-    final int time;
-    final String currency;
-    final double currencyRate;
-    final double fxRate;
-    final List<dynamic> refresh;
-    final double del;
-    final List<dynamic> refTasks;
-    final SearchParams searchParams;
-    final List<dynamic> allStopoverAirports;
-    final List<dynamic> allAirlines;
+    String searchId;
+    List<Datum> data;
+    List<dynamic> connections;
+    int time;
+    String currency;
+    double currencyRate;
+    double fxRate;
+    List<dynamic> refresh;
+    double del;
+    List<dynamic> refTasks;
+    SearchParams searchParams;
+    List<dynamic> allStopoverAirports;
+    List<dynamic> allAirlines;
 
     Trip({
         this.searchId,
@@ -38,37 +38,6 @@ class Trip {
         this.allStopoverAirports,
         this.allAirlines,
     });
-
-    Trip copyWith({
-        String searchId,
-        List<Datum> data,
-        List<dynamic> connections,
-        int time,
-        String currency,
-        double currencyRate,
-        double fxRate,
-        List<dynamic> refresh,
-        double del,
-        List<dynamic> refTasks,
-        SearchParams searchParams,
-        List<dynamic> allStopoverAirports,
-        List<dynamic> allAirlines,
-    }) => 
-        Trip(
-            searchId: searchId ?? this.searchId,
-            data: data ?? this.data,
-            connections: connections ?? this.connections,
-            time: time ?? this.time,
-            currency: currency ?? this.currency,
-            currencyRate: currencyRate ?? this.currencyRate,
-            fxRate: fxRate ?? this.fxRate,
-            refresh: refresh ?? this.refresh,
-            del: del ?? this.del,
-            refTasks: refTasks ?? this.refTasks,
-            searchParams: searchParams ?? this.searchParams,
-            allStopoverAirports: allStopoverAirports ?? this.allStopoverAirports,
-            allAirlines: allAirlines ?? this.allAirlines,
-        );
 
     factory Trip.fromJson(Map<String, dynamic> json) => Trip(
         searchId: json["search_id"] == null ? null : json["search_id"],
@@ -104,48 +73,45 @@ class Trip {
 }
 
 class Datum {
-    final String id;
-    final Map<String, double> bagsPrice;
-    final Baglimit baglimit;
-    final int p1;
-    final int p2;
-    final int p3;
-    final int price;
-    final List<Route> route;
-    final List<String> airlines;
-    final int pnrCount;
-    final List<dynamic> transfers;
-    final bool hasAirportChange;
-    final int technicalStops;
-    final Availability availability;
-    final List<String> typeFlights;
-    final int dTime;
-    final int dTimeUtc;
-    final int aTime;
-    final int aTimeUtc;
-    final int nightsInDest;
-    final String flyFrom;
-    final String flyTo;
-    final String cityFrom;
-    final String cityTo;
-    final String cityCodeFrom;
-    final String cityCodeTo;
-    final Country countryFrom;
-    final Country countryTo;
-    final String mapIdfrom;
-    final String mapIdto;
-    final double distance;
-    final List<List<String>> routes;
-    final bool virtualInterlining;
-    final String flyDuration;
-    final Duration duration;
-    final String returnDuration;
-    final bool facilitatedBookingAvailable;
-    final List<String> foundOn;
-    final Conversion conversion;
-    final double quality;
-    final String bookingToken;
-    final String deepLink;
+    String id;
+    Map<String, double> bagsPrice;
+    Baglimit baglimit;
+    int p1;
+    int p2;
+    int p3;
+    int price;
+    List<Route> route;
+    List<String> airlines;
+    int pnrCount;
+    List<dynamic> transfers;
+    bool hasAirportChange;
+    Availability availability;
+    int dTime;
+    int dTimeUtc;
+    int aTime;
+    int aTimeUtc;
+    int nightsInDest;
+    String flyFrom;
+    String flyTo;
+    String cityFrom;
+    String cityTo;
+    Country countryFrom;
+    Country countryTo;
+    String mapIdfrom;
+    String mapIdto;
+    double distance;
+    List<List<String>> routes;
+    bool virtualInterlining;
+    String flyDuration;
+    Duration duration;
+    String returnDuration;
+    bool facilitatedBookingAvailable;
+    List<String> typeFlights;
+    List<String> foundOn;
+    Conversion conversion;
+    String bookingToken;
+    double quality;
+    String deepLink;
 
     Datum({
         this.id,
@@ -160,9 +126,7 @@ class Datum {
         this.pnrCount,
         this.transfers,
         this.hasAirportChange,
-        this.technicalStops,
         this.availability,
-        this.typeFlights,
         this.dTime,
         this.dTimeUtc,
         this.aTime,
@@ -172,8 +136,6 @@ class Datum {
         this.flyTo,
         this.cityFrom,
         this.cityTo,
-        this.cityCodeFrom,
-        this.cityCodeTo,
         this.countryFrom,
         this.countryTo,
         this.mapIdfrom,
@@ -185,101 +147,13 @@ class Datum {
         this.duration,
         this.returnDuration,
         this.facilitatedBookingAvailable,
+        this.typeFlights,
         this.foundOn,
         this.conversion,
-        this.quality,
         this.bookingToken,
+        this.quality,
         this.deepLink,
     });
-
-    Datum copyWith({
-        String id,
-        Map<String, double> bagsPrice,
-        Baglimit baglimit,
-        int p1,
-        int p2,
-        int p3,
-        int price,
-        List<Route> route,
-        List<String> airlines,
-        int pnrCount,
-        List<dynamic> transfers,
-        bool hasAirportChange,
-        int technicalStops,
-        Availability availability,
-        List<String> typeFlights,
-        int dTime,
-        int dTimeUtc,
-        int aTime,
-        int aTimeUtc,
-        int nightsInDest,
-        String flyFrom,
-        String flyTo,
-        String cityFrom,
-        String cityTo,
-        String cityCodeFrom,
-        String cityCodeTo,
-        Country countryFrom,
-        Country countryTo,
-        String mapIdfrom,
-        String mapIdto,
-        double distance,
-        List<List<String>> routes,
-        bool virtualInterlining,
-        String flyDuration,
-        Duration duration,
-        String returnDuration,
-        bool facilitatedBookingAvailable,
-        List<String> foundOn,
-        Conversion conversion,
-        double quality,
-        String bookingToken,
-        String deepLink,
-    }) => 
-        Datum(
-            id: id ?? this.id,
-            bagsPrice: bagsPrice ?? this.bagsPrice,
-            baglimit: baglimit ?? this.baglimit,
-            p1: p1 ?? this.p1,
-            p2: p2 ?? this.p2,
-            p3: p3 ?? this.p3,
-            price: price ?? this.price,
-            route: route ?? this.route,
-            airlines: airlines ?? this.airlines,
-            pnrCount: pnrCount ?? this.pnrCount,
-            transfers: transfers ?? this.transfers,
-            hasAirportChange: hasAirportChange ?? this.hasAirportChange,
-            technicalStops: technicalStops ?? this.technicalStops,
-            availability: availability ?? this.availability,
-            typeFlights: typeFlights ?? this.typeFlights,
-            dTime: dTime ?? this.dTime,
-            dTimeUtc: dTimeUtc ?? this.dTimeUtc,
-            aTime: aTime ?? this.aTime,
-            aTimeUtc: aTimeUtc ?? this.aTimeUtc,
-            nightsInDest: nightsInDest ?? this.nightsInDest,
-            flyFrom: flyFrom ?? this.flyFrom,
-            flyTo: flyTo ?? this.flyTo,
-            cityFrom: cityFrom ?? this.cityFrom,
-            cityTo: cityTo ?? this.cityTo,
-            cityCodeFrom: cityCodeFrom ?? this.cityCodeFrom,
-            cityCodeTo: cityCodeTo ?? this.cityCodeTo,
-            countryFrom: countryFrom ?? this.countryFrom,
-            countryTo: countryTo ?? this.countryTo,
-            mapIdfrom: mapIdfrom ?? this.mapIdfrom,
-            mapIdto: mapIdto ?? this.mapIdto,
-            distance: distance ?? this.distance,
-            routes: routes ?? this.routes,
-            virtualInterlining: virtualInterlining ?? this.virtualInterlining,
-            flyDuration: flyDuration ?? this.flyDuration,
-            duration: duration ?? this.duration,
-            returnDuration: returnDuration ?? this.returnDuration,
-            facilitatedBookingAvailable: facilitatedBookingAvailable ?? this.facilitatedBookingAvailable,
-            foundOn: foundOn ?? this.foundOn,
-            conversion: conversion ?? this.conversion,
-            quality: quality ?? this.quality,
-            bookingToken: bookingToken ?? this.bookingToken,
-            deepLink: deepLink ?? this.deepLink,
-        );
 
     factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"] == null ? null : json["id"],
@@ -294,9 +168,7 @@ class Datum {
         pnrCount: json["pnr_count"] == null ? null : json["pnr_count"],
         transfers: json["transfers"] == null ? null : List<dynamic>.from(json["transfers"].map((x) => x)),
         hasAirportChange: json["has_airport_change"] == null ? null : json["has_airport_change"],
-        technicalStops: json["technical_stops"] == null ? null : json["technical_stops"],
         availability: json["availability"] == null ? null : Availability.fromJson(json["availability"]),
-        typeFlights: json["type_flights"] == null ? null : List<String>.from(json["type_flights"].map((x) => x)),
         dTime: json["dTime"] == null ? null : json["dTime"],
         dTimeUtc: json["dTimeUTC"] == null ? null : json["dTimeUTC"],
         aTime: json["aTime"] == null ? null : json["aTime"],
@@ -306,8 +178,6 @@ class Datum {
         flyTo: json["flyTo"] == null ? null : json["flyTo"],
         cityFrom: json["cityFrom"] == null ? null : json["cityFrom"],
         cityTo: json["cityTo"] == null ? null : json["cityTo"],
-        cityCodeFrom: json["cityCodeFrom"] == null ? null : json["cityCodeFrom"],
-        cityCodeTo: json["cityCodeTo"] == null ? null : json["cityCodeTo"],
         countryFrom: json["countryFrom"] == null ? null : Country.fromJson(json["countryFrom"]),
         countryTo: json["countryTo"] == null ? null : Country.fromJson(json["countryTo"]),
         mapIdfrom: json["mapIdfrom"] == null ? null : json["mapIdfrom"],
@@ -319,10 +189,11 @@ class Datum {
         duration: json["duration"] == null ? null : Duration.fromJson(json["duration"]),
         returnDuration: json["return_duration"] == null ? null : json["return_duration"],
         facilitatedBookingAvailable: json["facilitated_booking_available"] == null ? null : json["facilitated_booking_available"],
+        typeFlights: json["type_flights"] == null ? null : List<String>.from(json["type_flights"].map((x) => x)),
         foundOn: json["found_on"] == null ? null : List<String>.from(json["found_on"].map((x) => x)),
         conversion: json["conversion"] == null ? null : Conversion.fromJson(json["conversion"]),
-        quality: json["quality"] == null ? null : json["quality"].toDouble(),
         bookingToken: json["booking_token"] == null ? null : json["booking_token"],
+        quality: json["quality"] == null ? null : json["quality"].toDouble(),
         deepLink: json["deep_link"] == null ? null : json["deep_link"],
     );
 
@@ -339,9 +210,7 @@ class Datum {
         "pnr_count": pnrCount == null ? null : pnrCount,
         "transfers": transfers == null ? null : List<dynamic>.from(transfers.map((x) => x)),
         "has_airport_change": hasAirportChange == null ? null : hasAirportChange,
-        "technical_stops": technicalStops == null ? null : technicalStops,
         "availability": availability == null ? null : availability.toJson(),
-        "type_flights": typeFlights == null ? null : List<dynamic>.from(typeFlights.map((x) => x)),
         "dTime": dTime == null ? null : dTime,
         "dTimeUTC": dTimeUtc == null ? null : dTimeUtc,
         "aTime": aTime == null ? null : aTime,
@@ -351,8 +220,6 @@ class Datum {
         "flyTo": flyTo == null ? null : flyTo,
         "cityFrom": cityFrom == null ? null : cityFrom,
         "cityTo": cityTo == null ? null : cityTo,
-        "cityCodeFrom": cityCodeFrom == null ? null : cityCodeFrom,
-        "cityCodeTo": cityCodeTo == null ? null : cityCodeTo,
         "countryFrom": countryFrom == null ? null : countryFrom.toJson(),
         "countryTo": countryTo == null ? null : countryTo.toJson(),
         "mapIdfrom": mapIdfrom == null ? null : mapIdfrom,
@@ -364,27 +231,21 @@ class Datum {
         "duration": duration == null ? null : duration.toJson(),
         "return_duration": returnDuration == null ? null : returnDuration,
         "facilitated_booking_available": facilitatedBookingAvailable == null ? null : facilitatedBookingAvailable,
+        "type_flights": typeFlights == null ? null : List<dynamic>.from(typeFlights.map((x) => x)),
         "found_on": foundOn == null ? null : List<dynamic>.from(foundOn.map((x) => x)),
         "conversion": conversion == null ? null : conversion.toJson(),
-        "quality": quality == null ? null : quality,
         "booking_token": bookingToken == null ? null : bookingToken,
+        "quality": quality == null ? null : quality,
         "deep_link": deepLink == null ? null : deepLink,
     };
 }
 
 class Availability {
-    final int seats;
+    int seats;
 
     Availability({
         this.seats,
     });
-
-    Availability copyWith({
-        int seats,
-    }) => 
-        Availability(
-            seats: seats ?? this.seats,
-        );
 
     factory Availability.fromJson(Map<String, dynamic> json) => Availability(
         seats: json["seats"] == null ? null : json["seats"],
@@ -396,15 +257,15 @@ class Availability {
 }
 
 class Baglimit {
-    final int handWidth;
-    final int handHeight;
-    final int handLength;
-    final int handWeight;
-    final int holdWidth;
-    final int holdHeight;
-    final int holdLength;
-    final int holdDimensionsSum;
-    final int holdWeight;
+    int handWidth;
+    int handHeight;
+    int handLength;
+    int handWeight;
+    int holdWidth;
+    int holdHeight;
+    int holdLength;
+    int holdDimensionsSum;
+    int holdWeight;
 
     Baglimit({
         this.handWidth,
@@ -417,29 +278,6 @@ class Baglimit {
         this.holdDimensionsSum,
         this.holdWeight,
     });
-
-    Baglimit copyWith({
-        int handWidth,
-        int handHeight,
-        int handLength,
-        int handWeight,
-        int holdWidth,
-        int holdHeight,
-        int holdLength,
-        int holdDimensionsSum,
-        int holdWeight,
-    }) => 
-        Baglimit(
-            handWidth: handWidth ?? this.handWidth,
-            handHeight: handHeight ?? this.handHeight,
-            handLength: handLength ?? this.handLength,
-            handWeight: handWeight ?? this.handWeight,
-            holdWidth: holdWidth ?? this.holdWidth,
-            holdHeight: holdHeight ?? this.holdHeight,
-            holdLength: holdLength ?? this.holdLength,
-            holdDimensionsSum: holdDimensionsSum ?? this.holdDimensionsSum,
-            holdWeight: holdWeight ?? this.holdWeight,
-        );
 
     factory Baglimit.fromJson(Map<String, dynamic> json) => Baglimit(
         handWidth: json["hand_width"] == null ? null : json["hand_width"],
@@ -467,22 +305,13 @@ class Baglimit {
 }
 
 class Conversion {
-    final int usd;
-    final int eur;
+    int usd;
+    int eur;
 
     Conversion({
         this.usd,
         this.eur,
     });
-
-    Conversion copyWith({
-        int usd,
-        int eur,
-    }) => 
-        Conversion(
-            usd: usd ?? this.usd,
-            eur: eur ?? this.eur,
-        );
 
     factory Conversion.fromJson(Map<String, dynamic> json) => Conversion(
         usd: json["USD"] == null ? null : json["USD"],
@@ -496,22 +325,13 @@ class Conversion {
 }
 
 class Country {
-    final String code;
-    final String name;
+    String code;
+    String name;
 
     Country({
         this.code,
         this.name,
     });
-
-    Country copyWith({
-        String code,
-        String name,
-    }) => 
-        Country(
-            code: code ?? this.code,
-            name: name ?? this.name,
-        );
 
     factory Country.fromJson(Map<String, dynamic> json) => Country(
         code: json["code"] == null ? null : json["code"],
@@ -525,26 +345,15 @@ class Country {
 }
 
 class Duration {
-    final int departure;
-    final int durationReturn;
-    final int total;
+    int departure;
+    int durationReturn;
+    int total;
 
     Duration({
         this.departure,
         this.durationReturn,
         this.total,
     });
-
-    Duration copyWith({
-        int departure,
-        int durationReturn,
-        int total,
-    }) => 
-        Duration(
-            departure: departure ?? this.departure,
-            durationReturn: durationReturn ?? this.durationReturn,
-            total: total ?? this.total,
-        );
 
     factory Duration.fromJson(Map<String, dynamic> json) => Duration(
         departure: json["departure"] == null ? null : json["departure"],
@@ -560,61 +369,52 @@ class Duration {
 }
 
 class Route {
-    final String fareBasis;
-    final String fareCategory;
-    final String fareClasses;
-    final int price;
-    final String fareFamily;
-    final String foundOn;
-    final int lastSeen;
-    final int refreshTimestamp;
-    final String source;
-    final int routeReturn;
-    final bool bagsRecheckRequired;
-    final bool guarantee;
-    final String id;
-    final String combinationId;
-    final int originalReturn;
-    final int aTime;
-    final int dTime;
-    final int aTimeUtc;
-    final int dTimeUtc;
-    final String mapIdfrom;
-    final String mapIdto;
-    final String cityTo;
-    final String cityFrom;
-    final String cityCodeFrom;
-    final String cityCodeTo;
-    final String flyTo;
-    final String flyFrom;
-    final String airline;
-    final String operatingCarrier;
-    final String equipment;
-    final double latFrom;
-    final double lngFrom;
-    final double latTo;
-    final double lngTo;
-    final int flightNo;
-    final String vehicleType;
-    final String operatingFlightNo;
-    final bool followingTechnicalStop;
+    String id;
+    String combinationId;
+    int routeReturn;
+    int originalReturn;
+    String source;
+    String foundOn;
+    int price;
+    int aTime;
+    int dTime;
+    int aTimeUtc;
+    int dTimeUtc;
+    String mapIdfrom;
+    String mapIdto;
+    String cityTo;
+    String cityFrom;
+    String flyTo;
+    String airline;
+    String operatingCarrier;
+    dynamic equipment;
+    String flyFrom;
+    double latFrom;
+    double lngFrom;
+    double latTo;
+    double lngTo;
+    int flightNo;
+    String vehicleType;
+    int refreshTimestamp;
+    bool bagsRecheckRequired;
+    bool guarantee;
+    String fareClasses;
+    String fareBasis;
+    String fareFamily;
+    String fareCategory;
+    int lastSeen;
+    String operatingFlightNo;
+    String stationFrom;
+    String stationTo;
 
     Route({
-        this.fareBasis,
-        this.fareCategory,
-        this.fareClasses,
-        this.price,
-        this.fareFamily,
-        this.foundOn,
-        this.lastSeen,
-        this.refreshTimestamp,
-        this.source,
-        this.routeReturn,
-        this.bagsRecheckRequired,
-        this.guarantee,
         this.id,
         this.combinationId,
+        this.routeReturn,
         this.originalReturn,
+        this.source,
+        this.foundOn,
+        this.price,
         this.aTime,
         this.dTime,
         this.aTimeUtc,
@@ -623,120 +423,38 @@ class Route {
         this.mapIdto,
         this.cityTo,
         this.cityFrom,
-        this.cityCodeFrom,
-        this.cityCodeTo,
         this.flyTo,
-        this.flyFrom,
         this.airline,
         this.operatingCarrier,
         this.equipment,
+        this.flyFrom,
         this.latFrom,
         this.lngFrom,
         this.latTo,
         this.lngTo,
         this.flightNo,
         this.vehicleType,
+        this.refreshTimestamp,
+        this.bagsRecheckRequired,
+        this.guarantee,
+        this.fareClasses,
+        this.fareBasis,
+        this.fareFamily,
+        this.fareCategory,
+        this.lastSeen,
         this.operatingFlightNo,
-        this.followingTechnicalStop,
+        this.stationFrom,
+        this.stationTo,
     });
 
-    Route copyWith({
-        String fareBasis,
-        String fareCategory,
-        String fareClasses,
-        int price,
-        String fareFamily,
-        String foundOn,
-        int lastSeen,
-        int refreshTimestamp,
-        String source,
-        int routeReturn,
-        bool bagsRecheckRequired,
-        bool guarantee,
-        String id,
-        String combinationId,
-        int originalReturn,
-        int aTime,
-        int dTime,
-        int aTimeUtc,
-        int dTimeUtc,
-        String mapIdfrom,
-        String mapIdto,
-        String cityTo,
-        String cityFrom,
-        String cityCodeFrom,
-        String cityCodeTo,
-        String flyTo,
-        String flyFrom,
-        String airline,
-        String operatingCarrier,
-        String equipment,
-        double latFrom,
-        double lngFrom,
-        double latTo,
-        double lngTo,
-        int flightNo,
-        String vehicleType,
-        String operatingFlightNo,
-        bool followingTechnicalStop,
-    }) => 
-        Route(
-            fareBasis: fareBasis ?? this.fareBasis,
-            fareCategory: fareCategory ?? this.fareCategory,
-            fareClasses: fareClasses ?? this.fareClasses,
-            price: price ?? this.price,
-            fareFamily: fareFamily ?? this.fareFamily,
-            foundOn: foundOn ?? this.foundOn,
-            lastSeen: lastSeen ?? this.lastSeen,
-            refreshTimestamp: refreshTimestamp ?? this.refreshTimestamp,
-            source: source ?? this.source,
-            routeReturn: routeReturn ?? this.routeReturn,
-            bagsRecheckRequired: bagsRecheckRequired ?? this.bagsRecheckRequired,
-            guarantee: guarantee ?? this.guarantee,
-            id: id ?? this.id,
-            combinationId: combinationId ?? this.combinationId,
-            originalReturn: originalReturn ?? this.originalReturn,
-            aTime: aTime ?? this.aTime,
-            dTime: dTime ?? this.dTime,
-            aTimeUtc: aTimeUtc ?? this.aTimeUtc,
-            dTimeUtc: dTimeUtc ?? this.dTimeUtc,
-            mapIdfrom: mapIdfrom ?? this.mapIdfrom,
-            mapIdto: mapIdto ?? this.mapIdto,
-            cityTo: cityTo ?? this.cityTo,
-            cityFrom: cityFrom ?? this.cityFrom,
-            cityCodeFrom: cityCodeFrom ?? this.cityCodeFrom,
-            cityCodeTo: cityCodeTo ?? this.cityCodeTo,
-            flyTo: flyTo ?? this.flyTo,
-            flyFrom: flyFrom ?? this.flyFrom,
-            airline: airline ?? this.airline,
-            operatingCarrier: operatingCarrier ?? this.operatingCarrier,
-            equipment: equipment ?? this.equipment,
-            latFrom: latFrom ?? this.latFrom,
-            lngFrom: lngFrom ?? this.lngFrom,
-            latTo: latTo ?? this.latTo,
-            lngTo: lngTo ?? this.lngTo,
-            flightNo: flightNo ?? this.flightNo,
-            vehicleType: vehicleType ?? this.vehicleType,
-            operatingFlightNo: operatingFlightNo ?? this.operatingFlightNo,
-            followingTechnicalStop: followingTechnicalStop ?? this.followingTechnicalStop,
-        );
-
     factory Route.fromJson(Map<String, dynamic> json) => Route(
-        fareBasis: json["fare_basis"] == null ? null : json["fare_basis"],
-        fareCategory: json["fare_category"] == null ? null : json["fare_category"],
-        fareClasses: json["fare_classes"] == null ? null : json["fare_classes"],
-        price: json["price"] == null ? null : json["price"],
-        fareFamily: json["fare_family"] == null ? null : json["fare_family"],
-        foundOn: json["found_on"] == null ? null : json["found_on"],
-        lastSeen: json["last_seen"] == null ? null : json["last_seen"],
-        refreshTimestamp: json["refresh_timestamp"] == null ? null : json["refresh_timestamp"],
-        source: json["source"] == null ? null : json["source"],
-        routeReturn: json["return"] == null ? null : json["return"],
-        bagsRecheckRequired: json["bags_recheck_required"] == null ? null : json["bags_recheck_required"],
-        guarantee: json["guarantee"] == null ? null : json["guarantee"],
         id: json["id"] == null ? null : json["id"],
         combinationId: json["combination_id"] == null ? null : json["combination_id"],
+        routeReturn: json["return"] == null ? null : json["return"],
         originalReturn: json["original_return"] == null ? null : json["original_return"],
+        source: json["source"] == null ? null : json["source"],
+        foundOn: json["found_on"] == null ? null : json["found_on"],
+        price: json["price"] == null ? null : json["price"],
         aTime: json["aTime"] == null ? null : json["aTime"],
         dTime: json["dTime"] == null ? null : json["dTime"],
         aTimeUtc: json["aTimeUTC"] == null ? null : json["aTimeUTC"],
@@ -745,39 +463,38 @@ class Route {
         mapIdto: json["mapIdto"] == null ? null : json["mapIdto"],
         cityTo: json["cityTo"] == null ? null : json["cityTo"],
         cityFrom: json["cityFrom"] == null ? null : json["cityFrom"],
-        cityCodeFrom: json["cityCodeFrom"] == null ? null : json["cityCodeFrom"],
-        cityCodeTo: json["cityCodeTo"] == null ? null : json["cityCodeTo"],
         flyTo: json["flyTo"] == null ? null : json["flyTo"],
-        flyFrom: json["flyFrom"] == null ? null : json["flyFrom"],
         airline: json["airline"] == null ? null : json["airline"],
         operatingCarrier: json["operating_carrier"] == null ? null : json["operating_carrier"],
-        equipment: json["equipment"] == null ? null : json["equipment"],
+        equipment: json["equipment"],
+        flyFrom: json["flyFrom"] == null ? null : json["flyFrom"],
         latFrom: json["latFrom"] == null ? null : json["latFrom"].toDouble(),
         lngFrom: json["lngFrom"] == null ? null : json["lngFrom"].toDouble(),
         latTo: json["latTo"] == null ? null : json["latTo"].toDouble(),
         lngTo: json["lngTo"] == null ? null : json["lngTo"].toDouble(),
         flightNo: json["flight_no"] == null ? null : json["flight_no"],
         vehicleType: json["vehicle_type"] == null ? null : json["vehicle_type"],
+        refreshTimestamp: json["refresh_timestamp"] == null ? null : json["refresh_timestamp"],
+        bagsRecheckRequired: json["bags_recheck_required"] == null ? null : json["bags_recheck_required"],
+        guarantee: json["guarantee"] == null ? null : json["guarantee"],
+        fareClasses: json["fare_classes"] == null ? null : json["fare_classes"],
+        fareBasis: json["fare_basis"] == null ? null : json["fare_basis"],
+        fareFamily: json["fare_family"] == null ? null : json["fare_family"],
+        fareCategory: json["fare_category"] == null ? null : json["fare_category"],
+        lastSeen: json["last_seen"] == null ? null : json["last_seen"],
         operatingFlightNo: json["operating_flight_no"] == null ? null : json["operating_flight_no"],
-        followingTechnicalStop: json["following_technical_stop"] == null ? null : json["following_technical_stop"],
+        stationFrom: json["stationFrom"] == null ? null : json["stationFrom"],
+        stationTo: json["stationTo"] == null ? null : json["stationTo"],
     );
 
     Map<String, dynamic> toJson() => {
-        "fare_basis": fareBasis == null ? null : fareBasis,
-        "fare_category": fareCategory == null ? null : fareCategory,
-        "fare_classes": fareClasses == null ? null : fareClasses,
-        "price": price == null ? null : price,
-        "fare_family": fareFamily == null ? null : fareFamily,
-        "found_on": foundOn == null ? null : foundOn,
-        "last_seen": lastSeen == null ? null : lastSeen,
-        "refresh_timestamp": refreshTimestamp == null ? null : refreshTimestamp,
-        "source": source == null ? null : source,
-        "return": routeReturn == null ? null : routeReturn,
-        "bags_recheck_required": bagsRecheckRequired == null ? null : bagsRecheckRequired,
-        "guarantee": guarantee == null ? null : guarantee,
         "id": id == null ? null : id,
         "combination_id": combinationId == null ? null : combinationId,
+        "return": routeReturn == null ? null : routeReturn,
         "original_return": originalReturn == null ? null : originalReturn,
+        "source": source == null ? null : source,
+        "found_on": foundOn == null ? null : foundOn,
+        "price": price == null ? null : price,
         "aTime": aTime == null ? null : aTime,
         "dTime": dTime == null ? null : dTime,
         "aTimeUTC": aTimeUtc == null ? null : aTimeUtc,
@@ -786,45 +503,41 @@ class Route {
         "mapIdto": mapIdto == null ? null : mapIdto,
         "cityTo": cityTo == null ? null : cityTo,
         "cityFrom": cityFrom == null ? null : cityFrom,
-        "cityCodeFrom": cityCodeFrom == null ? null : cityCodeFrom,
-        "cityCodeTo": cityCodeTo == null ? null : cityCodeTo,
         "flyTo": flyTo == null ? null : flyTo,
-        "flyFrom": flyFrom == null ? null : flyFrom,
         "airline": airline == null ? null : airline,
         "operating_carrier": operatingCarrier == null ? null : operatingCarrier,
-        "equipment": equipment == null ? null : equipment,
+        "equipment": equipment,
+        "flyFrom": flyFrom == null ? null : flyFrom,
         "latFrom": latFrom == null ? null : latFrom,
         "lngFrom": lngFrom == null ? null : lngFrom,
         "latTo": latTo == null ? null : latTo,
         "lngTo": lngTo == null ? null : lngTo,
         "flight_no": flightNo == null ? null : flightNo,
         "vehicle_type": vehicleType == null ? null : vehicleType,
+        "refresh_timestamp": refreshTimestamp == null ? null : refreshTimestamp,
+        "bags_recheck_required": bagsRecheckRequired == null ? null : bagsRecheckRequired,
+        "guarantee": guarantee == null ? null : guarantee,
+        "fare_classes": fareClasses == null ? null : fareClasses,
+        "fare_basis": fareBasis == null ? null : fareBasis,
+        "fare_family": fareFamily == null ? null : fareFamily,
+        "fare_category": fareCategory == null ? null : fareCategory,
+        "last_seen": lastSeen == null ? null : lastSeen,
         "operating_flight_no": operatingFlightNo == null ? null : operatingFlightNo,
-        "following_technical_stop": followingTechnicalStop == null ? null : followingTechnicalStop,
+        "stationFrom": stationFrom == null ? null : stationFrom,
+        "stationTo": stationTo == null ? null : stationTo,
     };
 }
 
 class SearchParams {
-    final String flyFromType;
-    final String toType;
-    final Seats seats;
+    String flyFromType;
+    String toType;
+    Seats seats;
 
     SearchParams({
         this.flyFromType,
         this.toType,
         this.seats,
     });
-
-    SearchParams copyWith({
-        String flyFromType,
-        String toType,
-        Seats seats,
-    }) => 
-        SearchParams(
-            flyFromType: flyFromType ?? this.flyFromType,
-            toType: toType ?? this.toType,
-            seats: seats ?? this.seats,
-        );
 
     factory SearchParams.fromJson(Map<String, dynamic> json) => SearchParams(
         flyFromType: json["flyFrom_type"] == null ? null : json["flyFrom_type"],
@@ -840,10 +553,10 @@ class SearchParams {
 }
 
 class Seats {
-    final int passengers;
-    final int adults;
-    final int children;
-    final int infants;
+    int passengers;
+    int adults;
+    int children;
+    int infants;
 
     Seats({
         this.passengers,
@@ -851,19 +564,6 @@ class Seats {
         this.children,
         this.infants,
     });
-
-    Seats copyWith({
-        int passengers,
-        int adults,
-        int children,
-        int infants,
-    }) => 
-        Seats(
-            passengers: passengers ?? this.passengers,
-            adults: adults ?? this.adults,
-            children: children ?? this.children,
-            infants: infants ?? this.infants,
-        );
 
     factory Seats.fromJson(Map<String, dynamic> json) => Seats(
         passengers: json["passengers"] == null ? null : json["passengers"],

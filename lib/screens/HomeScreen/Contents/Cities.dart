@@ -10,7 +10,8 @@ class Cities extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserQuery _query = Provider.of<UserQuery>(context, listen: true);
-    final _nearby = Provider.of<FetchNearBy>(context);
+    final FetchNearBy _nearby =
+        Provider.of<FetchNearBy>(context, listen: false);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
   Future _openBoxes() async {
     var dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
-    //print(dir.path);
+    // print('path is' + dir.path);
 
     return Future.wait([
       Hive.openBox(
