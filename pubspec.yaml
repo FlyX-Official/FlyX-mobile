@@ -1,0 +1,56 @@
+name: flyx
+description: No bs FlightBooking
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons:
+  dio:
+  intl:
+  hive:
+  hive_flutter:
+  provider:
+  path_provider:
+  url_launcher:
+  geohash:
+  #UI
+  date_range_picker:
+  flutter_auth_buttons:
+  flutter_icons:
+  groovin_widgets:
+  google_maps_flutter:
+  flutter_page_indicators:
+  #UX
+  rubber:
+  flutter_staggered_animations:
+  #Auth
+  google_sign_in:
+  firebase_auth:
+  cloud_firestore:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test: 
+  flutter_driver:
+    sdk: flutter
+  flutter_gherkin: 
+flutter:
+  uses-material-design: true

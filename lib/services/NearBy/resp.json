@@ -1,0 +1,191 @@
+{
+  "took": 5,
+  "timed_out": false,
+  "_shards": { "total": 5, "successful": 5, "skipped": 0, "failed": 0 },
+  "hits": {
+    "total": 16,
+    "max_score": 1.0,
+    "hits": [
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "TJpt8GoBcTu6piNhUgr8",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Alameda Naval Air Station",
+          "City": "Alameda",
+          "Country": "United States",
+          "IATA": "NGZ",
+          "ICAO": "KNGZ",
+          "Latitude": 37.78889846801758,
+          "Longitude": -122.31999969482422,
+          "Geohash": "9q9nbx3233jx",
+          "Combined": "NGZ, Alameda Naval Air Station, Alameda",
+          "IATA_Completion": "NGZ"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "Ge1s8GoBvislT62Up2Yk",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Livermore Municipal Airport",
+          "City": "Livermore",
+          "Country": "United States",
+          "IATA": "LVK",
+          "ICAO": "KLVK",
+          "Latitude": 37.6934013367,
+          "Longitude": -121.819999695,
+          "Geohash": "9q9q7vv7ur29",
+          "Combined": "LVK, Livermore Municipal Airport, Livermore",
+          "IATA_Completion": "LVK"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "mu1t8GoBvislT62UPmZF",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Palo Alto Airport of Santa Clara County",
+          "City": "Palo Alto",
+          "Country": "United States",
+          "IATA": "PAO",
+          "ICAO": "KPAO",
+          "Latitude": 37.461101532,
+          "Longitude": -122.114997864,
+          "Geohash": "9q9jj5wddr3y",
+          "Combined": "PAO, Palo Alto Airport of Santa Clara County, Palo Alto",
+          "IATA_Completion": "PAO"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "DO1t8GoBvislT62UxGd6",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Watsonville Municipal Airport",
+          "City": "Watsonville",
+          "Country": "United States",
+          "IATA": "WVI",
+          "ICAO": "KWVI",
+          "Latitude": 36.9356994629,
+          "Longitude": -121.790000916,
+          "Geohash": "9q96hegnp33j",
+          "Combined": "WVI, Watsonville Municipal Airport, Watsonville",
+          "IATA_Completion": "WVI"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "wpps8GoBcTu6piNhsAlz",
+        "_score": 1.0,
+        "_source": {
+          "Name": "San Carlos Airport",
+          "City": "San Carlos",
+          "Country": "United States",
+          "IATA": "SQL",
+          "ICAO": "KSQL",
+          "Latitude": 37.511901855469,
+          "Longitude": -122.25,
+          "Geohash": "9q9j6hu68t34",
+          "Combined": "SQL, San Carlos Airport, San Carlos",
+          "IATA_Completion": "SQL"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "uppp8GoBcTu6piNhCwby",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Metropolitan Oakland International Airport",
+          "City": "Oakland",
+          "Country": "United States",
+          "IATA": "OAK",
+          "ICAO": "KOAK",
+          "Latitude": 37.721298,
+          "Longitude": -122.221001,
+          "Geohash": "9q9ndfcqkr87",
+          "Combined": "OAK, Metropolitan Oakland International Airport, Oakland",
+          "IATA_Completion": "OAK"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "v5pp8GoBcTu6piNhEgYK",
+        "_score": 1.0,
+        "_source": {
+          "Name": "San Francisco International Airport",
+          "City": "San Francisco",
+          "Country": "United States",
+          "IATA": "SFO",
+          "ICAO": "KSFO",
+          "Latitude": 37.61899948120117,
+          "Longitude": -122.375,
+          "Geohash": "9q8yp234xcf2",
+          "Combined": "SFO, San Francisco International Airport, San Francisco",
+          "IATA_Completion": "SFO"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "Hu1s8GoBvislT62UrGaz",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Napa County Airport",
+          "City": "Napa",
+          "Country": "United States",
+          "IATA": "APC",
+          "ICAO": "KAPC",
+          "Latitude": 38.2132,
+          "Longitude": -122.280998,
+          "Geohash": "9qc13kt8n0z3",
+          "Combined": "APC, Napa County Airport, Napa",
+          "IATA_Completion": "APC"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "i7xt8GoBsKQzFWN0TJkv",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Hayward Executive Airport",
+          "City": "Hayward",
+          "Country": "United States",
+          "IATA": "HWD",
+          "ICAO": "KHWD",
+          "Latitude": 37.659198761,
+          "Longitude": -122.122001648,
+          "Geohash": "9q9njp9kxp7w",
+          "Combined": "HWD, Hayward Executive Airport, Hayward",
+          "IATA_Completion": "HWD"
+        }
+      },
+      {
+        "_index": "airports",
+        "_type": "_doc",
+        "_id": "M-1s8GoBvislT62UxWYl",
+        "_score": 1.0,
+        "_source": {
+          "Name": "Buchanan Field",
+          "City": "Concord",
+          "Country": "United States",
+          "IATA": "CCR",
+          "ICAO": "KCCR",
+          "Latitude": 37.9897003174,
+          "Longitude": -122.056999207,
+          "Geohash": "9qc0nebf1c2v",
+          "Combined": "CCR, Buchanan Field, Concord",
+          "IATA_Completion": "CCR"
+        }
+      }
+    ]
+  }
+}

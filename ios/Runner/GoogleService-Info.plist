@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>882535873724-2lvv4dnqb4g1tmne1b7ac0nf4qflm3f0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.882535873724-2lvv4dnqb4g1tmne1b7ac0nf4qflm3f0</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>882535873724-3jkj6h8hcvmjjq1h8i68r5e86phpkqjt.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDDTi67tSTkcVvIsFEmwj5K_iqSQPgauC0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>882535873724</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mahesh.flyx</string>
+	<key>PROJECT_ID</key>
+	<string>flyx-1551400318222</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flyx-1551400318222.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:882535873724:ios:8972dbca7f9f1116b9e4b9</string>
+	<key>DATABASE_URL</key>
+	<string>https://flyx-1551400318222.firebaseio.com</string>
+</dict>
+</plist>
