@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-// import 'package:flyx/models/AutoComplete/AutoComplete.dart';
+import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
+// import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
 
 class AutoCompleteCall with ChangeNotifier {
   List<Suggestions> _data;

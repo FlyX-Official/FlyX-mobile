@@ -1,15 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flyx/models/TicketResponse/ResponseModal.dart';
-import 'package:flyx/services/TicketNetworkCall/Request.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/models/TicketResponse/ResponseModal.dart';
+import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 final scrollController = ScrollController(keepScrollOffset: true);
+
+class Tickets extends StatelessWidget {
+  const Tickets({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Box _tickets = Hive.box('Tickets');
+    final _snapshot = Provider.of<FlightSearch>(context).data;
+    return Scaffold(
+      body: WatchBoxBuilder(
+        box: _tickets,
+        builder: (context, box) => Center(
+          child: box.values.length == 1 && _snapshot != null
+              ? const TicketResults()
+              : const Center(
+                  child: const CircularProgressIndicator(),
+                ),
+        ),
+      ),
+    );
+  }
+}
 
 class TicketResults extends StatefulWidget {
   const TicketResults({Key key}) : super(key: key);
@@ -32,49 +54,41 @@ class _TicketResultsState extends State<TicketResults> {
     final UserQuery _query = Provider.of<UserQuery>(context);
     final _snapshot = Provider.of<FlightSearch>(context).data;
 
-    return Scaffold(
-      body: SafeArea(
-        maintainBottomViewPadding: true,
-        top: false,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              backgroundColor: Colors.blueGrey,
-              automaticallyImplyLeading: true,
-              elevation: 8,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Text(
-                    _query.departureCityIata,
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverAppBar(
+          backgroundColor: Colors.blueGrey,
+          automaticallyImplyLeading: true,
+          elevation: 8,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text('LAX' //_query.departureCityIata,
                   ),
-                  Icon(
-                    _query.isOneWay
-                        ? Icons.arrow_forward
-                        : Icons.swap_horizontal_circle,
-                  ),
-                  Text(
-                    _query.destinationCityIata,
-                  ),
-                ],
+              Icon(
+                _query.isOneWay
+                    ? Icons.arrow_forward
+                    : Icons.swap_horizontal_circle,
               ),
-              centerTitle: true,
-            ),
-            SliverFillRemaining(
-              child: WatchBoxBuilder(
-                box: _tickets,
-                builder: (context, box) => Center(
-                  child: box.values.length == 1 && _snapshot != null
-                      ? const TicketSliverList()
-                      : const Center(
-                          child: const CircularProgressIndicator(),
-                        ),
-                ),
-              ),
-            )
-          ],
+              Text('HYD' // _query.destinationCityIata,
+                  ),
+            ],
+          ),
+          centerTitle: true,
         ),
-      ),
+        SliverFillRemaining(
+          child: WatchBoxBuilder(
+            box: _tickets,
+            builder: (context, box) => Center(
+              child: box.values.length == 1 && _snapshot != null
+                  ? const TicketSliverList()
+                  : const Center(
+                      child: const CircularProgressIndicator(),
+                    ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -88,7 +102,8 @@ class TicketSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     final _isOneWay = Provider.of<UserQuery>(context);
     final Trip _snapshot = Provider.of<FlightSearch>(context).data;
-
+    final Size _width = MediaQuery.of(context).size;
+    print(_width.width);
     return CustomScrollView(
       controller: scrollController,
       // cacheExtent: 25,
@@ -106,11 +121,11 @@ class TicketSliverList extends StatelessWidget {
                     child: InkWell(
                       onTap: () async {
                         String url = _snapshot.data[index].deepLink;
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
+                        // if (await canLaunch(url)) {
+                        //   await launch(url);
+                        // } else {
+                        //   throw 'Could not launch $url';
+                        // }
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(
@@ -167,7 +182,7 @@ class TicketSliverList extends StatelessWidget {
             childCount: _snapshot.data.length ?? 1,
             // _snapshot.data.length,
           ),
-        ),
+        )
       ],
     );
   }
@@ -195,44 +210,50 @@ class TopLayer extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Container(
-            decoration: const BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(16),
+          Expanded(
+            flex: 4,
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: const BorderRadius.all(
+                  const Radius.circular(16),
+                ),
               ),
-            ),
-            margin: const EdgeInsets.only(left: 4.0),
-            height: 40,
-            width: MediaQuery.of(context).size.width * .66,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _snapshot.data[index].airlines.length,
-              itemBuilder: (context, i) => Container(
-                padding: const EdgeInsets.only(right: 2),
-                child: Image.network(
-                  'https://images.kiwi.com/airlines/64/${_snapshot.data[index].airlines[i]}.png',
+              margin: const EdgeInsets.only(left: 4.0),
+              height: 40,
+              // width: MediaQuery.of(context).size.width * .66,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _snapshot.data[index].airlines.length,
+                itemBuilder: (context, i) => Container(
+                  padding: const EdgeInsets.only(right: 2),
+                  child: Image.network(
+                    'https://images.kiwi.com/airlines/64/${_snapshot.data[index].airlines[i]}.png',
+                  ),
                 ),
               ),
             ),
           ),
           // For AirlineLogos
 
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  bottomRight: const Radius.circular(16)),
-            ),
-            color: const Color(0xcFF2ed199),
-            elevation: 2,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              width: MediaQuery.of(context).size.width * .25,
-              child: Center(
-                child: Text(
-                  '\$${_snapshot.data[index].price}',
-                  textScaleFactor: 2,
-                  style: const TextStyle(color: Colors.white),
+          Expanded(
+            flex: 1,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: const BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    bottomRight: const Radius.circular(16)),
+              ),
+              color: const Color(0xcFF2ed199),
+              elevation: 2,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                // width: MediaQuery.of(context).size.width * .25,
+                child: Center(
+                  child: Text(
+                    '\$${_snapshot.data[index].price}',
+                    textScaleFactor: 2,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),

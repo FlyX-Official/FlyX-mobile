@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flyx/models/TicketResponse/ResponseModal.dart';
-// import 'package:flyx/pages/TicketsView/TicketView.dart';
+import 'package:flyxweb/models/TicketResponse/ResponseModal.dart';
+// import 'package:flyxweb/pages/TicketsView/TicketView.dart';
 import 'package:hive/hive.dart';
 
 class FlightSearch with ChangeNotifier {

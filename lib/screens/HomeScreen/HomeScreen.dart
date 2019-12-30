@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/screens/GoogleMap/GMap.dart';
-import 'package:flyx/screens/HomeScreen/Contents/Cities.dart';
-import 'package:flyx/screens/HomeScreen/Contents/DateEntries.dart';
-import 'package:flyx/screens/HomeScreen/Contents/SearchButton.dart';
-import 'package:flyx/screens/HomeScreen/Contents/TripType.dart';
-import 'package:flyx/screens/ProfileScreen/ProfileScreen.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
-import 'package:groovin_widgets/modal_drawer_handle.dart';
+import 'package:flyxweb/screens/HomeScreen/Contents/Cities.dart';
+import 'package:flyxweb/screens/HomeScreen/Contents/DateEntries.dart';
+import 'package:flyxweb/screens/HomeScreen/Contents/SearchButton.dart';
+import 'package:flyxweb/screens/HomeScreen/Contents/TripType.dart';
+import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
+import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -14,73 +14,70 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size _mq = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.account_circle),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ProfileScreen(),
+      body: Responsive(
+        desktop: Row(
+          children: <Widget>[
+            Card(
+              elevation: 8,
+              child: SizedBox(
+                height: _mq.height,
+                width: 400,
+                child: ListView(
+                  // physics: const BouncingScrollPhysics(),
+                  children: <Widget>[
+                    //  const Divider(
+                    //       color: Colors.white,
+                    //     ),
+                    // ModalDrawerHandle(
+                    //   handleColor: Colors.lightGreenAccent,
+                    // ),
+                    const Divider(),
+                    TripType(),
+                    const Divider(),
+                    Provider.of<UserQuery>(context, listen: true).isOrigin !=
+                                null &&
+                            true
+                        ? Container(
+                            height: _mq.height / 2,
+                            child: SearchUi(),
+                          )
+                        : Container(),
+                    const Divider(),
+                    Provider.of<UserQuery>(context, listen: true).isOrigin !=
+                                null &&
+                            false
+                        ? Container(
+                            height: _mq.height / 2,
+                            child: SearchUi(),
+                          )
+                        : Container(),
+                    Cities(),
+                    const Divider(),
+                    DepartureDate(),
+                    const Divider(),
+                    !Provider.of<UserQuery>(context).isOneWay
+                        ? ReturnDate()
+                        : Container(),
+                    !Provider.of<UserQuery>(context).isOneWay
+                        ? const Divider()
+                        : Container(),
+                    SearchButton(),
+                  ],
+                ),
               ),
             ),
-          )
-        ],
-      ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: <Widget>[
-            GMap(),
-            SizedBox.expand(
-              child: DraggableScrollableSheet(
-                expand: true,
-                maxChildSize: .6,
-                minChildSize: .1,
-                initialChildSize: .6,
-                builder:
-                    (BuildContext context, ScrollController scrollController) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8),
-                      ),
-                    ),
-                    child: ListView(
-                      controller: scrollController,
-                      children: <Widget>[
-                        const Divider(
-                          color: Colors.white,
-                        ),
-                        ModalDrawerHandle(
-                          handleColor: Colors.lightGreenAccent,
-                        ),
-                        const Divider(),
-                        TripType(),
-                        const Divider(),
-                        Cities(),
-                        const Divider(),
-                        DepartureDate(),
-                        const Divider(),
-                        !Provider.of<UserQuery>(context).isOneWay
-                            ? ReturnDate()
-                            : Container(),
-                        !Provider.of<UserQuery>(context).isOneWay
-                            ? const Divider()
-                            : Container(),
-                        SearchButton(),
-                      ],
-                    ),
-                  );
-                },
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Tickets(),
               ),
-            )
+              // constraints: BoxConstraints.expand(),
+            ),
           ],
         ),
-      ), //GMap(),
+      ),
     );
   }
 }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_driver/driver_extension.dart';
-import 'package:flyx/root.dart';
-import 'package:flyx/services/Auth/Auth.dart';
-import 'package:flyx/services/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/NearBy/NearBy.dart';
-import 'package:flyx/services/TicketNetworkCall/Request.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/root.dart';
+import 'package:flyxweb/services/Auth/Auth.dart';
+import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
+import 'package:flyxweb/services/NearBy/NearBy.dart';
+import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -41,8 +40,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   Future _openBoxes() async {
-    var dir = await getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
     // print('path is' + dir.path);
 
     return Future.wait([

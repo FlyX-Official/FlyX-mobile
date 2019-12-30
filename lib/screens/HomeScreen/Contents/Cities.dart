@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/screens/SearchUiScreen/SearchUi.dart';
-import 'package:flyx/services/NearBy/NearBy.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+// import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
+import 'package:flyxweb/services/NearBy/NearBy.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
 class Cities extends StatelessWidget {
@@ -32,14 +32,14 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(true);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchUi(),
-                        maintainState: false,
-                        fullscreenDialog: false,
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => SearchUi(),
+                    //     maintainState: false,
+                    //     fullscreenDialog: false,
+                    //   ),
+                    // );
                   },
                 ),
                 Slider.adaptive(
@@ -76,14 +76,14 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(false);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchUi(), //AirportSearch(),
-                        maintainState: false,
-                        fullscreenDialog: false,
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => SearchUi(), //AirportSearch(),
+                    //     maintainState: false,
+                    //     fullscreenDialog: false,
+                    //   ),
+                    // );
                   },
                 ),
                 Slider.adaptive(

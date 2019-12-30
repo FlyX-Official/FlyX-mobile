@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
+import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
 class TicketList extends StatelessWidget {
@@ -47,7 +47,7 @@ class TicketList extends StatelessWidget {
                             _query.setDestinationCityGeohash(
                                 _sugg[i].source.geohash);
                           }
-                          Navigator.pop(context);
+                          // Navigator.pop(context);
                         },
                         leading: IconButton(
                           icon: const Icon(
