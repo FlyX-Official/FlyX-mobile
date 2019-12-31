@@ -14,7 +14,7 @@ class DepartureDate extends StatelessWidget {
         children: <Widget>[
           _query.departureDate == null
               ? Container()
-              : Text('DEPARTURE DATE RANGE'),
+              : Card(elevation: 0, child: Text('DEPARTURE DATE RANGE')),
           FlatButton(
             child: Text(
               _query.departureDate ?? 'DEPARTURE DATE RANGE',
@@ -53,8 +53,11 @@ class ReturnDate extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _query.returnDate != null
-              ? Text(
-                  'RETURN DATE RANGE',
+              ? Card(
+                  elevation: 0,
+                  child: Text(
+                    'RETURN DATE RANGE',
+                  ),
                 )
               : Container(),
           FlatButton(

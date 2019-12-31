@@ -73,7 +73,7 @@ class _SearchUiState extends State<SearchUi> {
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: TextFormField(
                         controller: _inputController,
-                        autofocus: false,
+                        autofocus: true,
                         enableSuggestions: true,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(

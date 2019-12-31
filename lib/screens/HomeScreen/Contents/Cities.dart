@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
 // import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
 import 'package:flyxweb/services/NearBy/NearBy.dart';
 import 'package:flyxweb/services/UserQuery/UserQuery.dart';
@@ -32,6 +33,10 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(true);
+                    Provider.of<AutoCompleteCall>(context, listen: false)
+                        .data
+                        .clear();
+
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(
@@ -50,7 +55,7 @@ class Cities extends StatelessWidget {
                         true, v, _query.departureCityGeoHash);
                   },
                   value: _query.originRadius,
-                  label: _query.originRadius.toString() + 'mi',
+                  label: _query.originRadius.toString() + ' Mi',
                   divisions: 10,
                   min: 0,
                   max: 250,
@@ -76,6 +81,9 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(false);
+                    Provider.of<AutoCompleteCall>(context, listen: false)
+                        .data
+                        .clear();
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(
@@ -97,7 +105,7 @@ class Cities extends StatelessWidget {
                   min: 0,
                   divisions: 10,
                   max: 250,
-                  label: _query.originRadius.toString() + 'mi',
+                  label: _query.originRadius.toString() + ' Mi',
                   inactiveColor: Colors.grey,
                 )
               ],
