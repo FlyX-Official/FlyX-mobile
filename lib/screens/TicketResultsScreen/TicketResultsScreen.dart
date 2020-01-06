@@ -12,8 +12,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 final scrollController = ScrollController(keepScrollOffset: true);
 
-class Tickets extends StatelessWidget {
+class Tickets extends StatefulWidget {
   const Tickets({Key key}) : super(key: key);
+
+  @override
+  _TicketsState createState() => _TicketsState();
+}
+
+class _TicketsState extends State<Tickets> {
+  @override
+  void dispose() {
+    Hive.box('Tickets').clear();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +230,6 @@ class TopLayer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Expanded(
-            flex: 4,
             child: Container(
               decoration: const BoxDecoration(
                 borderRadius: const BorderRadius.all(
@@ -242,8 +253,8 @@ class TopLayer extends StatelessWidget {
           ),
           // For AirlineLogos
 
-          Expanded(
-            flex: 1,
+          Container(
+            width: 120,
             child: Card(
               shape: RoundedRectangleBorder(
                 borderRadius: const BorderRadius.only(
@@ -257,7 +268,7 @@ class TopLayer extends StatelessWidget {
                 // width: MediaQuery.of(context).size.width * .25,
                 child: Center(
                   child: Text(
-                    '\$${_snapshot.data[index].price}',
+                    '\$' + _snapshot.data[index].price.toString(),
                     textScaleFactor: 2,
                     style: const TextStyle(color: Colors.white),
                   ),

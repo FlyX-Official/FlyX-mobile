@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/utils/Responsive.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({Key key}) : super(key: key);

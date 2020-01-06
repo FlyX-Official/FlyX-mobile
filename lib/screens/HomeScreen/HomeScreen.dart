@@ -16,6 +16,39 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size _mq = MediaQuery.of(context).size;
+    var _searchScreen = <Widget>[
+      //  const Divider(
+      //       color: Colors.white,
+      //     ),
+      // ModalDrawerHandle(
+      //   handleColor: Colors.lightGreenAccent,
+      // ),
+      const Divider(),
+      TripType(),
+      const Divider(),
+      Provider.of<UserQuery>(context, listen: true).isOrigin != null && true
+          ? Container(
+              height: _mq.height / 2,
+              child: SearchUi(),
+            )
+          : Container(),
+      const Divider(),
+      Provider.of<UserQuery>(context, listen: true).isOrigin != null && false
+          ? Container(
+              height: _mq.height / 2,
+              child: SearchUi(),
+            )
+          : Container(),
+      Cities(),
+      const Divider(),
+      DepartureDate(),
+      const Divider(),
+      !Provider.of<UserQuery>(context).isOneWay ? ReturnDate() : Container(),
+      !Provider.of<UserQuery>(context).isOneWay ? const Divider() : Container(),
+      FliterWidget(),
+      Divider(),
+      SearchButton(),
+    ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
@@ -44,47 +77,7 @@ class HomeScreen extends StatelessWidget {
                 child: ListView(
                   // physics: const BouncingScrollPhysics(),
 
-                  children: <Widget>[
-                    //  const Divider(
-                    //       color: Colors.white,
-                    //     ),
-                    // ModalDrawerHandle(
-                    //   handleColor: Colors.lightGreenAccent,
-                    // ),
-                    const Divider(),
-                    TripType(),
-                    const Divider(),
-                    Provider.of<UserQuery>(context, listen: true).isOrigin !=
-                                null &&
-                            true
-                        ? Container(
-                            height: _mq.height / 2,
-                            child: SearchUi(),
-                          )
-                        : Container(),
-                    const Divider(),
-                    Provider.of<UserQuery>(context, listen: true).isOrigin !=
-                                null &&
-                            false
-                        ? Container(
-                            height: _mq.height / 2,
-                            child: SearchUi(),
-                          )
-                        : Container(),
-                    Cities(),
-                    const Divider(),
-                    DepartureDate(),
-                    const Divider(),
-                    !Provider.of<UserQuery>(context).isOneWay
-                        ? ReturnDate()
-                        : Container(),
-                    !Provider.of<UserQuery>(context).isOneWay
-                        ? const Divider()
-                        : Container(),
-                    FliterWidget(),
-                    Divider(),
-                    SearchButton(),
-                  ],
+                  children: _searchScreen,
                 ),
               ),
             ),
@@ -96,6 +89,9 @@ class HomeScreen extends StatelessWidget {
               // constraints: BoxConstraints.expand(),
             ),
           ],
+        ),
+        mobile: ListView(
+          children: _searchScreen,
         ),
       ),
     );

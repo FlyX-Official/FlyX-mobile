@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
 // import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
 import 'package:flyxweb/services/NearBy/NearBy.dart';
 import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
@@ -36,12 +37,14 @@ class SearchButton extends StatelessWidget {
         ),
         label: const Text('SEARCH'),
         onPressed: () async {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => TicketResults(),
-          //   ),
-          // );
+          MediaQuery.of(context).size.shortestSide < 768
+              ? Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Tickets(),
+                  ),
+                )
+              : print('isDesktop');
           Hive.box('Tickets').clear();
           Provider.of<FlightSearch>(context, listen: false).makeRequest(
             context,
