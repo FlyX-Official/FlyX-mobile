@@ -97,18 +97,23 @@ class FlightSearch with ChangeNotifier {
           }).then(
             (r) {
               //print(r);
-              Hive.box('Tickets').put(0, r.data);
-              print(Hive.box('Tickets').keys.length);
 
-              print(Hive.box('Tickets').values.length);
+              Hive.box('Tickets').put(0, r.statusCode);
+              setData(Trip.fromJson(r.data));
+
+              print(data.data.length);
             },
-          ).whenComplete(() {
-            setData(
-              Trip.fromJson(
-                Hive.box('Tickets').getAt(0),
-              ),
-            );
-          }),
+            // .whenComplete(
+            //   () {
+            //     print(Hive.box('Tickets').getAt(0).runtimeType);
+
+            //     setData(
+            //       Trip.fromJson(
+            //         Hive.box('Tickets').getAt(0),
+            //       ),
+            //     );
+            //   },
+          ),
         ],
       );
     } catch (e) {
