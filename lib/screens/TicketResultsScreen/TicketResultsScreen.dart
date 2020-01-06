@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 final scrollController = ScrollController(keepScrollOffset: true);
@@ -16,12 +17,12 @@ class Tickets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Box _tickets = Hive.box('Tickets');
+    // final Box _tickets = Hive.box('Tickets');
     final _snapshot = Provider.of<FlightSearch>(context).data;
     return Scaffold(
-      body: WatchBoxBuilder(
-        box: _tickets,
-        builder: (context, box) => Center(
+      body: ValueListenableBuilder(
+        valueListenable: Hive.box('Tickets').listenable(),
+        builder: (context, box, widget) => Center(
           child: box.values.length == 1 && _snapshot != null
               ? const TicketResults()
               : const Center(
@@ -44,17 +45,20 @@ class _TicketResultsState extends State<TicketResults> {
   @override
   void dispose() {
     Hive.box('Tickets').clear();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final Box _tickets = Hive.box('Tickets');
+    // final Box _tickets = Hive.box('Tickets');
 
     final UserQuery _query = Provider.of<UserQuery>(context);
-    final _snapshot = Provider.of<FlightSearch>(context).data;
+    final Trip _snapshot = Provider.of<FlightSearch>(context).data;
 
     return CustomScrollView(
+      // controller: _scrollController,
+      semanticChildCount: _snapshot.data.length ?? 1,
       slivers: <Widget>[
         SliverAppBar(
           backgroundColor: Colors.blueGrey,
@@ -63,23 +67,28 @@ class _TicketResultsState extends State<TicketResults> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Text('LAX' //_query.departureCityIata,
-                  ),
+              Text(
+                _query.departureCityIata,
+              ),
               Icon(
                 _query.isOneWay
                     ? Icons.arrow_forward
                     : Icons.swap_horizontal_circle,
               ),
-              Text('HYD' // _query.destinationCityIata,
-                  ),
+              Text(
+                _query.destinationCityIata,
+              ),
             ],
           ),
           centerTitle: true,
+          pinned: true,
+          floating: false,
+          snap: false,
         ),
         SliverFillRemaining(
-          child: WatchBoxBuilder(
-            box: _tickets,
-            builder: (context, box) => Center(
+          child: ValueListenableBuilder(
+            valueListenable: Hive.box('Tickets').listenable(),
+            builder: (context, box, widget) => Center(
               child: box.values.length == 1 && _snapshot != null
                   ? const TicketSliverList()
                   : const Center(
@@ -120,12 +129,10 @@ class TicketSliverList extends StatelessWidget {
                   child: FadeInAnimation(
                     child: InkWell(
                       onTap: () async {
-                        String url = _snapshot.data[index].deepLink;
-                        // if (await canLaunch(url)) {
-                        //   await launch(url);
-                        // } else {
-                        //   throw 'Could not launch $url';
-                        // }
+                        final String url = _snapshot.data[index].deepLink;
+                        await canLaunch(url)
+                            ? await launch(url)
+                            : throw 'Could not launch $url';
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(

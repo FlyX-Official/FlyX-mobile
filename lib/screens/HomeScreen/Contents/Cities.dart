@@ -34,8 +34,8 @@ class Cities extends StatelessWidget {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(true);
                     Provider.of<AutoCompleteCall>(context, listen: false)
-                        .data
-                        .clear();
+                        .data?.
+                        clear();
 
                     // Navigator.push(
                     //   context,
@@ -105,7 +105,7 @@ class Cities extends StatelessWidget {
                   min: 0,
                   divisions: 10,
                   max: 250,
-                  label: _query.originRadius.toString() + ' Mi',
+                  label: _query.destinationRadius.toString() + ' Mi',
                   inactiveColor: Colors.grey,
                 )
               ],

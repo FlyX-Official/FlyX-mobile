@@ -8,9 +8,9 @@ class Responsive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      MediaQuery.of(context).size.shortestSide < 1000
+      MediaQuery.of(context).size.shortestSide < 768
           ? mobile
-          : MediaQuery.of(context).size.shortestSide > 1000 &&
+          : MediaQuery.of(context).size.shortestSide > 768 &&
                   MediaQuery.of(context).size.shortestSide < 1200
               ? tablet ?? desktop
               : desktop;

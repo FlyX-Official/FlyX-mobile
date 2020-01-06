@@ -15,7 +15,6 @@ class _TicketListState extends State<TicketList> {
   UserQuery _query;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -45,7 +44,7 @@ class _TicketListState extends State<TicketList> {
                   child: FadeInAnimation(
                     child: Card(
                       color: Colors.white,
-                      elevation: 8,
+                      elevation: 4,
                       child: ListTile(
                         dense: false,
                         enabled: true,

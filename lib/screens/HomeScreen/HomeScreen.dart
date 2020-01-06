@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flyxweb/screens/HomeScreen/Contents/Cities.dart';
 import 'package:flyxweb/screens/HomeScreen/Contents/DateEntries.dart';
+import 'package:flyxweb/screens/HomeScreen/Contents/FilterPicker.dart';
 import 'package:flyxweb/screens/HomeScreen/Contents/SearchButton.dart';
 import 'package:flyxweb/screens/HomeScreen/Contents/TripType.dart';
 import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
@@ -16,6 +17,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size _mq = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+        centerTitle: true,
+        title: const ListTile(
+          leading: const Icon(
+            Icons.warning,
+            color: Colors.yellow,
+          ),
+          title: const Text(
+            'This is a Pre-Alpha Version. Filled with Bugs. Be patient and proceed with CAUTION. ',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
       body: Responsive(
         desktop: Row(
           children: <Widget>[
@@ -26,6 +43,7 @@ class HomeScreen extends StatelessWidget {
                 width: 400,
                 child: ListView(
                   // physics: const BouncingScrollPhysics(),
+
                   children: <Widget>[
                     //  const Divider(
                     //       color: Colors.white,
@@ -63,6 +81,8 @@ class HomeScreen extends StatelessWidget {
                     !Provider.of<UserQuery>(context).isOneWay
                         ? const Divider()
                         : Container(),
+                    FliterWidget(),
+                    Divider(),
                     SearchButton(),
                   ],
                 ),
@@ -71,7 +91,7 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Tickets(),
+                child: const Tickets(),
               ),
               // constraints: BoxConstraints.expand(),
             ),

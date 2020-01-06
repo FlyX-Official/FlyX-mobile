@@ -59,7 +59,7 @@ class FetchNearBy with ChangeNotifier {
         [
           _dio
               .post(
-            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?pretty',
+            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?size=150',
             data: nearbyRequestToJson(
               NearbyRequest(
                 query: Query(

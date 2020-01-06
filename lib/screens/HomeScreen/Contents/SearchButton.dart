@@ -26,6 +26,7 @@ class SearchButton extends StatelessWidget {
         Provider.of<UserQuery>(context).departureDateRange;
     final List<DateTime> destDates =
         Provider.of<UserQuery>(context).returnDateRange;
+    final String sortFilter = Provider.of<UserQuery>(context).sortFilter;
     return Card(
       shape: const StadiumBorder(),
       color: Colors.blueGrey,
@@ -52,6 +53,7 @@ class SearchButton extends StatelessWidget {
                 : destinationSurrAirports,
             depDates,
             destDates,
+            sortFilter,
             // Provider.of<UserQuery>(context).vehicleType,
             'aircraft',
           );
