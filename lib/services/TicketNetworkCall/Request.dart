@@ -25,6 +25,7 @@ class FlightSearch with ChangeNotifier {
     List<String> destinationAirports,
     List<DateTime> onewayDateRange,
     List<DateTime> returnDateRange,
+    String sort,
     String vehicleType,
   ) async {
     try {
@@ -60,7 +61,8 @@ class FlightSearch with ChangeNotifier {
               returnDateRange.last.month.toString() +
               '/' +
               returnDateRange.last.year.toString();
-      String _vehicleType = vehicleType == null ? 'aircraft' : vehicleType;
+      String _vehicleType = vehicleType ?? 'aircraft';
+      String _sortFilter = sort.toLowerCase() ?? 'price';
 
       String _url = 'https://api.skypicker.com/flights?' +
           'fly_from=$_flyFrom' +
@@ -72,6 +74,7 @@ class FlightSearch with ChangeNotifier {
           '&one_per_city=1' +
           '&vehicle_type=$_vehicleType' +
           '&curr=USD' +
+          '&sort=$_sortFilter' +
           '&partner=picky';
       print(_url);
       // Navigator.push(
@@ -93,19 +96,24 @@ class FlightSearch with ChangeNotifier {
             // notifyListeners();
           }).then(
             (r) {
-              //print(r);
-              Hive.box('Tickets').put(0, r.data);
+              // //print(r);
+              Hive.box('Tickets').put(0, r.statusCode);
+              setData(Trip.fromJson(r.data));
+
+              // print(data.data.length);
+              // Hive.box('Tickets').put(0, r.data);
               print(Hive.box('Tickets').keys.length);
 
               print(Hive.box('Tickets').values.length);
             },
-          ).whenComplete(() {
-            setData(
-              Trip.fromJson(
-                Hive.box('Tickets').getAt(0),
-              ),
-            );
-          }),
+          ),
+          // .whenComplete(() {
+          //   setData(
+          //     Trip.fromJson(
+          //       Hive.box('Tickets').getAt(0),
+          //     ),
+          //   );
+          // }),
         ],
       );
     } catch (e) {

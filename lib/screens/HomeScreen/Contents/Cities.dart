@@ -43,11 +43,13 @@ class Cities extends StatelessWidget {
                   },
                 ),
                 Slider.adaptive(
+                  onChangeEnd: (v) => _nearby.populateNearByAirports(
+                      true, v, _query.departureCityGeoHash),
                   onChanged: (v) async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setOriginRadius(v);
-                    _nearby.populateNearByAirports(
-                        true, v, _query.departureCityGeoHash);
+                    // _nearby.populateNearByAirports(
+                    //     true, v, _query.departureCityGeoHash);
                   },
                   value: _query.originRadius,
                   label: _query.originRadius.toString() + 'mi',
@@ -87,17 +89,19 @@ class Cities extends StatelessWidget {
                   },
                 ),
                 Slider.adaptive(
+                  onChangeEnd: (v) => _nearby.populateNearByAirports(
+                      false, v, _query.destinationCityGeoHash),
                   onChanged: (v) async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setDestinationRadius(v);
-                    _nearby.populateNearByAirports(
-                        false, v, _query.destinationCityGeoHash);
+                    // _nearby.populateNearByAirports(
+                    //     false, v, _query.destinationCityGeoHash);
                   },
                   value: _query.destinationRadius,
                   min: 0,
                   divisions: 10,
                   max: 250,
-                  label: _query.originRadius.toString() + 'mi',
+                  label: _query.destinationRadius.toString() + 'mi',
                   inactiveColor: Colors.grey,
                 )
               ],

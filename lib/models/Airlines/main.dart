@@ -54,8 +54,8 @@ main() async {
   // data['busOperator'] = bus;
   data['trainOperator'] = train;
 
-  data.forEach((k, v)async {
-   await _dio
+  data.forEach((k, v) async {
+    await _dio
         .get(v[0].logo, options: Options(responseType: ResponseType.bytes))
         .then((r) {
       final file = File('imageBytes.json');

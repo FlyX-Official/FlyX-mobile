@@ -5,11 +5,32 @@ import 'package:flyx/services/AutoComplete/AutoComplete.dart';
 import 'package:flyx/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
-class TicketList extends StatelessWidget {
+class TicketList extends StatefulWidget {
+  @override
+  _TicketListState createState() => _TicketListState();
+}
+
+class _TicketListState extends State<TicketList> {
+  List<Suggestions> _sugg;
+  UserQuery _query;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sugg.clear();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Suggestions> _sugg = Provider.of<AutoCompleteCall>(context).data;
-    final UserQuery _query = Provider.of<UserQuery>(context, listen: false);
+    setState(() {
+      _sugg = Provider.of<AutoCompleteCall>(context).data;
+
+      _query = Provider.of<UserQuery>(context, listen: false);
+    });
     return CustomScrollView(
       // physics: const BouncingScrollPhysics(),
       reverse: true,

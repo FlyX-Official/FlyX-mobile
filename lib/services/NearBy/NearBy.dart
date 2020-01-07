@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flyx/models/NearByAirports/NearByResponse.dart';
@@ -59,7 +58,7 @@ class FetchNearBy with ChangeNotifier {
         [
           _dio
               .post(
-            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?pretty',
+            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?size=50',
             data: nearbyRequestToJson(
               NearbyRequest(
                 query: Query(

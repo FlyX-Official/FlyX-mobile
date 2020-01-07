@@ -15,7 +15,8 @@ class UserQuery with ChangeNotifier {
       _departureDate,
       _returnDate,
       _departureCityGeoHash,
-      _destinationCityGeohash;
+      _destinationCityGeohash,
+      _sortFilter;
 
   bool _isOneWay = true, _isOrigin;
   Marker _marker;
@@ -80,12 +81,20 @@ class UserQuery with ChangeNotifier {
 
   String get destinationCityGeoHash => _destinationCityGeohash;
 
+  String get sortFilter => _sortFilter;
+
   List<DateTime> get departureDateRange => _departureDateRange;
 
   List<DateTime> get returnDateRange => _returnDateRange;
 
   void setOneWay(bool x) {
     _isOneWay = x;
+    notifyListeners();
+  }
+
+  void setSortFilter(String x) {
+    _sortFilter = x;
+
     notifyListeners();
   }
 

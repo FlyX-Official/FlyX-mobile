@@ -27,52 +27,43 @@ class _TicketResultsState extends State<TicketResults> {
 
   @override
   Widget build(BuildContext context) {
-    final Box _tickets = Hive.box('Tickets');
-
     final UserQuery _query = Provider.of<UserQuery>(context);
     final _snapshot = Provider.of<FlightSearch>(context).data;
 
     return Scaffold(
-      body: SafeArea(
-        maintainBottomViewPadding: true,
-        top: false,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              backgroundColor: Colors.blueGrey,
-              automaticallyImplyLeading: true,
-              elevation: 8,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Text(
-                    _query.departureCityIata,
-                  ),
-                  Icon(
-                    _query.isOneWay
-                        ? Icons.arrow_forward
-                        : Icons.swap_horizontal_circle,
-                  ),
-                  Text(
-                    _query.destinationCityIata,
-                  ),
-                ],
-              ),
-              centerTitle: true,
+      // controller: _scrollController,
+      // semanticChildCount: _snapshot.data.length ?? 1,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.blueGrey,
+        automaticallyImplyLeading: true,
+        elevation: 8,
+        primary: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Text(
+              _query.departureCityIata,
             ),
-            SliverFillRemaining(
-              child: WatchBoxBuilder(
-                box: _tickets,
-                builder: (context, box) => Center(
-                  child: box.values.length == 1 && _snapshot != null
-                      ? const TicketSliverList()
-                      : const Center(
-                          child: const CircularProgressIndicator(),
-                        ),
-                ),
-              ),
-            )
+            Icon(
+              _query.isOneWay
+                  ? Icons.arrow_forward
+                  : Icons.swap_horizontal_circle,
+            ),
+            Text(
+              _query.destinationCityIata,
+            ),
           ],
+        ),
+      ),
+      body: ValueListenableBuilder(
+        valueListenable: Hive.box('Tickets').listenable(),
+        builder: (_, box, widget) => Center(
+          child: box.values.length == 1 && _snapshot != null
+              ? const TicketSliverList()
+              : const Center(
+                  child: const CircularProgressIndicator(),
+                ),
         ),
       ),
     );
@@ -98,70 +89,72 @@ class TicketSliverList extends StatelessWidget {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              return AnimationConfiguration.synchronized(
-                //position: index,
-                child: ScaleAnimation(
-                  // scale: 2,
-                  child: FadeInAnimation(
-                    child: InkWell(
-                      onTap: () async {
-                        String url = _snapshot.data[index].deepLink;
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(
-                            // topLeft: const Radius.circular(16),
-                            // topRight:
-                            const Radius.circular(16),
+              return AnimationLimiter(
+                child: AnimationConfiguration.synchronized(
+                  //position: index,
+                  child: ScaleAnimation(
+                    // scale: 2,
+                    child: FadeInAnimation(
+                      child: InkWell(
+                        onTap: () async {
+                          String url = _snapshot.data[index].deepLink;
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 4,
                           ),
-                          color: index == 0
-                              ? Colors.lightGreenAccent
-                              : Colors.blueGrey,
-                        ),
-                        child: Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
+                          decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(
+                              // topLeft: const Radius.circular(16),
+                              // topRight:
                               const Radius.circular(16),
                             ),
+                            color: index == 0
+                                ? Colors.lightGreenAccent
+                                : Colors.blueGrey,
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              MidLayer(
-                                index: index,
+                          child: Card(
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: const BorderRadius.all(
+                                const Radius.circular(16),
                               ),
-                              _isOneWay.isOneWay == true
-                                  ? Container()
-                                  : Divider(
-                                      color: Colors.black,
-                                      endIndent: 16,
-                                      indent: 16,
-                                    ),
-                              _isOneWay.isOneWay == true
-                                  ? Container()
-                                  : BottomLayer(
-                                      index: index,
-                                    ),
-                              TopLayer(
-                                index: index,
-                              ),
-                            ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                MidLayer(
+                                  index: index,
+                                ),
+                                _isOneWay.isOneWay == true
+                                    ? Container()
+                                    : Divider(
+                                        color: Colors.black,
+                                        endIndent: 16,
+                                        indent: 16,
+                                      ),
+                                _isOneWay.isOneWay == true
+                                    ? Container()
+                                    : BottomLayer(
+                                        index: index,
+                                      ),
+                                TopLayer(
+                                  index: index,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
+                  // position: index,
                 ),
-                // position: index,
               );
             },
             childCount: _snapshot.data.length ?? 1,

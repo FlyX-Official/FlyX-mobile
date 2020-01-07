@@ -119,7 +119,7 @@ packages:
       name: dio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.7"
+    version: "3.0.8"
   file:
     dependency: transitive
     description:
@@ -199,7 +199,7 @@ packages:
       name: flutter_gherkin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.5+2"
+    version: "1.1.7+2"
   flutter_icons:
     dependency: "direct main"
     description:
@@ -249,7 +249,7 @@ packages:
       name: gherkin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.5+1"
+    version: "1.1.5+2"
   glob:
     dependency: transitive
     description:
@@ -298,14 +298,14 @@ packages:
       name: hive
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   hive_flutter:
     dependency: "direct main"
     description:
       name: hive_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.1"
+    version: "0.3.0+1"
   html:
     dependency: transitive
     description:
@@ -319,7 +319,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.0+3"
+    version: "0.12.0+4"
   http_multi_server:
     dependency: transitive
     description:
@@ -612,6 +612,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  sync_http:
+    dependency: transitive
+    description:
+      name: sync_http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   term_glyph:
     dependency: transitive
     description:
@@ -688,7 +695,7 @@ packages:
       name: vm_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
+    version: "2.3.1"
   vm_service_client:
     dependency: transitive
     description:
@@ -710,6 +717,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  webdriver:
+    dependency: transitive
+    description:
+      name: webdriver
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   xml:
     dependency: transitive
     description:

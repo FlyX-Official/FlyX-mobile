@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flyx/screens/GoogleMap/GMap.dart';
 import 'package:flyx/screens/HomeScreen/Contents/Cities.dart';
 import 'package:flyx/screens/HomeScreen/Contents/DateEntries.dart';
+import 'package:flyx/screens/HomeScreen/Contents/FilterPicker.dart';
 import 'package:flyx/screens/HomeScreen/Contents/SearchButton.dart';
 import 'package:flyx/screens/HomeScreen/Contents/TripType.dart';
 import 'package:flyx/screens/ProfileScreen/ProfileScreen.dart';
@@ -71,6 +72,8 @@ class HomeScreen extends StatelessWidget {
                         !Provider.of<UserQuery>(context).isOneWay
                             ? const Divider()
                             : Container(),
+                        FliterWidget(),
+                        Divider(),
                         SearchButton(),
                       ],
                     ),
