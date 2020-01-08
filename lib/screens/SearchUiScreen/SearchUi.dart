@@ -80,7 +80,10 @@ class _SearchUiState extends State<SearchUi> {
                           hintText: 'Enter City or Airport code...',
                           border: InputBorder.none,
                         ),
-                        onChanged: (val) => Provider.of<AutoCompleteCall>(context,listen: false).makeRequest(val),
+                        onChanged: (val) => Provider.of<AutoCompleteCall>(
+                                context,
+                                listen: false)
+                            .makeRequest(val),
                       ),
                     ),
                   ),

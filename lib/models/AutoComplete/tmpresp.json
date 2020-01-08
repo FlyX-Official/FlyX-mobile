@@ -1,0 +1,40 @@
+[
+  {
+    "text": "San Francisco",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "v5pp8GoBcTu6piNhEgYK",
+    "_score": 1,
+    "_source": {
+      "Name": "San Francisco International Airport",
+      "City": "San Francisco",
+      "Country": "United States",
+      "IATA": "SFO",
+      "ICAO": "KSFO",
+      "Latitude": 37.61899948120117,
+      "Longitude": -122.375,
+      "Geohash": "9q8yp234xcf2",
+      "Combined": "SFO, San Francisco International Airport, San Francisco",
+      "IATA_Completion": "SFO"
+    }
+  },
+  {
+    "text": "San Francisco International Airport",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "v5pp8GoBcTu6piNhEgYK",
+    "_score": 1,
+    "_source": {
+      "Name": "San Francisco International Airport",
+      "City": "San Francisco",
+      "Country": "United States",
+      "IATA": "SFO",
+      "ICAO": "KSFO",
+      "Latitude": 37.61899948120117,
+      "Longitude": -122.375,
+      "Geohash": "9q8yp234xcf2",
+      "Combined": "SFO, San Francisco International Airport, San Francisco",
+      "IATA_Completion": "SFO"
+    }
+  }
+]

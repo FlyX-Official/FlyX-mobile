@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flyxweb/models/NearByAirports/NearByResponse.dart';
@@ -87,7 +86,7 @@ class FetchNearBy with ChangeNotifier {
               .then((r) {
             _data = NearbyResponse.fromJson(r.data);
             notifyListeners();
-          }).then((r) {
+          }).whenComplete(() {
             populateIataCodes(isOrigin);
           }),
         ],

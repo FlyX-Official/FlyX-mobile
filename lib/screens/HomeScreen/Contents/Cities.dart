@@ -34,8 +34,8 @@ class Cities extends StatelessWidget {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(true);
                     Provider.of<AutoCompleteCall>(context, listen: false)
-                        .data?.
-                        clear();
+                        .data
+                        ?.clear();
 
                     // Navigator.push(
                     //   context,

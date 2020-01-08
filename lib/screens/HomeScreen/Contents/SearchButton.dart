@@ -37,6 +37,7 @@ class SearchButton extends StatelessWidget {
         ),
         label: const Text('SEARCH'),
         onPressed: () async {
+          Provider.of<FlightSearch>(context, listen: false).setData(null);
           MediaQuery.of(context).size.shortestSide < 768
               ? Navigator.push(
                   context,

@@ -85,16 +85,19 @@ class FlightSearch with ChangeNotifier {
       // );
       await Future.wait(
         [
-          _dio.get(_url,
-              options: Options(
-                responseType: ResponseType.json,
-              ), onReceiveProgress: (start, end) {
-            // var increase = start / end;
-            // var divide = increase;
-            // print('Progress ->>> $start end $end');
-            // _receiveProgress = divide;
-            // notifyListeners();
-          }).then(
+          _dio.get(
+            _url,
+            options: Options(
+              responseType: ResponseType.json,
+            ),
+            onReceiveProgress: (start, end) {
+              // var increase = start / end;
+              // var divide = increase;
+              // print('Progress ->>> $start end $end');
+              // _receiveProgress = divide;
+              // notifyListeners();
+            },
+          ).then(
             (r) {
               //print(r);
 

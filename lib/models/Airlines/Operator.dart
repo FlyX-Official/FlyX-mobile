@@ -53,7 +53,6 @@ class Operator {
   int lcc;
   String name;
   String logo;
-  
 
   Operator({
     this.id,
