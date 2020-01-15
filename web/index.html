@@ -2,25 +2,28 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="google-signin-client_id" content="882535873724-i2t9ooba3ct9vlfr1eo7uv3frs6b9e5m.apps.googleusercontent.com" />
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="flyxweb">
+  <link rel="apple-touch-icon" href="/icons/Icon-192.png">
+
   <title>flyxweb</title>
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
   <script>
-    // Your web app's Firebase configuration
-    var firebaseConfig = {
-      apiKey: "AIzaSyCcqGJ4Fn6NZzt2Ymppsn2Kf1x4rODnKaQ",
-  authDomain: "flyx-1551400318222.firebaseapp.com",
-  databaseURL: "https://flyx-1551400318222.firebaseio.com",
-  projectId: "flyx-1551400318222",
-  storageBucket: "flyx-1551400318222.appspot.com",
-  messagingSenderId: "882535873724",
-  appId: "1:882535873724:web:bf281f6bb2e52c15b9e4b9"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/flutter_service_worker.js');
+      });
+    }
   </script>
   <script src="main.dart.js" type="application/javascript"></script>
 </body>
