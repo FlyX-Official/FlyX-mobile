@@ -26,19 +26,21 @@ class HomeScreen extends StatelessWidget {
       const Divider(),
       TripType(),
       const Divider(),
-      Provider.of<UserQuery>(context, listen: true).isOrigin != null && true
-          ? Container(
-              height: _mq.height / 2,
-              child: SearchUi(),
-            )
-          : Container(),
+      if (isDisplayDesktop(context))
+        Provider.of<UserQuery>(context, listen: true).isOrigin != null && true
+            ? Container(
+                height: _mq.height / 2,
+                child: SearchUi(),
+              )
+            : Container(),
       const Divider(),
-      Provider.of<UserQuery>(context, listen: true).isOrigin != null && false
-          ? Container(
-              height: _mq.height / 2,
-              child: SearchUi(),
-            )
-          : Container(),
+      if (isDisplayDesktop(context))
+        Provider.of<UserQuery>(context, listen: true).isOrigin != null && false
+            ? Container(
+                height: _mq.height / 2,
+                child: SearchUi(),
+              )
+            : Container(),
       Cities(),
       const Divider(),
       DepartureDate(),
@@ -66,34 +68,52 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Responsive(
-        desktop: Row(
-          children: <Widget>[
-            Card(
-              elevation: 8,
-              child: SizedBox(
-                height: _mq.height,
-                width: 400,
-                child: ListView(
-                  // physics: const BouncingScrollPhysics(),
-
-                  children: _searchScreen,
+      body: isDisplayDesktop(context)
+          ? Row(
+              children: <Widget>[
+                Drawer(
+                  child: SafeArea(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) =>
+                          _searchScreen.elementAt(index),
+                      itemCount: _searchScreen.length,
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: Scaffold(
+                    body: Tickets(),
+                  ),
+                ),
+              ],
+            )
+          // ? Row(
+          //     children: <Widget>[
+          //       Card(
+          //         elevation: 8,
+          //         child: SizedBox(
+          //           height: _mq.height,
+          //           width: 400,
+          //           child: ListView(
+          //             // physics: const BouncingScrollPhysics(),
+
+          //             children: _searchScreen,
+          //           ),
+          //         ),
+          //       ),
+          //       Expanded(
+          //         child: Padding(
+          //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //           child: const Tickets(),
+          //         ),
+          //         // constraints: BoxConstraints.expand(),
+          //       ),
+          //     ],
+          //   )
+          : ListView(
+              children: _searchScreen,
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: const Tickets(),
-              ),
-              // constraints: BoxConstraints.expand(),
-            ),
-          ],
-        ),
-        mobile: ListView(
-          children: _searchScreen,
-        ),
-      ),
     );
   }
 }

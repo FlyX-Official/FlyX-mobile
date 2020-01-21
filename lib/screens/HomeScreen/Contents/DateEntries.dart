@@ -19,7 +19,7 @@ class DepartureDate extends StatelessWidget {
             child: Text(
               _query.departureDate ?? 'DEPARTURE DATE RANGE',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 22,
               ),
             ),
             onPressed: () async {
@@ -64,7 +64,7 @@ class ReturnDate extends StatelessWidget {
             child: Text(
               _query.returnDate ?? 'RETURN DATE RANGE',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 22,
               ),
             ),
             onPressed: () async {

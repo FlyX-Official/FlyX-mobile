@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flyxweb/models/TicketResponse/ResponseModal.dart';
 import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
 import 'package:flyxweb/services/UserQuery/UserQuery.dart';

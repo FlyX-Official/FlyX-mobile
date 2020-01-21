@@ -3,6 +3,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
 import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
 import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class TicketList extends StatefulWidget {
@@ -70,7 +71,8 @@ class _TicketListState extends State<TicketList> {
                           }
                           Provider.of<UserQuery>(context, listen: false)
                               .setIsOrigin(null);
-                          // Navigator.pop(context);
+                          if (!isDisplayDesktop(context))
+                            Navigator.pop(context);
                         },
                         leading: IconButton(
                           icon: const Icon(

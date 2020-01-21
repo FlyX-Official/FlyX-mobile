@@ -24,10 +24,11 @@ class _FliterWidgetState extends State<FliterWidget> {
     return Center(
       child: ToggleButtons(
         constraints: BoxConstraints.expand(
-            width: MediaQuery.of(context).size.shortestSide < 768
-                ? MediaQuery.of(context).size.shortestSide / 3.25
-                : 130,
-            height: 48),
+          // width: MediaQuery.of(context).size.shortestSide < 768
+          //     ? MediaQuery.of(context).size.shortestSide / 3.25
+          width: 100,
+          height: 48,
+        ),
         children: <Widget>[
           const Text(
             'Price',

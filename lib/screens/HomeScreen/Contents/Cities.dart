@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
 import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
 // import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
 import 'package:flyxweb/services/NearBy/NearBy.dart';
 import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class Cities extends StatelessWidget {
@@ -37,14 +39,15 @@ class Cities extends StatelessWidget {
                         .data
                         ?.clear();
 
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => SearchUi(),
-                    //     maintainState: false,
-                    //     fullscreenDialog: false,
-                    //   ),
-                    // );
+                    if (!isDisplayDesktop(context))
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchUi(),
+                          maintainState: false,
+                          fullscreenDialog: false,
+                        ),
+                      );
                   },
                 ),
                 Slider.adaptive(
@@ -84,14 +87,15 @@ class Cities extends StatelessWidget {
                     Provider.of<AutoCompleteCall>(context, listen: false)
                         .data
                         .clear();
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => SearchUi(), //AirportSearch(),
-                    //     maintainState: false,
-                    //     fullscreenDialog: false,
-                    //   ),
-                    // );
+                    if (!isDisplayDesktop(context))
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchUi(), //AirportSearch(),
+                          maintainState: false,
+                          fullscreenDialog: false,
+                        ),
+                      );
                   },
                 ),
                 Slider.adaptive(
