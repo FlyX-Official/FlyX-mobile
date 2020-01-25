@@ -75,7 +75,6 @@ class _SearchUiState extends State<SearchUi> {
                         controller: _inputController,
                         autofocus: true,
                         enableSuggestions: true,
-                        autocorrect: true,
                         // autovalidate: true,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(

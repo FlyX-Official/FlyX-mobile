@@ -26,21 +26,22 @@ class HomeScreen extends StatelessWidget {
       const Divider(),
       TripType(),
       const Divider(),
-      if (isDisplayDesktop(context))
-        Provider.of<UserQuery>(context, listen: true).isOrigin != null && true
-            ? Container(
-                height: _mq.height / 2,
-                child: SearchUi(),
-              )
-            : Container(),
+      // if (isDisplayDesktop(context) &&
+      //     Provider.of<UserQuery>(context, listen: true).isOrigin != null &&
+      //     true)
+      //   Container(
+      //     height: _mq.height / 2,
+      //     child: SearchUi(),
+      //   ),
+
       const Divider(),
-      if (isDisplayDesktop(context))
-        Provider.of<UserQuery>(context, listen: true).isOrigin != null && false
-            ? Container(
-                height: _mq.height / 2,
-                child: SearchUi(),
-              )
-            : Container(),
+      // if (isDisplayDesktop(context) &&
+      //     Provider.of<UserQuery>(context, listen: true).isOrigin != null &&
+      //     false)
+      //   Container(
+      //     height: _mq.height / 2,
+      //     child: SearchUi(),
+      //   ),
       Cities(),
       const Divider(),
       DepartureDate(),

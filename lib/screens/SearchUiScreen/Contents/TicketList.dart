@@ -71,8 +71,8 @@ class _TicketListState extends State<TicketList> {
                           }
                           Provider.of<UserQuery>(context, listen: false)
                               .setIsOrigin(null);
-                          if (!isDisplayDesktop(context))
-                            Navigator.pop(context);
+                          // if (!isDisplayDesktop(context))
+                          Navigator.pop(context);
                         },
                         leading: IconButton(
                           icon: const Icon(

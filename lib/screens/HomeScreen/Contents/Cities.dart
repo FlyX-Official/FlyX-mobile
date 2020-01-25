@@ -39,15 +39,21 @@ class Cities extends StatelessWidget {
                         .data
                         ?.clear();
 
-                    if (!isDisplayDesktop(context))
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchUi(),
-                          maintainState: false,
-                          fullscreenDialog: false,
-                        ),
-                      );
+                    isDisplayDesktop(context)
+                        ? showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SearchUi(),
+                            ),
+                          )
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchUi(),
+                              maintainState: false,
+                              fullscreenDialog: false,
+                            ),
+                          );
                   },
                 ),
                 Slider.adaptive(
@@ -86,16 +92,22 @@ class Cities extends StatelessWidget {
                         .setIsOrigin(false);
                     Provider.of<AutoCompleteCall>(context, listen: false)
                         .data
-                        .clear();
-                    if (!isDisplayDesktop(context))
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchUi(), //AirportSearch(),
-                          maintainState: false,
-                          fullscreenDialog: false,
-                        ),
-                      );
+                        ?.clear();
+                    isDisplayDesktop(context)
+                        ? showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SearchUi(),
+                            ),
+                          )
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchUi(),
+                              maintainState: false,
+                              fullscreenDialog: false,
+                            ),
+                          );
                   },
                 ),
                 Slider.adaptive(
