@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 import 'package:provider/provider.dart';
 
@@ -14,12 +14,12 @@ class DepartureDate extends StatelessWidget {
         children: <Widget>[
           _query.departureDate == null
               ? Container()
-              : Text('DEPARTURE DATE RANGE'),
+              : Card(elevation: 0, child: Text('DEPARTURE DATE RANGE')),
           FlatButton(
             child: Text(
               _query.departureDate ?? 'DEPARTURE DATE RANGE',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 22,
               ),
             ),
             onPressed: () async {
@@ -53,15 +53,18 @@ class ReturnDate extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _query.returnDate != null
-              ? Text(
-                  'RETURN DATE RANGE',
+              ? Card(
+                  elevation: 0,
+                  child: Text(
+                    'RETURN DATE RANGE',
+                  ),
                 )
               : Container(),
           FlatButton(
             child: Text(
               _query.returnDate ?? 'RETURN DATE RANGE',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 22,
               ),
             ),
             onPressed: () async {

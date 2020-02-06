@@ -15,7 +15,7 @@ class Suggestions {
   String index;
   String type;
   String id;
-  num score;
+  int score;
   Source source;
 
   Suggestions({

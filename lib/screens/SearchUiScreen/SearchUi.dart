@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/screens/SearchUiScreen/Contents/TicketList.dart';
-import 'package:flyx/services/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/screens/SearchUiScreen/Contents/TicketList.dart';
+import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
 class SearchUi extends StatefulWidget {
@@ -32,10 +32,10 @@ class _SearchUiState extends State<SearchUi> {
   Widget build(BuildContext context) {
     // final _sugg = Provider.of<AutoCompleteCall>(context);
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      // resizeToAvoidBottomInset: true,
       // resizeToAvoidBottomPadding: true,
       appBar: AppBar(
-        title: Text(Provider.of<UserQuery>(context).isOrigin
+        title: Text(Provider.of<UserQuery>(context, listen: false).isOrigin
             ? 'Departure Airport'
             : 'Destination Airport'),
         automaticallyImplyLeading: true,
@@ -73,8 +73,9 @@ class _SearchUiState extends State<SearchUi> {
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: TextFormField(
                         controller: _inputController,
-                        autofocus: false,
+                        autofocus: true,
                         enableSuggestions: true,
+                        // autovalidate: true,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           hintText: 'Enter City or Airport code...',

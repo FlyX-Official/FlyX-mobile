@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
 class TripType extends StatefulWidget {

@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flyx/models/TicketResponse/ResponseModal.dart';
-import 'package:flyx/services/TicketNetworkCall/Request.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:flyxweb/models/TicketResponse/ResponseModal.dart';
+import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
+import 'package:flyxweb/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
-final scrollController = ScrollController(keepScrollOffset: true);
+class Tickets extends StatefulWidget {
+  const Tickets({Key key}) : super(key: key);
+
+  @override
+  _TicketsState createState() => _TicketsState();
+}
+
+class _TicketsState extends State<Tickets> {
+  @override
+  void dispose() {
+    Hive.box('Tickets').clear();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // final Box _tickets = Hive.box('Tickets');
+    final _snapshot = Provider.of<FlightSearch>(context).data;
+    return Scaffold(
+      body: ValueListenableBuilder(
+        valueListenable: Hive.box('Tickets').listenable(),
+        builder: (_, box, widget) => Center(
+          child: box.values.length == 1 && _snapshot != null
+              ? const TicketResults()
+              : const Center(
+                  child: const CircularProgressIndicator(),
+                ),
+        ),
+      ),
+    );
+  }
+}
 
 class TicketResults extends StatefulWidget {
   const TicketResults({Key key}) : super(key: key);
@@ -22,13 +54,16 @@ class _TicketResultsState extends State<TicketResults> {
   @override
   void dispose() {
     Hive.box('Tickets').clear();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final Box _tickets = Hive.box('Tickets');
+
     final UserQuery _query = Provider.of<UserQuery>(context);
-    final _snapshot = Provider.of<FlightSearch>(context).data;
+    final Trip _snapshot = Provider.of<FlightSearch>(context).data;
 
     return Scaffold(
       // controller: _scrollController,
@@ -67,17 +102,77 @@ class _TicketResultsState extends State<TicketResults> {
         ),
       ),
     );
+    // <Widget>[
+    //   SliverAppBar(
+    //     backgroundColor: Colors.blueGrey,
+    //     automaticallyImplyLeading: true,
+    //     elevation: 8,
+    // title: Row(
+    //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+    //   children: <Widget>[
+    //     Text(
+    //       _query.departureCityIata,
+    //     ),
+    //     Icon(
+    //       _query.isOneWay
+    //           ? Icons.arrow_forward
+    //           : Icons.swap_horizontal_circle,
+    //     ),
+    //     Text(
+    //       _query.destinationCityIata,
+    //     ),
+    //   ],
+    // ),
+    //     centerTitle: true,
+    //     pinned: true,
+    //     floating: false,
+    //     snap: false,
+    //   ),
+    //   SliverFillRemaining(
+    // child: ValueListenableBuilder(
+    //   valueListenable: Hive.box('Tickets').listenable(),
+    //   builder: (context, box, widget) => Center(
+    //     child: box.values.length == 1 && _snapshot != null
+    //         ? const TicketSliverList()
+    //         : const Center(
+    //             child: const CircularProgressIndicator(),
+    //           ),
+    //   ),
+    //     ),
+    //   )
+    // ],
   }
 }
 
-class TicketSliverList extends StatelessWidget {
+class TicketSliverList extends StatefulWidget {
   const TicketSliverList({
     Key key,
   }) : super(key: key);
 
   @override
+  _TicketSliverListState createState() => _TicketSliverListState();
+}
+
+class _TicketSliverListState extends State<TicketSliverList> {
+  ScrollController scrollController;
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController(
+      keepScrollOffset: true,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _isOneWay = Provider.of<UserQuery>(context);
+    final UserQuery _isOneWay = Provider.of<UserQuery>(context);
     final Trip _snapshot = Provider.of<FlightSearch>(context).data;
 
     return CustomScrollView(
@@ -86,80 +181,132 @@ class TicketSliverList extends StatelessWidget {
       reverse: true,
       physics: BouncingScrollPhysics(),
       slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return AnimationLimiter(
-                child: AnimationConfiguration.synchronized(
-                  //position: index,
-                  child: ScaleAnimation(
-                    // scale: 2,
-                    child: FadeInAnimation(
-                      child: InkWell(
-                        onTap: () async {
-                          String url = _snapshot.data[index].deepLink;
-                          if (await canLaunch(url)) {
-                            await launch(url);
-                          } else {
-                            throw 'Could not launch $url';
-                          }
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              // topLeft: const Radius.circular(16),
-                              // topRight:
-                              const Radius.circular(16),
-                            ),
-                            color: index == 0
-                                ? Colors.lightGreenAccent
-                                : Colors.blueGrey,
-                          ),
-                          child: Card(
-                            elevation: 8,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: const BorderRadius.all(
-                                const Radius.circular(16),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                MidLayer(
-                                  index: index,
-                                ),
-                                _isOneWay.isOneWay == true
-                                    ? Container()
-                                    : Divider(
-                                        color: Colors.black,
-                                        endIndent: 16,
-                                        indent: 16,
-                                      ),
-                                _isOneWay.isOneWay == true
-                                    ? Container()
-                                    : BottomLayer(
-                                        index: index,
-                                      ),
-                                TopLayer(
-                                  index: index,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+        // SliverList(
+        //   delegate: SliverChildBuilderDelegate(
+        //     (context, index) {
+        //       return AnimationConfiguration.synchronized(
+        //         //position: index,
+        // child: InkWell(
+        //   onTap: () async {
+        //     final String url = _snapshot.data[index].deepLink;
+        //     await canLaunch(url)
+        //         ? await launch(url)
+        //         : throw 'Could not launch $url';
+        //   },
+        //   child: Container(
+        //     margin: const EdgeInsets.symmetric(
+        //       vertical: 4,
+        //     ),
+        //     decoration: BoxDecoration(
+        //       borderRadius: const BorderRadius.all(
+        //         // topLeft: const Radius.circular(16),
+        //         // topRight:
+        //         const Radius.circular(16),
+        //       ),
+        //       color: index == 0
+        //           ? Colors.lightGreenAccent
+        //           : Colors.blueGrey,
+        //     ),
+        //     child: Card(
+        //       elevation: 8,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: const BorderRadius.all(
+        //           const Radius.circular(16),
+        //         ),
+        //       ),
+        //       child: Column(
+        //         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //         children: <Widget>[
+        //           MidLayer(
+        //             index: index,
+        //           ),
+        //           _isOneWay.isOneWay == true
+        //               ? Container()
+        //               : Divider(
+        //                   color: Colors.black,
+        //                   endIndent: 16,
+        //                   indent: 16,
+        //                 ),
+        //           _isOneWay.isOneWay == true
+        //               ? Container()
+        //               : BottomLayer(
+        //                   index: index,
+        //                 ),
+        //           TopLayer(
+        //             index: index,
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        //         // position: index,
+        //       );
+        //     },
+        //     childCount: _snapshot.data.length ?? 1,
+        //     // _snapshot.data.length,
+        //   ),
+        // )
+        SliverAnimatedList(
+          initialItemCount: _snapshot.data.length ?? 0,
+          itemBuilder: (_, index, _animation) {
+            return SizeTransition(
+              sizeFactor: _animation,
+              child: InkWell(
+                onTap: () async {
+                  final String url = _snapshot.data[index].deepLink;
+                  await canLaunch(url)
+                      ? await launch(url)
+                      : throw 'Could not launch $url';
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(
+                      // topLeft: const Radius.circular(16),
+                      // topRight:
+                      const Radius.circular(16),
+                    ),
+                    color:
+                        index == 0 ? Colors.lightGreenAccent : Colors.blueGrey,
+                  ),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: const BorderRadius.all(
+                        const Radius.circular(16),
                       ),
                     ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        MidLayer(
+                          index: index,
+                        ),
+                        _isOneWay.isOneWay == true
+                            ? Container()
+                            : Divider(
+                                color: Colors.black,
+                                endIndent: 16,
+                                indent: 16,
+                              ),
+                        _isOneWay.isOneWay == true
+                            ? Container()
+                            : BottomLayer(
+                                index: index,
+                              ),
+                        TopLayer(
+                          index: index,
+                        ),
+                      ],
+                    ),
                   ),
-                  // position: index,
                 ),
-              );
-            },
-            childCount: _snapshot.data.length ?? 1,
-            // _snapshot.data.length,
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -188,44 +335,49 @@ class TopLayer extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Container(
-            decoration: const BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(16),
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: const BorderRadius.all(
+                  const Radius.circular(16),
+                ),
               ),
-            ),
-            margin: const EdgeInsets.only(left: 4.0),
-            height: 40,
-            width: MediaQuery.of(context).size.width * .66,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _snapshot.data[index].airlines.length,
-              itemBuilder: (context, i) => Container(
-                padding: const EdgeInsets.only(right: 2),
-                child: Image.network(
-                  'https://images.kiwi.com/airlines/64/${_snapshot.data[index].airlines[i]}.png',
+              margin: const EdgeInsets.only(left: 4.0),
+              height: 40,
+              // width: MediaQuery.of(context).size.width * .66,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _snapshot.data[index].airlines.length,
+                itemBuilder: (context, i) => Container(
+                  padding: const EdgeInsets.only(right: 2),
+                  child: Image.network(
+                    'https://images.kiwi.com/airlines/64/${_snapshot.data[index].airlines[i]}.png',
+                  ),
                 ),
               ),
             ),
           ),
           // For AirlineLogos
 
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  bottomRight: const Radius.circular(16)),
-            ),
-            color: const Color(0xcFF2ed199),
-            elevation: 2,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              width: MediaQuery.of(context).size.width * .25,
-              child: Center(
-                child: Text(
-                  '\$${_snapshot.data[index].price}',
-                  textScaleFactor: 2,
-                  style: const TextStyle(color: Colors.white),
+          Container(
+            width: 120,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: const BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    bottomRight: const Radius.circular(16)),
+              ),
+              color: const Color(0xcFF2ed199),
+              elevation: 2,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                // width: MediaQuery.of(context).size.width * .25,
+                child: Center(
+                  child: Text(
+                    '\$' + _snapshot.data[index].price.toString(),
+                    textScaleFactor: 2,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),
