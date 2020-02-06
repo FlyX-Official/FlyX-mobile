@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "FlyXWebSource",
     "short_name": "FlyXWebSource",
+=======
+    "name": "flyxweb",
+    "short_name": "flyxweb",
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
     "start_url": ".",
     "display": "minimal-ui",
     "background_color": "#0175C2",

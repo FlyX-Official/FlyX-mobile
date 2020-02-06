@@ -15,7 +15,11 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
                BuildableName = "FlyXWebSource.app"
+=======
+               BuildableName = "flyxweb.app"
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
                BlueprintName = "Runner"
                ReferencedContainer = "container:Runner.xcodeproj">
             </BuildableReference>
@@ -43,7 +47,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "FlyXWebSource.app"
+=======
+            BuildableName = "flyxweb.app"
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -66,7 +74,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "FlyXWebSource.app"
+=======
+            BuildableName = "flyxweb.app"
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
@@ -85,7 +97,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+<<<<<<< HEAD
             BuildableName = "FlyXWebSource.app"
+=======
+            BuildableName = "flyxweb.app"
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
             BlueprintName = "Runner"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>

@@ -3,15 +3,45 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
 import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
 import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+<<<<<<< HEAD
+=======
+import 'package:flyxweb/utils/Responsive.dart';
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
 import 'package:provider/provider.dart';
 
-class TicketList extends StatelessWidget {
+class TicketList extends StatefulWidget {
+  @override
+  _TicketListState createState() => _TicketListState();
+}
+
+class _TicketListState extends State<TicketList> {
+  List<Suggestions> _sugg;
+  UserQuery _query;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sugg.clear();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     List<Suggestions> _sugg = Provider.of<AutoCompleteCall>(context).data;
 
     UserQuery _query = Provider.of<UserQuery>(context, listen: false);
 
+=======
+    setState(() {
+      _sugg = Provider.of<AutoCompleteCall>(context).data;
+
+      _query = Provider.of<UserQuery>(context, listen: false);
+    });
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
     return CustomScrollView(
       // physics: const BouncingScrollPhysics(),
       reverse: true,
@@ -48,7 +78,12 @@ class TicketList extends StatelessWidget {
                             _query.setDestinationCityGeohash(
                                 _sugg[i].source.geohash);
                           }
+<<<<<<< HEAD
 
+=======
+                          Provider.of<UserQuery>(context, listen: false)
+                              .setIsOrigin(null);
+>>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
                           // if (!isDisplayDesktop(context))
                           Navigator.pop(context);
                           Provider.of<UserQuery>(context, listen: false)
