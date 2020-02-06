@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/screens/SearchUiScreen/Contents/TicketList.dart';
-import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
-import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/screens/SearchUiScreen/Contents/TicketList.dart';
+import 'package:FlyXWebSource/services/AutoComplete/AutoComplete.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
 class SearchUi extends StatefulWidget {

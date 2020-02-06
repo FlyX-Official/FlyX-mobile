@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/screens/HomeScreen/Contents/Cities.dart';
-import 'package:flyxweb/screens/HomeScreen/Contents/DateEntries.dart';
-import 'package:flyxweb/screens/HomeScreen/Contents/FilterPicker.dart';
-import 'package:flyxweb/screens/HomeScreen/Contents/SearchButton.dart';
-import 'package:flyxweb/screens/HomeScreen/Contents/TripType.dart';
-<<<<<<< HEAD
-=======
-import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
-import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
-import 'package:flyxweb/services/UserQuery/UserQuery.dart';
-import 'package:flyxweb/utils/Responsive.dart';
+import 'package:FlyXWebSource/screens/HomeScreen/Contents/Cities.dart';
+import 'package:FlyXWebSource/screens/HomeScreen/Contents/DateEntries.dart';
+import 'package:FlyXWebSource/screens/HomeScreen/Contents/FilterPicker.dart';
+import 'package:FlyXWebSource/screens/HomeScreen/Contents/SearchButton.dart';
+import 'package:FlyXWebSource/screens/HomeScreen/Contents/TripType.dart';
+import 'package:FlyXWebSource/screens/TicketResultsScreen/TicketResultsScreen.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -18,11 +14,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     // final Size _mq = MediaQuery.of(context).size;
-=======
-    final Size _mq = MediaQuery.of(context).size;
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
     var _searchScreen = <Widget>[
       //  const Divider(
       //       color: Colors.white,

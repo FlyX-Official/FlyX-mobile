@@ -38,11 +38,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-<<<<<<< HEAD
         applicationId "com.example.FlyXWebSource"
-=======
-        applicationId "com.example.flyxweb"
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()

@@ -16,11 +16,7 @@ class UserQuery with ChangeNotifier {
       _destinationCityGeohash,
       _sortFilter;
 
-<<<<<<< HEAD
   bool _isOneWay = true, _isOrigin = true;
-=======
-  bool _isOneWay = true, _isOrigin;
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
   // Marker _marker;
   // Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
   double _originRadius = 0,

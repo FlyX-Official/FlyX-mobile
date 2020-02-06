@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
-import 'package:flyxweb/services/AutoComplete/AutoComplete.dart';
-// import 'package:flyxweb/screens/SearchUiScreen/SearchUi.dart';
-import 'package:flyxweb/services/NearBy/NearBy.dart';
-import 'package:flyxweb/services/UserQuery/UserQuery.dart';
-import 'package:flyxweb/utils/Responsive.dart';
+import 'package:FlyXWebSource/screens/SearchUiScreen/SearchUi.dart';
+import 'package:FlyXWebSource/services/AutoComplete/AutoComplete.dart';
+// import 'package:FlyXWebSource/screens/SearchUiScreen/SearchUi.dart';
+import 'package:FlyXWebSource/services/NearBy/NearBy.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class Cities extends StatelessWidget {

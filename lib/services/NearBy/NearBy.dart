@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flyxweb/models/NearByAirports/NearByResponse.dart';
-import 'package:flyxweb/models/NearByAirports/NearbyRequest.dart';
+import 'package:FlyXWebSource/models/NearByAirports/NearByResponse.dart';
+import 'package:FlyXWebSource/models/NearByAirports/NearbyRequest.dart';
 
 // GET /airports/_search?pretty
 // {

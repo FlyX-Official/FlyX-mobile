@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/models/TicketResponse/ResponseModal.dart';
-import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
-import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/models/TicketResponse/ResponseModal.dart';
+import 'package:FlyXWebSource/services/TicketNetworkCall/Request.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';

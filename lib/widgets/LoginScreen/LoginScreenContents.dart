@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flyxweb/services/Auth/Auth.dart';
+import 'package:FlyXWebSource/services/Auth/Auth.dart';
 
 Auth _auth = Auth();
 final List<Widget> signInButtons = <Widget>[

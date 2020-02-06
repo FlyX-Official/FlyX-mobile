@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
-// import 'package:flyxweb/screens/TicketResultsScreen/TicketResultsScreen.dart';
-import 'package:flyxweb/services/NearBy/NearBy.dart';
-import 'package:flyxweb/services/TicketNetworkCall/Request.dart';
-import 'package:flyxweb/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/screens/TicketResultsScreen/TicketResultsScreen.dart';
+// import 'package:FlyXWebSource/screens/TicketResultsScreen/TicketResultsScreen.dart';
+import 'package:FlyXWebSource/services/NearBy/NearBy.dart';
+import 'package:FlyXWebSource/services/TicketNetworkCall/Request.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 

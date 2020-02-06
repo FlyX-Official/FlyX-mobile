@@ -1,9 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-<<<<<<< HEAD
     package="com.example.FlyXWebSource">
-=======
-    package="com.example.flyxweb">
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
     <!-- Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->

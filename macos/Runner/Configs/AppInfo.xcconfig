@@ -5,7 +5,6 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-<<<<<<< HEAD
 PRODUCT_NAME = FlyXWebSource
 
 // The application's bundle identifier
@@ -13,12 +12,3 @@ PRODUCT_BUNDLE_IDENTIFIER = com.example.FlyXWebSource
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2020 com.example. All rights reserved.
-=======
-PRODUCT_NAME = flyxweb
-
-// The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.flyxweb
-
-// The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2019 com.example. All rights reserved.
->>>>>>> 42aa53c25962b24e009aa456f0f3dafd73fc754f
