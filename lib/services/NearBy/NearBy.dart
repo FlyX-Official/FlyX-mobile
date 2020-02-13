@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flyx/models/NearByAirports/NearByResponse.dart';
-import 'package:flyx/models/NearByAirports/NearbyRequest.dart';
+import 'package:FlyXWebSource/models/NearByAirports/NearByResponse.dart';
+import 'package:FlyXWebSource/models/NearByAirports/NearbyRequest.dart';
 
 // GET /airports/_search?pretty
 // {
@@ -58,7 +58,7 @@ class FetchNearBy with ChangeNotifier {
         [
           _dio
               .post(
-            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?size=50',
+            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search?size=150',
             data: nearbyRequestToJson(
               NearbyRequest(
                 query: Query(
@@ -86,7 +86,7 @@ class FetchNearBy with ChangeNotifier {
               .then((r) {
             _data = NearbyResponse.fromJson(r.data);
             notifyListeners();
-          }).then((r) {
+          }).whenComplete(() {
             populateIataCodes(isOrigin);
           }),
         ],

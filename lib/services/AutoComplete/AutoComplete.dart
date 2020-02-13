@@ -1,48 +1,11 @@
-// import 'package:dio/dio.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-// // import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-
-// class AutoCompleteCall with ChangeNotifier {
-//   List<Suggestions> _data;
-//   final _dio = Dio();
-
-//   List<Suggestions> get data => _data;
-
-//   void makeRequest(String query) async {
-//     try {
-//       Future.wait(
-//         [
-//           _dio
-//               .get(
-//             'https://flyx-server.herokuapp.com/autocomplete?q=$query',
-//             options: Options(
-//               responseType: ResponseType.plain,
-//             ),
-//           )
-//               .then(
-//             (r) {
-//               _data = suggestionsFromJson(r.data);
-//               notifyListeners();
-//               print(_data);
-//             },
-//           ),
-//         ],
-//       );
-//     } catch (e) {
-//       Exception(e);
-//     }
-//   }
-// }
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-import 'package:flyx/models/AutoComplete/AutoCompleteRequest.dart' as req;
-import 'package:flyx/models/AutoComplete/AutoCompleteResponse.dart';
-// import 'package:flyxweb/models/AutoComplete/AutoComplete.dart';
+import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
+import 'package:FlyXWebSource/models/AutoComplete/AutoCompleteRequest.dart' as req;
+import 'package:FlyXWebSource/models/AutoComplete/AutoCompleteResponse.dart';
+// import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
 
 class AutoCompleteCall with ChangeNotifier {
   List<Suggestions> _data;
@@ -118,11 +81,3 @@ class AutoCompleteCall with ChangeNotifier {
     }
   }
 }
-
-//  .map(e => e[comp])
-
-//        // store the keys of the unique objects
-//       .map((e, i, final) => final.indexOf(e) === i && i)
-
-//       // eliminate the dead keys & store unique objects
-//       .filter(e => arr[e]).map(e => arr[e]);

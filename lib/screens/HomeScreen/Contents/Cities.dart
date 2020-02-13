@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flyx/screens/SearchUiScreen/SearchUi.dart';
-import 'package:flyx/services/NearBy/NearBy.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/screens/SearchUiScreen/SearchUi.dart';
+import 'package:FlyXWebSource/services/AutoComplete/AutoComplete.dart';
+// import 'package:FlyXWebSource/screens/SearchUiScreen/SearchUi.dart';
+import 'package:FlyXWebSource/services/NearBy/NearBy.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/utils/Responsive.dart';
 import 'package:provider/provider.dart';
 
 class Cities extends StatelessWidget {
@@ -32,27 +35,36 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(true);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchUi(),
-                        maintainState: false,
-                        fullscreenDialog: false,
-                      ),
-                    );
+                    Provider.of<AutoCompleteCall>(context, listen: false)
+                        .data
+                        ?.clear();
+
+                    isDisplayDesktop(context)
+                        ? showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SearchUi(),
+                            ),
+                          )
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchUi(),
+                              maintainState: false,
+                              fullscreenDialog: false,
+                            ),
+                          );
                   },
                 ),
                 Slider.adaptive(
-                  onChangeEnd: (v) => _nearby.populateNearByAirports(
-                      true, v, _query.departureCityGeoHash),
                   onChanged: (v) async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setOriginRadius(v);
-                    // _nearby.populateNearByAirports(
-                    //     true, v, _query.departureCityGeoHash);
+                    _nearby.populateNearByAirports(
+                        true, v, _query.departureCityGeoHash);
                   },
                   value: _query.originRadius,
-                  label: _query.originRadius.toString() + 'mi',
+                  label: _query.originRadius.toString() + ' Mi',
                   divisions: 10,
                   min: 0,
                   max: 250,
@@ -78,30 +90,38 @@ class Cities extends StatelessWidget {
                   onPressed: () async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setIsOrigin(false);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchUi(), //AirportSearch(),
-                        maintainState: false,
-                        fullscreenDialog: false,
-                      ),
-                    );
+                    Provider.of<AutoCompleteCall>(context, listen: false)
+                        .data
+                        ?.clear();
+                    isDisplayDesktop(context)
+                        ? showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SearchUi(),
+                            ),
+                          )
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchUi(),
+                              maintainState: false,
+                              fullscreenDialog: false,
+                            ),
+                          );
                   },
                 ),
                 Slider.adaptive(
-                  onChangeEnd: (v) => _nearby.populateNearByAirports(
-                      false, v, _query.destinationCityGeoHash),
                   onChanged: (v) async {
                     Provider.of<UserQuery>(context, listen: false)
                         .setDestinationRadius(v);
-                    // _nearby.populateNearByAirports(
-                    //     false, v, _query.destinationCityGeoHash);
+                    _nearby.populateNearByAirports(
+                        false, v, _query.destinationCityGeoHash);
                   },
                   value: _query.destinationRadius,
                   min: 0,
                   divisions: 10,
                   max: 250,
-                  label: _query.destinationRadius.toString() + 'mi',
+                  label: _query.destinationRadius.toString() + ' Mi',
                   inactiveColor: Colors.grey,
                 )
               ],

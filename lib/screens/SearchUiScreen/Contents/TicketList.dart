@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flyx/models/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/AutoComplete/AutoComplete.dart';
-import 'package:flyx/services/UserQuery/UserQuery.dart';
+import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
+import 'package:FlyXWebSource/services/AutoComplete/AutoComplete.dart';
+import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
 
-class TicketList extends StatefulWidget {
-  @override
-  _TicketListState createState() => _TicketListState();
-}
-
-class _TicketListState extends State<TicketList> {
-  List<Suggestions> _sugg;
-  UserQuery _query;
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _sugg.clear();
-    super.dispose();
-  }
-
+class TicketList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      _sugg = Provider.of<AutoCompleteCall>(context).data;
+    final List<Suggestions> _sugg = Provider.of<AutoCompleteCall>(context).data;
 
-      _query = Provider.of<UserQuery>(context, listen: false);
-    });
+    final UserQuery _query = Provider.of<UserQuery>(context, listen: false);
+
     return CustomScrollView(
       // physics: const BouncingScrollPhysics(),
       reverse: true,
@@ -44,7 +25,7 @@ class _TicketListState extends State<TicketList> {
                   child: FadeInAnimation(
                     child: Card(
                       color: Colors.white,
-                      elevation: 8,
+                      elevation: 4,
                       child: ListTile(
                         dense: false,
                         enabled: true,
@@ -58,8 +39,7 @@ class _TicketListState extends State<TicketList> {
                                 _sugg[i].source.longitude);
                             _query.setDepartureCityGeohash(
                                 _sugg[i].source.geohash);
-                          }
-                          if (_query.isOrigin == false) {
+                          } else {
                             _query.setDestinationIata(_sugg[i].source.iata);
                             _query.setDestinationCityLat(
                                 _sugg[i].source.latitude);
@@ -68,7 +48,10 @@ class _TicketListState extends State<TicketList> {
                             _query.setDestinationCityGeohash(
                                 _sugg[i].source.geohash);
                           }
+                          // if (!isDisplayDesktop(context))
                           Navigator.pop(context);
+                          Provider.of<UserQuery>(context, listen: false)
+                              .setIsOrigin(null);
                         },
                         leading: IconButton(
                           icon: const Icon(

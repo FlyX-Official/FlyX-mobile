@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flyx/models/TicketResponse/ResponseModal.dart';
-// import 'package:flyx/pages/TicketsView/TicketView.dart';
+import 'package:FlyXWebSource/models/TicketResponse/ResponseModal.dart';
+// import 'package:FlyXWebSource/pages/TicketsView/TicketView.dart';
 import 'package:hive/hive.dart';
 
 class FlightSearch with ChangeNotifier {
@@ -85,35 +85,38 @@ class FlightSearch with ChangeNotifier {
       // );
       await Future.wait(
         [
-          _dio.get(_url,
-              options: Options(
-                responseType: ResponseType.json,
-              ), onReceiveProgress: (start, end) {
-            // var increase = start / end;
-            // var divide = increase;
-            // print('Progress ->>> $start end $end');
-            // _receiveProgress = divide;
-            // notifyListeners();
-          }).then(
+          _dio.get(
+            _url,
+            options: Options(
+              responseType: ResponseType.json,
+            ),
+            onReceiveProgress: (start, end) {
+              // var increase = start / end;
+              // var divide = increase;
+              // print('Progress ->>> $start end $end');
+              // _receiveProgress = divide;
+              // notifyListeners();
+            },
+          ).then(
             (r) {
-              // //print(r);
+              //print(r);
+
               Hive.box('Tickets').put(0, r.statusCode);
               setData(Trip.fromJson(r.data));
 
-              // print(data.data.length);
-              // Hive.box('Tickets').put(0, r.data);
-              print(Hive.box('Tickets').keys.length);
-
-              print(Hive.box('Tickets').values.length);
+              print(data.data.length);
             },
+            // .whenComplete(
+            //   () {
+            //     print(Hive.box('Tickets').getAt(0).runtimeType);
+
+            //     setData(
+            //       Trip.fromJson(
+            //         Hive.box('Tickets').getAt(0),
+            //       ),
+            //     );
+            //   },
           ),
-          // .whenComplete(() {
-          //   setData(
-          //     Trip.fromJson(
-          //       Hive.box('Tickets').getAt(0),
-          //     ),
-          //   );
-          // }),
         ],
       );
     } catch (e) {
