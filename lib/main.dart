@@ -41,18 +41,23 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => Auth(),
+          lazy: true,
         ),
         ChangeNotifierProvider(
           create: (_) => FetchNearBy(),
+          lazy: true,
         ),
         ChangeNotifierProvider(
           create: (_) => AutoCompleteCall(),
+          lazy: true,
         ),
         ChangeNotifierProvider(
           create: (_) => UserQuery(),
+          lazy: true,
         ),
         ChangeNotifierProvider(
           create: (_) => FlightSearch(),
+          lazy: true,
         )
       ],
       child: MaterialApp(
