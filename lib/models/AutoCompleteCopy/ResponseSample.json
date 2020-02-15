@@ -1,0 +1,229 @@
+[
+  {
+    "text": "FAA",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Y5pm8GoBcTu6piNhKgSc",
+    "_score": 1,
+    "_source": {
+      "Name": "Faranah Airport",
+      "City": "Faranah",
+      "Country": "Guinea",
+      "IATA": "FAA",
+      "ICAO": "GUFH",
+      "Latitude": 10.0354995728,
+      "Longitude": -10.7698001862,
+      "Geohash": "ecb34fvtj2wy",
+      "Combined": "FAA, Faranah Airport, Faranah",
+      "IATA_Completion": "FAA"
+    }
+  },
+  {
+    "text": "FAB",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Ebxl8GoBsKQzFWN0bpNV",
+    "_score": 1,
+    "_source": {
+      "Name": "Farnborough Airport",
+      "City": "Farnborough",
+      "Country": "United Kingdom",
+      "IATA": "FAB",
+      "ICAO": "EGLF",
+      "Latitude": 51.275798797600004,
+      "Longitude": -0.776332974434,
+      "Geohash": "gcp7wq6xnjsn",
+      "Combined": "FAB, Farnborough Airport, Farnborough",
+      "IATA_Completion": "FAB"
+    }
+  },
+  {
+    "text": "FAC",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Zbxu8GoBsKQzFWN0TZq_",
+    "_score": 1,
+    "_source": {
+      "Name": "Faaite Airport",
+      "City": "Faaite",
+      "Country": "French Polynesia",
+      "IATA": "FAC",
+      "ICAO": "NTKF",
+      "Latitude": -16.686700820922848,
+      "Longitude": -145.32899475097656,
+      "Geohash": "2v09hfq8uvx2",
+      "Combined": "FAC, Faaite Airport, Faaite",
+      "IATA_Completion": "FAC"
+    }
+  },
+  {
+    "text": "FAE",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Tu1l8GoBvislT62UmGDs",
+    "_score": 1,
+    "_source": {
+      "Name": "Vagar Airport",
+      "City": "Vagar",
+      "Country": "Faroe Islands",
+      "IATA": "FAE",
+      "ICAO": "EKVG",
+      "Latitude": 62.0635986328125,
+      "Longitude": -7.277219772338867,
+      "Geohash": "gg4c46kfsmrd",
+      "Combined": "FAE, Vagar Airport, Vagar",
+      "IATA_Completion": "FAE"
+    }
+  },
+  {
+    "text": "FAF",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "z5pp8GoBcTu6piNhJAZM",
+    "_score": 1,
+    "_source": {
+      "Name": "Felker Army Air Field",
+      "City": "Fort Eustis",
+      "Country": "United States",
+      "IATA": "FAF",
+      "ICAO": "KFAF",
+      "Latitude": 37.1324996948,
+      "Longitude": -76.60880279540002,
+      "Geohash": "dq9e0xz0mx8k",
+      "Combined": "FAF, Felker Army Air Field, Fort Eustis",
+      "IATA_Completion": "FAF"
+    }
+  },
+  {
+    "text": "Faa'a International Airport",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "2e1p8GoBvislT62U9mNC",
+    "_score": 1,
+    "_source": {
+      "Name": "Faa'a International Airport",
+      "City": "Papeete",
+      "Country": "French Polynesia",
+      "IATA": "PPT",
+      "ICAO": "NTAA",
+      "Latitude": -17.553698999999998,
+      "Longitude": -149.60699499999996,
+      "Geohash": "2svs5s7w2374",
+      "Combined": "PPT, Faa'a International Airport, Papeete",
+      "IATA_Completion": "PPT"
+    }
+  },
+  {
+    "text": "Fabio Alberto Leon Bentley Airport",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Ve1o8GoBvislT62UGWKY",
+    "_score": 1,
+    "_source": {
+      "Name": "Fabio Alberto Leon Bentley Airport",
+      "City": "Mitu",
+      "Country": "Colombia",
+      "IATA": "MVP",
+      "ICAO": "SKMU",
+      "Latitude": 1.25366,
+      "Longitude": -70.2339,
+      "Geohash": "d2np1u1ppe0m",
+      "Combined": "MVP, Fabio Alberto Leon Bentley Airport, Mitu",
+      "IATA_Completion": "MVP"
+    }
+  },
+  {
+    "text": "Fagali'i Airport",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "tJpq8GoBcTu6piNhOgcs",
+    "_score": 1,
+    "_source": {
+      "Name": "Fagali'i Airport",
+      "City": "Apia",
+      "Country": "Samoa",
+      "IATA": "FGI",
+      "ICAO": "NSFI",
+      "Latitude": -13.8486995697,
+      "Longitude": -171.74000549299998,
+      "Geohash": "2jtc5yytrz63",
+      "Combined": "FGI, Fagali'i Airport, Apia",
+      "IATA_Completion": "FGI"
+    }
+  },
+  {
+    "text": "Fair Isle Airport",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "Rbxq8GoBsKQzFWN0lpeJ",
+    "_score": 1,
+    "_source": {
+      "Name": "Fair Isle Airport",
+      "City": "Fair Isle",
+      "Country": "United Kingdom",
+      "IATA": "FIE",
+      "ICAO": "EGEF",
+      "Latitude": 59.53580093383789,
+      "Longitude": -1.628059983253479,
+      "Geohash": "gfwfdynmpmwq",
+      "Combined": "FIE, Fair Isle Airport, Fair Isle",
+      "IATA_Completion": "FIE"
+    }
+  },
+  {
+    "text": "Fagernes",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "8Jpl8GoBcTu6piNhnwNd",
+    "_score": 1,
+    "_source": {
+      "Name": "Leirin Airport",
+      "City": "Fagernes",
+      "Country": "Norway",
+      "IATA": "VDB",
+      "ICAO": "ENFG",
+      "Latitude": 61.015598297119,
+      "Longitude": 9.2880601882935,
+      "Geohash": "u4ye57e3e7zt",
+      "Combined": "VDB, Leirin Airport, Fagernes",
+      "IATA_Completion": "VDB"
+    }
+  },
+  {
+    "text": "Fairbanks",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "-ppp8GoBcTu6piNhVwbU",
+    "_score": 1,
+    "_source": {
+      "Name": "Eielson Air Force Base",
+      "City": "Fairbanks",
+      "Country": "United States",
+      "IATA": "EIL",
+      "ICAO": "PAEI",
+      "Latitude": 64.66570282,
+      "Longitude": -147.102005,
+      "Geohash": "berrus594ben",
+      "Combined": "EIL, Eielson Air Force Base, Fairbanks",
+      "IATA_Completion": "EIL"
+    }
+  },
+  {
+    "text": "Fairbanks",
+    "_index": "airports",
+    "_type": "_doc",
+    "_id": "k-1p8GoBvislT62UoGM0",
+    "_score": 1,
+    "_source": {
+      "Name": "Fairbanks International Airport",
+      "City": "Fairbanks",
+      "Country": "United States",
+      "IATA": "FAI",
+      "ICAO": "PAFA",
+      "Latitude": 64.81510162,
+      "Longitude": -147.85600280000003,
+      "Geohash": "bewbernx36tt",
+      "Combined": "FAI, Fairbanks International Airport, Fairbanks",
+      "IATA_Completion": "FAI"
+    }
+  }]

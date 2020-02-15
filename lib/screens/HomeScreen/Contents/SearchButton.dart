@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:FlyXWebSource/screens/TicketResultsScreen/TicketResultsScreen.dart';
-// import 'package:FlyXWebSource/screens/TicketResultsScreen/TicketResultsScreen.dart';
-import 'package:FlyXWebSource/services/NearBy/NearBy.dart';
-import 'package:FlyXWebSource/services/TicketNetworkCall/Request.dart';
-import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
+import 'package:flyx/screens/TicketResultsScreen/TicketResultsScreen.dart';
+import 'package:flyx/services/NearBy/NearBy.dart';
+import 'package:flyx/services/TicketNetworkCall/Request.dart';
+import 'package:flyx/services/UserQuery/UserQuery.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
@@ -38,15 +37,17 @@ class SearchButton extends StatelessWidget {
         label: const Text('SEARCH'),
         onPressed: () async {
           Provider.of<FlightSearch>(context, listen: false).setData(null);
-          MediaQuery.of(context).size.shortestSide < 768
-              ? Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Tickets(),
-                  ),
-                )
-              : print('isDesktop');
-          Hive.box('Tickets').clear();
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TicketResults(),
+            ),
+          );
+          Hive.box('Tickets').isNotEmpty
+              ? Hive.box('Tickets').clear()
+              : print('is ALready Empty');
+
           Provider.of<FlightSearch>(context, listen: false).makeRequest(
             context,
             departureSurrAirports.isEmpty
@@ -61,12 +62,6 @@ class SearchButton extends StatelessWidget {
             // Provider.of<UserQuery>(context).vehicleType,
             'aircraft',
           );
-          // Provider.of<FlightSearch>(context, listen: false).makeRequest(
-          //   context,
-          //   ['FAT','LAX','SFO'], ['HYD'], depDates, destDates,
-          //   // Provider.of<UserQuery>(context).vehicleType,
-          //   'aircraft',
-          // );
         },
       ),
     );

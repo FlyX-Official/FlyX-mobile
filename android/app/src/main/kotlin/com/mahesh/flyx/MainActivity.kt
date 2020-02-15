@@ -1,4 +1,4 @@
-package com.example.FlyXWebSource
+package com.mahesh.flyx
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
