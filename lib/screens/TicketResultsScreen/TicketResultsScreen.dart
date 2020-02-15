@@ -31,7 +31,7 @@ class _TicketsState extends State<Tickets> {
     return Scaffold(
       body: ValueListenableBuilder(
         valueListenable: Hive.box('Tickets').listenable(),
-        builder: (_, box, widget) => Center(
+        builder: (_, box, __) => Center(
           child: box.values.length == 1 && _snapshot != null
               ? const TicketResults()
               : const Center(
