@@ -1,6 +1,6 @@
+import 'package:FlyXWebSource/models/AutoCompleteV2/AutoCompleteResponse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
 import 'package:FlyXWebSource/services/AutoComplete/AutoComplete.dart';
 import 'package:FlyXWebSource/services/UserQuery/UserQuery.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +8,8 @@ import 'package:provider/provider.dart';
 class TicketList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final List<Suggestions> _sugg = Provider.of<AutoCompleteCall>(context).data;
+    final List<Hit> _sugg =
+        Provider.of<AutoCompleteCall>(context, listen: true).data;
 
     final UserQuery _query = Provider.of<UserQuery>(context, listen: false);
 
@@ -18,7 +19,7 @@ class TicketList extends StatelessWidget {
       slivers: <Widget>[
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, i) {
+            (BuildContext context, int index) {
               return AnimationConfiguration.synchronized(
                 child: ScaleAnimation(
                   scale: 2,
@@ -32,21 +33,23 @@ class TicketList extends StatelessWidget {
                         isThreeLine: false,
                         onTap: () {
                           if (_query.isOrigin) {
-                            _query.setDepartureIata(_sugg[i].source.iata);
                             _query
-                                .setDepartureCityLat(_sugg[i].source.latitude);
+                                .setDepartureIata(_sugg.elementAt(index).iata);
+                            _query.setDepartureCityLat(
+                                _sugg.elementAt(index).location.latitude);
                             _query.setDepartureCityLong(
-                                _sugg[i].source.longitude);
+                                _sugg.elementAt(index).location.longitude);
                             _query.setDepartureCityGeohash(
-                                _sugg[i].source.geohash);
+                                _sugg.elementAt(index).location.geohash);
                           } else {
-                            _query.setDestinationIata(_sugg[i].source.iata);
+                            _query.setDestinationIata(
+                                _sugg.elementAt(index).iata);
                             _query.setDestinationCityLat(
-                                _sugg[i].source.latitude);
+                                _sugg.elementAt(index).location.latitude);
                             _query.setDestinationCityLong(
-                                _sugg[i].source.longitude);
+                                _sugg.elementAt(index).location.longitude);
                             _query.setDestinationCityGeohash(
-                                _sugg[i].source.geohash);
+                                _sugg.elementAt(index).location.geohash);
                           }
                           // if (!isDisplayDesktop(context))
                           Navigator.pop(context);
@@ -60,10 +63,12 @@ class TicketList extends StatelessWidget {
                           ),
                           onPressed: () {},
                         ),
-                        title: Text(
-                            '${_sugg[i].source.iata} - ${_sugg[i].source.name}'),
+                        // title: Text(_sugg.elementAt(index).name),
+                        // subtitle:
+                        title: Text(_sugg.elementAt(index).iata),
+                        //'${_sugg.elementAt(index).iata} - ${_sugg.elementAt(index).name}'),
                         subtitle: Text(
-                            '${_sugg[i].source.city}, ${_sugg[i].source.country}'),
+                            '${_sugg.elementAt(index).location.city}, ${_sugg.elementAt(index).location.country}'),
                       ),
                     ),
                   ),

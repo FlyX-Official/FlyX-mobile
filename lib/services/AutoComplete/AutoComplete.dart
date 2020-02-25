@@ -1,83 +1,46 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
+import 'package:FlyXWebSource/models/AutoCompleteV2/AutoCompleteResponse.dart';
+import 'package:database/database.dart';
+import 'package:database/filter.dart';
+import 'package:database_adapter_algolia/database_adapter_algolia.dart';
 import 'package:flutter/foundation.dart';
-import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
-import 'package:FlyXWebSource/models/AutoComplete/AutoCompleteRequest.dart' as req;
-import 'package:FlyXWebSource/models/AutoComplete/AutoCompleteResponse.dart';
-// import 'package:FlyXWebSource/models/AutoComplete/AutoComplete.dart';
 
 class AutoCompleteCall with ChangeNotifier {
-  List<Suggestions> _data;
-  final _dio = Dio();
-  AutoCompleteResponse _response;
-  List<Suggestions> get data => _data;
+  final Database _algoliaDb = Algolia(
+    apiKey: '392b738314345e58af28cd72ef399e99',
+    appId: 'ULNY1X7FOY',
+  ).database();
 
-  AutoCompleteResponse get response => _response;
+  List<Hit> _data;
+  List<Hit> get data => _data;
 
-  void makeRequest(String query) async {
-    try {
-      Future.wait(
-        [
-          _dio
-              .post(
-            'https://search-flyx-pjpbplak6txrmnjlcrzwekexy4.us-east-2.es.amazonaws.com/airports/_search',
-            data: req.autoCompleteRequestToJson(
-              req.AutoCompleteRequest(
-                size: 30,
-                suggest: req.Suggest(
-                  text: query,
-                  name: req.City(
-                    completion: req.Completion(
-                      field: 'Name',
-                    ),
-                  ),
-                  city: req.City(
-                    completion: req.Completion(
-                      field: 'City',
-                    ),
-                  ),
-                  iata: req.City(
-                    completion: req.Completion(
-                      field: 'IATA_Completion',
-                    ),
-                  ),
-                ),
-              ),
+  makeRequest(String query) async {
+    List<Hit> _tmpData = List<Hit>();
+    Stream<QueryResult> tmp =
+        _algoliaDb.collection('airportData').searchIncrementally(
+              reach: Reach.server,
+              query: Query.parse(query),
+            );
+    tmp.listen(
+      (event) {
+        for (var item in event.items) {
+          final _tmp = json.encode(Hit.fromJson(item.data));
+          _tmpData.add(
+            Hit.fromJson(
+              json.decode(_tmp),
             ),
-            options: Options(
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              responseType: ResponseType.json,
-            ),
-          )
-              .then(
-            (r) {
-              _response = AutoCompleteResponse.fromJson(r.data);
-              notifyListeners();
-
-              Set<Option> combined = <Option>{}
-                ..addAll(response.suggest.city.first.options)
-                ..addAll(response.suggest.iata.first.options)
-                ..addAll(response.suggest.name.first.options);
-              // noDupli(combined);
-
-              var enc = json.encode(
-                combined.toList(),
-              );
-              // print(enc);
-
-              _data = suggestionsFromJson(
-                enc,
-              );
-              notifyListeners();
-            },
-          )
-        ],
-      );
-    } catch (e) {
-      Exception(e);
-    }
+          );
+        }
+      },
+    ).onDone(
+      () {
+        _data = _tmpData;
+        notifyListeners();
+        print(_tmpData.length);
+        print(_data.length);
+      },
+    );
   }
 }

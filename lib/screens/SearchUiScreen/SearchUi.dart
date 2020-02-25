@@ -81,10 +81,10 @@ class _SearchUiState extends State<SearchUi> {
                           hintText: 'Enter City or Airport code...',
                           border: InputBorder.none,
                         ),
-                        onChanged: (val) => Provider.of<AutoCompleteCall>(
-                                context,
-                                listen: false)
-                            .makeRequest(val),
+                        onChanged: (String val) async =>
+                            await Provider.of<AutoCompleteCall>(context,
+                                    listen: false)
+                                .makeRequest(val),
                       ),
                     ),
                   ),
@@ -104,3 +104,66 @@ class _SearchUiState extends State<SearchUi> {
     );
   }
 }
+
+// buildColumn(BuildContext context) {
+// Column(
+//   //alignment: Alignment.bottomCenter,
+//   children: <Widget>[
+//     Expanded(
+//       child: Provider.of<AutoCompleteCall>(context).data != null
+//           ? TicketList()
+//           : Container(
+//               child: Center(
+//                 child: Text('It\'s Empty in here...'),
+//               ),
+//             ),
+//     ),
+//     Container(
+//       alignment: Alignment.bottomCenter,
+//       color: Colors.blueGrey,
+//       height: 60,
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//         children: <Widget>[
+//           IconButton(
+//             icon: Icon(
+//               Icons.mic,
+//               color: Colors.white,
+//             ),
+//             onPressed: () {},
+//           ),
+//           Expanded(
+//             child: Card(
+//               child: Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
+//                 child: TextFormField(
+//                   controller: _inputController,
+//                   autofocus: true,
+//                   enableSuggestions: true,
+//                   // autovalidate: true,
+//                   keyboardType: TextInputType.text,
+//                   decoration: InputDecoration(
+//                     hintText: 'Enter City or Airport code...',
+//                     border: InputBorder.none,
+//                   ),
+//                   onChanged: (val) => Provider.of<AutoCompleteCall>(
+//                           context,
+//                           listen: false)
+//                       .makeRequest(val),
+//                 ),
+//               ),
+//             ),
+//           ),
+//           IconButton(
+//             icon: Icon(
+//               Icons.clear,
+//               color: Colors.white,
+//             ),
+//             onPressed: () => _inputController.clear(),
+//           ),
+//         ],
+//       ),
+//     ),
+//   ],
+// );
+// }
