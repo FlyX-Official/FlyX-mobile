@@ -11,6 +11,6 @@ class Root extends StatelessWidget {
   Widget build(BuildContext context) => ValueListenableBuilder(
         valueListenable: Hive.box('User').listenable(),
         builder: (_, box, __) =>
-            box.values.isNotEmpty ? HomeScreen() : LoginSceen(), 
+            box.values.isNotEmpty ? HomeScreen() : HomeScreen(), 
       );
 }
